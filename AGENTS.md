@@ -11,7 +11,8 @@ Documentation guidelines: `/docs/documentation/README.md`. This repo is their so
 
 - harness: a coding agent program (Claude Code, OpenCode, Codex). spiral-review calls it coding agent. Avoid: agent, tool, client.
 - adapter: the code for one harness; everything harness-specific lives in it. Avoid: driver, integration.
-- plugin: the user-level package agentfiles installs into one harness. Avoid: extension, bundle.
+- plugin: the user-level package one harness loads during a session: skills, hooks, commands. Avoid: extension, bundle.
+- CLI: `agentfiles`, run in the shell to install plugins, merge user-level config, set up repos and report drift; never runs inside a session. Avoid: installer, script.
 - skill: a directory with a `SKILL.md`, written once for every harness. Avoid: prompt, command.
 - machine: a computer where harnesses run, local or cloud dev machine. Avoid: host, box.
 - user-level config: harness files under the home directory (`~/.claude`, `~/.codex`, `~/.config/opencode`). Avoid: global config.
