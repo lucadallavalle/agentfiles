@@ -4,10 +4,13 @@
   "private": true,
   "description": "Personal agent development setup for Claude Code, OpenCode and Codex",
   "scripts": {
+    "test": "vitest run",
+    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "pnpm format:check",
-    "build": "node -e \"console.log('no code to build yet (docs/ROADMAP.md, step 2)')\""
+    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test"
   },
   "author": "Luca Dalla Valle",
   "license": "MIT",
@@ -26,7 +29,14 @@
   },
   "packageManager": "pnpm@12.11.2",
   "devDependencies": {
-    "prettier": "^3.9.10"
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.19.2",
+    "eslint": "^10.14.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.10",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^5.0.5"
   },
   "engines": {
     "node": ">=24"

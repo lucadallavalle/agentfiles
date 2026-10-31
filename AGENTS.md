@@ -6,7 +6,7 @@ Documentation guidelines: `/docs/documentation/README.md`. This repo is their so
 
 ## Gate
 
-`pnpm check && pnpm build`; CI runs the same. Until the first TypeScript lands (ROADMAP step 2), `check` is the format check only and `build` is a no-op. No runnable app yet; `./install.sh` links the skills for Claude Code in the meantime.
+`pnpm check && pnpm build`; CI runs the same. `check` is typecheck, eslint, prettier and vitest; `build` is `tsc` into `dist/`. No runnable app yet; `./install.sh` links the skills for Claude Code until the plugins land (ROADMAP step 2).
 
 ## Domain words
 
