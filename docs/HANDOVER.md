@@ -1,10 +1,10 @@
 # Handover
 
-Updated: 2026-10-31, PR #4
+Updated: 2026-10-31, branch `docs/packaging-formats`
 
 ## Where we are
 
-Step 1 (foundations, #1), pre-commit hooks (#2) and the plugins vs CLI docs with the `install.sh` replacement plan (#3) are merged. No code yet: `install.sh` is the interim installer for Claude Code.
+Step 1, pre-commit hooks and the `install.sh` replacement plan are merged (#1–#4). Step 2: plugin formats verified from official docs and written into ROADMAP step 2 (branch `docs/packaging-formats`, not yet merged). No code yet.
 
 ## Prove it
 
@@ -17,7 +17,7 @@ None.
 
 ## Next action
 
-ROADMAP step 2: verify the plugin formats from official docs (the "Needs" list), then propose the packaging decisions to the owner before writing code.
+Grill round 1 on packaging is asked, answers pending: repo as marketplace for Claude Code and Codex, names, versioning, OpenCode route, skill ID collisions, Codex CLI for testing, install source on the owner's machine. Record the answers in `docs/decisions.md`, then ask round 2: generated or hand-written manifests, manifest validation in the gate, PR split.
 
 ## Decisions not to reopen
 
@@ -29,5 +29,7 @@ ROADMAP step 2: verify the plugin formats from official docs (the "Needs" list),
 
 ## Open questions
 
+- Packaging grill round 1 (above).
+- Does npm run `prepare` when installing from git (`npx github:…`, `opencode plugin add github:…`)? Unverified: docs.npmjs.com was unreachable. If yes, `prepare` must do nothing outside this repo's own checkout.
 - Make this repo and spiral-review public (decided, owner's action).
 - spiral-review R13 (user-level config, `.git/info/exclude`) and R14 (scriptable `init`) are not yet in spiral-review's roadmap.
