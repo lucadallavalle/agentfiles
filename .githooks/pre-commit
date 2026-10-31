@@ -1,0 +1,5 @@
+#!/bin/sh
+# Run .pre-commit-config.yaml on the staged files.
+# `pre-commit install` refuses to work with core.hooksPath set, so the hook lives here.
+command -v pre-commit >/dev/null || { echo "pre-commit not found: pipx install pre-commit" >&2; exit 1; }
+exec pre-commit run --hook-stage pre-commit
