@@ -1,0 +1,2 @@
+Adapted from the `grilling`, `grill-with-docs` and `domain-modeling` skills in https://github.com/mattpocock/skills (MIT License, Copyright (c) 2026 Matt Pocock).
+Changed: merged into one manual skill (no skill-to-skill calls, which don't port across harnesses); follows the owner's documentation guidance: ADR-NNN naming and template, decision levels in docs/decisions.md, domain words in AGENTS.md instead of GLOSSARY.md.
