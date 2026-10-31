@@ -24,7 +24,7 @@ In order; each step is one small PR. D-numbers refer to [ADR-001](adr/ADR-001_ge
   - `doctor` / `doctor --fix`: drift between this repo and the machine or a repo, including stale copies of the common documentation in owned repos.
   - Needs: how `bootstrap` gets Node 24 for `npx` on a bare machine; pin `npx github:…#<tag>` or run `main`; what `attach` must write at all once plugins and user-level config exist; skills such as `grill` read `docs/documentation/` from the repo, which foreign repos lack (ship the common documentation in the plugin?); `doctor --fix` when an owned repo edited its copy of the common documentation (report only?); whether hosted sessions (e.g. Claude Code on the web) can run `bootstrap` at all.
   - Depends:
-    - spiral-review on npm or otherwise installable without credentials (today: private repo, version 0.0.0).
+    - spiral-review on npm or otherwise installable without credentials (today: private repo, to be made public; version 0.0.0, not on npm).
     - spiral-review R14, scriptable and idempotent `init` with per-harness flags. Not yet in its roadmap (it ends at R12).
     - spiral-review R13, user-level config and `.git/info/exclude` for foreign repos, needed by `attach`. Not yet in its roadmap.
     - spiral-review repo config: `.spiral-review.toml` exists in its design; the instructions file name (`REVIEW.md`) is still open there. `scaffold` must get both from spiral-review, not write them itself.

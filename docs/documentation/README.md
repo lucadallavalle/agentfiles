@@ -21,9 +21,8 @@
      - Design documents (Architecture Decision Records - ADRs and decision logs)
      - Implementation plans ([template](./plan_template.md), naming: `NNN_short-name.md`)
      - Agent execution: `AGENTS.md` (gate, domain words) and `docs/HANDOVER.md` ([template](./handover_template.md))
-  2. Pull Requests
-  3. Git commits
-  4. Product documentation (PRDs ([template](./prd_template.md), naming: `NNN_short-name.md`), ROADMAP.md, STRATEGY.md)
+  2. Source control: branching, merging, PRs and commits ([rules](./source_control.md))
+  3. Product documentation (PRDs ([template](./prd_template.md), naming: `NNN_short-name.md`), ROADMAP.md, STRATEGY.md)
 
 ## Documentation Update Policies
 
@@ -74,7 +73,7 @@ If requirements change after a plan is approved:
     - [Design Decision Log](https://microsoft.github.io/code-with-engineering-playbook/design/design-reviews/decision-log/) link
     - Contributing
       - Coding conventions
-      - Source control documentation (branching/merging strategy)
+      - Source control documentation (branching/merging strategy): [common rules](./source_control.md)
   - Design documents
     - [Architecture Decision Records](https://adr.github.io/) (including the High-level architecture overview, see below).
     - [Design Decision Log](https://microsoft.github.io/code-with-engineering-playbook/design/design-reviews/decision-log/) document (see below).
