@@ -10,10 +10,16 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test"
+    "generate": "pnpm build && node dist/generate.js",
+    "validate:claude-code": "claude plugin validate --strict .",
+    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm validate:claude-code"
   },
   "author": "Luca Dalla Valle",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lucadallavalle/agentfiles.git"
+  },
   "type": "module",
   "devEngines": {
     "packageManager": {
@@ -29,6 +35,7 @@
   },
   "packageManager": "pnpm@12.11.2",
   "devDependencies": {
+    "@anthropic-ai/claude-code": "2.1.309",
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.19.2",
     "eslint": "^10.14.0",
@@ -40,5 +47,8 @@
   },
   "engines": {
     "node": ">=24"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
   }
 }
