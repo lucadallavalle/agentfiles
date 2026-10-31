@@ -5,7 +5,7 @@ In order; each step is one small PR. D-numbers refer to [ADR-001](adr/ADR-001_ge
 ## Planned work
 
 - [x] **1. Foundations:** README, AGENTS.md, this roadmap, decision log, ADR-001; common documentation imported from spiral-review (D7); `grill` moved to `skills/`.
-- [ ] **2. Packaging** (D2, D3): one user-level plugin per harness carrying the skills (later hooks and commands); replaces `install.sh` and removes the links it made.
+- [ ] **2. Packaging** (D2, D3): one user-level plugin per harness carrying the skills (later hooks and commands); replaces the skill links of `install.sh` and removes them. This repo's git hooks are enabled by a `prepare` script in `package.json` (`pnpm install`); then `install.sh` and `.githooks/post-merge` are deleted.
   - Needs, verified from official docs only:
     - Claude Code: plugin and marketplace format; non-interactive install (`claude plugin …`) for `bootstrap`.
     - OpenCode: does it load `SKILL.md` skills, from where? If not: commands or `AGENTS.md` as the fallback, documented as a gap.
