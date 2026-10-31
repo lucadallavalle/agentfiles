@@ -10,7 +10,7 @@ In order; each step is one small PR. D-numbers refer to [ADR-001](adr/ADR-001_ge
     - Claude Code: plugin and marketplace format; non-interactive install (`claude plugin …`) for `bootstrap`.
     - OpenCode: does it load `SKILL.md` skills, from where? If not: commands or `AGENTS.md` as the fallback, documented as a gap.
     - Codex: `.codex-plugin/plugin.json`, the personal marketplace `~/.agents/plugins/marketplace.json`, the shared `.agents/skills/` path, `hooks.json` and its feature flag. Sources so far are third-party blogs.
-    - Equivalent of `disable-model-invocation` per harness (mattpocock/skills ships `agents/openai.yaml` with `policy.allow_implicit_invocation: false` for Codex; unverified).
+    - Equivalent of `disable-model-invocation` per harness (Codex may use `agents/openai.yaml` with `policy.allow_implicit_invocation: false`; unverified).
     - Generated or hand-written manifests; if generated, committed and checked for staleness by the gate.
     - One repo serving as marketplace for all harnesses, or a generated tree per harness.
   - Depends: spiral-review `init` installs its own plugin; the two plugins must not collide (skill and command names, hook order).

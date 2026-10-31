@@ -35,7 +35,7 @@ I run three harnesses (Claude Code, OpenCode, Codex) on my machine and on cloud 
 
 ## Alternatives considered
 
-- **Dotfiles manager (chezmoi, GNU Stow) (D2, D4):** good at placing files, but knows nothing of plugin manifests, structured merges of JSON/TOML settings, or per-repo `attach`/`scaffold`; it would still need the adapters.
+- **Dotfiles manager (D2, D4):** good at placing files, but knows nothing of plugin manifests, structured merges of JSON/TOML settings, or per-repo `attach`/`scaffold`; it would still need the adapters.
 - **Symlinks into `~/.claude/skills/` (the current `install.sh`) or into projects (D2):** per-harness paths, no hooks or commands, breaks when the repo moves (it did: the `grill` link pointed at the old checkout); links into projects show up in `git status` of foreign repos.
 - **Committed per-project config (D1):** what most setups do; violates the foreign repo rule.
 - **Shell scripts instead of a TypeScript CLI (D5, D8):** less to maintain, but merging structured config without clobbering is fragile in shell and untestable in practice.
