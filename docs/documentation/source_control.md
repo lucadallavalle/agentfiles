@@ -20,15 +20,15 @@
 ```mermaid
 gitGraph
     commit
-    branch feature/42_login
+    branch feat/42_login
     commit
     commit
     checkout main
-    merge feature/42_login id: "PR #43"
-    branch bug/57_rounding
+    merge feat/42_login id: "PR #43"
+    branch fix/57_rounding
     commit
     checkout main
-    merge bug/57_rounding id: "PR #58"
+    merge fix/57_rounding id: "PR #58"
     branch chore/update-deps
     commit
     checkout main
@@ -47,20 +47,17 @@ Every branch starts from the tip of `main` and lands back on it as one squashed 
 ## Branch naming
 
 - We follow this template: `<type>/<title>`, or `<type>/<issue number>_<title>` when the work has a GitHub issue; reference it in the PR body (e.g. `Closes #42`) so it is linked and auto-closed.
-  - The `<type>` can be one of `feature|bug|hotfix|chore|experiment`.
-    - `feature`: New feature or enhancement.
-    - `bug`: Bug fix.
-    - `hotfix`: Critical bug fix that needs to be fixed ASAP and could not follow the traditional process.
-    - `chore`: Changes that don't fit in any of the above categories.
-    - `experiment`: Experiments.
+  - The `<type>` is the [Conventional Commits](#commit-messages) type of the PR title (`feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `ci`, …), so branch and squash commit share one vocabulary.
+  - One extra type: `experiment`, for work never meant to be merged.
+  - Urgent fixes are `fix`; flag the urgency in the PR, not in the branch name.
 
 ### Examples
 
-- `feature/42_add-new-feature` (GitHub issue #42)
-- `chore/update-readme`
-- `bug/57_fix-bug` (GitHub issue #57)
-- `hotfix/63_fix-critical-bug` (GitHub issue #63)
-- `experiment/do-not-deploy`
+- `feat/42_add-login` (GitHub issue #42)
+- `fix/57_rounding` (GitHub issue #57)
+- `docs/update-readme`
+- `chore/update-deps`
+- `experiment/try-bun`
 
 ## Commit messages
 
