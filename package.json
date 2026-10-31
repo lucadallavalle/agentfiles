@@ -15,6 +15,9 @@
   "author": "Luca Dalla Valle",
   "license": "MIT",
   "type": "module",
+  "exports": {
+    "./server": "./src/adapters/opencode/plugin.ts"
+  },
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
@@ -30,13 +33,15 @@
   "packageManager": "pnpm@12.11.2",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@opencode/plugin": "2.0.32",
     "@types/node": "^24.19.2",
     "eslint": "^10.14.0",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.9.10",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.72.1",
-    "vitest": "^5.0.5"
+    "vitest": "^5.0.5",
+    "zod": "^4.6.7"
   },
   "engines": {
     "node": ">=24"
