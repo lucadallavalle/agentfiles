@@ -1,0 +1,35 @@
+---
+repos:
+  # General file hygiene
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c # v6.0.0
+    hooks:
+      - id: no-commit-to-branch
+        args: [--branch, main]
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: [--allow-multiple-documents] # pnpm-lock.yaml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=500]
+
+  # Secret scanning
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: 83d9cd684c87d95d656c1458ef04895a7f1cbd8e # v8.30.1
+    hooks:
+      - id: gitleaks
+
+  # Local hooks
+  - repo: local
+    hooks:
+      # Same gate as CI (.github/workflows/ci.yml) — only when checked files are staged
+      - id: gate
+        name: pnpm check
+        entry: pnpm check
+        language: system
+        pass_filenames: false
+        types_or: [markdown, json, yaml, ts, javascript]
+        description: Run the AGENTS.md gate before committing.

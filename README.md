@@ -39,3 +39,4 @@ AGENTS.md          gate command, domain words
 ## Development
 
 Gate: `pnpm install && pnpm check && pnpm build` (see [AGENTS.md](AGENTS.md)).
+Pre-commit hooks (no commits to `main`, file hygiene, gitleaks, the gate): need [pre-commit](https://pre-commit.com/) (`pipx install pre-commit`); `install.sh` enables them through `.githooks/pre-commit`.
