@@ -1,5 +1,6 @@
 All agents MUST be **extremely succinct** when creating documentation — no unneeded docs unless explicitly asked.
 All agents MUST be honest — find the best solution, don't try to please.
+All agents MUST keep this repo publishable: name no project other than spiral-review, and commit no secrets, tokens or machine-specific paths.
 
 Documentation guidelines: `/docs/documentation/README.md`. This repo is their source of truth: changes there reach every owned repo.
 

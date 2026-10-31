@@ -34,6 +34,7 @@ docs/
   adr/             architecture decisions
   decisions.md     decision log
   ROADMAP.md
+  HANDOVER.md      current state for the next session
 skills/<name>/     skills, one SKILL.md each, shared by every harness
 src/               TypeScript (planned): cli/, core/, adapters/<harness>/
 .githooks/         this repo's git hooks
