@@ -21,8 +21,8 @@ In order; each step is one small PR. D-numbers refer to [ADR-001](adr/ADR-001_ge
   - `bootstrap`: one non-interactive command on a fresh or cloud machine: prerequisites, plugins (step 2), user-level config (step 3), spiral-review install and `spiral-review init` per harness it supports (Claude Code first).
   - `attach`: any repo, nothing committed (D1).
   - `scaffold`: owned repos; writes and commits `AGENTS.md`, the docs structure with the common documentation, and spiral-review repo config.
-  - `doctor` / `doctor --fix`: drift between this repo and the machine or a repo, including stale copies of the common documentation in owned repos.
-  - Needs: how `bootstrap` gets Node 24 for `npx` on a bare machine; pin `npx github:…#<tag>` or run `main`; what `attach` must write at all once plugins and user-level config exist; skills such as `grill` read `docs/documentation/` from the repo, which foreign repos lack (ship the common documentation in the plugin?); `doctor --fix` when an owned repo edited its copy of the common documentation (report only?); whether hosted sessions (e.g. Claude Code on the web) can run `bootstrap` at all.
+  - `doctor` / `doctor --fix`: drift between this repo and the machine or a repo, including stale copies of the common documentation in owned repos. Edited copies are only reported, never overwritten (D7).
+  - Needs: how `bootstrap` gets Node 24 for `npx` on a bare machine; pin `npx github:…#<tag>` or run `main`; what `attach` must write at all once plugins and user-level config exist; skills such as `grill` read `docs/documentation/` from the repo, which foreign repos lack (ship the common documentation in the plugin?); whether hosted sessions (e.g. Claude Code on the web) can run `bootstrap` at all.
   - Depends:
     - spiral-review on npm or otherwise installable without credentials (today: private repo, to be made public; version 0.0.0, not on npm).
     - spiral-review R14, scriptable and idempotent `init` with per-harness flags. Not yet in its roadmap (it ends at R12).

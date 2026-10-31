@@ -23,6 +23,7 @@
      - Agent execution: `AGENTS.md` (gate, domain words) and `docs/HANDOVER.md` ([template](./handover_template.md))
   2. Source control: branching, merging, PRs and commits ([rules](./source_control.md))
   3. Product documentation (PRDs ([template](./prd_template.md), naming: `NNN_short-name.md`), ROADMAP.md, STRATEGY.md)
+- `docs/documentation/` is a read-only copy of the common documentation, kept in sync by `agentfiles doctor --fix` (source of truth: the agentfiles repo). Never edit it in a project: record where the project deviates in `docs/decisions.md`, or change the common documentation in agentfiles.
 
 ## Documentation Update Policies
 
