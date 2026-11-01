@@ -3,7 +3,7 @@
 My agent development setup, like dotfiles but for coding agents: Claude Code, OpenCode and Codex.
 It encodes my development process once and applies it on every machine I code on, local or cloud. It never adds a committed file to a repo I only contribute to.
 
-Status: foundations only. Plugins, user-level config and the `agentfiles` CLI are planned in the [roadmap](docs/ROADMAP.md). Design: [ADR-001](docs/adr/ADR-001_general-design.md); all decisions: [decision log](docs/decisions.md).
+Status: the Claude Code plugin is installable; other plugins, user-level config and the `agentfiles` CLI are planned in the [roadmap](docs/ROADMAP.md). Design: [ADR-001](docs/adr/ADR-001_general-design.md); all decisions: [decision log](docs/decisions.md).
 
 ## How it works
 
