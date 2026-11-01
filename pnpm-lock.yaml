@@ -165,7 +165,14 @@ settings:
 importers:
 
   .:
+    dependencies:
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
     devDependencies:
+      '@anthropic-ai/claude-code':
+        specifier: 2.1.309
+        version: 2.1.309
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0)
@@ -195,6 +202,55 @@ importers:
         version: 5.0.5(@types/node@24.19.2)(vite@8.3.5(@types/node@24.19.2))
 
 packages:
+
+  '@anthropic-ai/claude-code-darwin-arm64@2.1.309':
+    resolution: {integrity: sha512-7ZVUH/WyxWpFfkV90tJBUSnFTQo8wwRxHNOLNj+q8eYp5DNoCU8KOVC3OiNDmo832BrfQImH0XmpWjGqKPulDg==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@anthropic-ai/claude-code-darwin-x64@2.1.309':
+    resolution: {integrity: sha512-K+9PSzQQYYooMpohqGInTLbNDXQvbroZZJcmrpyAKonXjzkl4jAQJHe6F6wHxFLKoALntoP6/5WIuCIetoR26w==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@anthropic-ai/claude-code-linux-arm64-musl@2.1.309':
+    resolution: {integrity: sha512-nzSJ+jjU2IvWcDqd5h5bRQZ2pKWRM7ZUXAPG/MdDq0QiyewAQ6dJuk7E6RIUDYZyG4/d8w96IiYYdQxYqspvqw==}
+    cpu: [arm64]
+    os: [linux]
+    libc: [musl]
+
+  '@anthropic-ai/claude-code-linux-arm64@2.1.309':
+    resolution: {integrity: sha512-tTZvLm0QR5d6hWsDpNvc1/QnjRzIfAEaGeZgau+tBle5z5DT8QGRe7IZsPuyBFkkS3MtSbbvsUx/ghO8zYc2ew==}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@anthropic-ai/claude-code-linux-x64-musl@2.1.309':
+    resolution: {integrity: sha512-te6Id7ci4RUpsvAIOLofAF8EeciHpf6PyzZ5d62KRTHTYmbgNHugMCyhnhdg3DDupem/63JNgnHC5n0uqSpnpQ==}
+    cpu: [x64]
+    os: [linux]
+    libc: [musl]
+
+  '@anthropic-ai/claude-code-linux-x64@2.1.309':
+    resolution: {integrity: sha512-36D6kMC0fWdWLwBA8XYaJTSTXEWvw0Kc3WQYqterieKDtplIfUsE5jurZAYilhzOeF+uNL9SNn4DkwhQmUrRMg==}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  '@anthropic-ai/claude-code-win32-arm64@2.1.309':
+    resolution: {integrity: sha512-NV+lqbyZCJmc3rWE+VSYW8NcPzxnL6dh8BHu+JAvXKHLhjUbEv2YPq35vTw7Tl6LDJoGujrI8esVmfeQhkqSsw==}
+    cpu: [arm64]
+    os: [win32]
+
+  '@anthropic-ai/claude-code-win32-x64@2.1.309':
+    resolution: {integrity: sha512-b4Ju2gf1VliNsF9dONk/G1xZEW3Zg+G4TgpOS5oXPHSsMIciczcF267//7RvtjEXghflc3Lwrqe+Q4iNMf2ukQ==}
+    cpu: [x64]
+    os: [win32]
+
+  '@anthropic-ai/claude-code@2.1.309':
+    resolution: {integrity: sha512-+lBYZRuXOJpiKJcRv/CK7gF+5UFNWyJE7hSxkgGUKDZOWgANl9MAabfTkrJk183Tp3B0Nv4xF/DU1t0BaKXOPw==}
+    engines: {node: '>=22.0.0'}
+    hasBin: true
 
   '@cacheable/memory@2.2.0':
     resolution: {integrity: sha512-CTLKqLItRCEixEAewD3/j9DB3/o96gpTPD4eJ1v+DGOlxZRZncRQkGYqqnAGCscYd6RNeXfGeiuCphsPtqyIfQ==}
@@ -1120,7 +1176,45 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
+  zod@4.6.7:
+    resolution: {integrity: sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg==}
+
 snapshots:
+
+  '@anthropic-ai/claude-code-darwin-arm64@2.1.309':
+    optional: true
+
+  '@anthropic-ai/claude-code-darwin-x64@2.1.309':
+    optional: true
+
+  '@anthropic-ai/claude-code-linux-arm64-musl@2.1.309':
+    optional: true
+
+  '@anthropic-ai/claude-code-linux-arm64@2.1.309':
+    optional: true
+
+  '@anthropic-ai/claude-code-linux-x64-musl@2.1.309':
+    optional: true
+
+  '@anthropic-ai/claude-code-linux-x64@2.1.309':
+    optional: true
+
+  '@anthropic-ai/claude-code-win32-arm64@2.1.309':
+    optional: true
+
+  '@anthropic-ai/claude-code-win32-x64@2.1.309':
+    optional: true
+
+  '@anthropic-ai/claude-code@2.1.309':
+    optionalDependencies:
+      '@anthropic-ai/claude-code-darwin-arm64': 2.1.309
+      '@anthropic-ai/claude-code-darwin-x64': 2.1.309
+      '@anthropic-ai/claude-code-linux-arm64': 2.1.309
+      '@anthropic-ai/claude-code-linux-arm64-musl': 2.1.309
+      '@anthropic-ai/claude-code-linux-x64': 2.1.309
+      '@anthropic-ai/claude-code-linux-x64-musl': 2.1.309
+      '@anthropic-ai/claude-code-win32-arm64': 2.1.309
+      '@anthropic-ai/claude-code-win32-x64': 2.1.309
 
   '@cacheable/memory@2.2.0':
     dependencies:
@@ -1783,3 +1877,5 @@ snapshots:
   word-wrap@1.2.5: {}
 
   yocto-queue@0.1.0: {}
+
+  zod@4.6.7: {}

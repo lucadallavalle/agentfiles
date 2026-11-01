@@ -6,7 +6,7 @@ Documentation guidelines: `/docs/documentation/README.md`. This repo is their so
 
 ## Gate
 
-`pnpm check && pnpm build`; CI runs the same. `check` is typecheck, eslint, prettier and vitest; `build` is `tsc` into `dist/`. No runnable app yet; `./install.sh` links the skills for Claude Code until the plugins land (ROADMAP step 2).
+`pnpm check && pnpm build`; CI runs the same. `check` is typecheck, eslint, prettier, vitest (including stale generated manifests: run `pnpm generate`) and `claude plugin validate --strict .`; `build` is `tsc` into `dist/`. No CLI yet; skills ship as plugins (README, Install).
 
 ## Domain words
 
