@@ -74,7 +74,7 @@ describe("addSkills", () => {
     expect(advertised(skills.values())).toEqual(["auto"]);
   });
 
-  it("replaces a same-ID skill from another source", () => {
+  it("keeps a same-ID skill from another source", () => {
     const other = {
       id: "manual",
       name: "manual",
@@ -84,7 +84,8 @@ describe("addSkills", () => {
     } as Skill.Info;
     const { editor, skills } = fakeEditor([other]);
     addSkills(editor, dir);
-    expect(skills.get("manual")?.path).toBe(join(dir, "manual", "SKILL.md"));
+    expect(skills.get("manual")).toBe(other);
+    expect(skills.get("auto")?.path).toBe(join(dir, "auto", "SKILL.md"));
   });
 
   it("keeps this repo's grill manual-only", () => {

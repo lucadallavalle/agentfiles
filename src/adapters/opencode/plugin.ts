@@ -8,10 +8,12 @@ const repoSkills = fileURLToPath(new URL("../../../skills", import.meta.url));
 /**
  * Adds every `<dir>/<id>/SKILL.md`. A manual-only skill gets
  * `autoinvoke: false`: OpenCode maps `disable-model-invocation` only for
- * skills it reads from disk itself. Adding replaces a same-ID skill.
+ * skills it reads from disk itself. A same-ID skill already registered
+ * wins: IDs are flat, and `add` would replace it.
  */
 export function addSkills(editor: SkillEditor, dir = repoSkills): void {
   for (const skill of readSkills(dir)) {
+    if (editor.get(skill.id)) continue;
     // The brands are type-level only; OpenCode stores plain strings.
     editor.add({
       id: skill.id as Skill.Info["id"],
