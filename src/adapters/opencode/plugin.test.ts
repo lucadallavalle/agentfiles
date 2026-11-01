@@ -118,8 +118,23 @@ describe("package.json", () => {
       name: z.string(),
       type: z.literal("module"),
       exports: z.object({ "./server": z.string().endsWith(".ts") }),
+      scripts: z.record(z.string(), z.string()),
+      workspaces: z.never().optional(),
     })
     .parse(JSON.parse(readFileSync(join(root, "package.json"), "utf8")));
+
+  // npm prepares a git dependency that has any of these, and OpenCode
+  // 2.0.32's bundled npm fails to: "git dep preparation failed".
+  it.each([
+    "build",
+    "preinstall",
+    "install",
+    "postinstall",
+    "prepack",
+    "prepare",
+  ])("has no %s script", (script) => {
+    expect(manifest.scripts).not.toHaveProperty(script);
+  });
 
   it("exports the server plugin as TypeScript source", () => {
     expect(join(root, manifest.exports["./server"])).toBe(

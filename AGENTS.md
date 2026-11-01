@@ -6,7 +6,7 @@ Documentation guidelines: `/docs/documentation/README.md`. This repo is their so
 
 ## Gate
 
-`pnpm check && pnpm build`; CI runs the same. `check` is typecheck, eslint, prettier and vitest; `build` is `tsc` into `dist/`. No runnable app yet; `./install.sh` links the skills for Claude Code until the plugins land (ROADMAP step 2).
+`pnpm check && pnpm compile`; CI runs the same. `check` is typecheck, eslint, prettier and vitest; `compile` is `tsc` into `dist/`. No `build`, `prepare` or other install script in `package.json`: they break `opencode plugin add github:…` ([decision log](docs/decisions.md)). No runnable app yet; `./install.sh` links the skills for Claude Code until the plugins land (ROADMAP step 2).
 
 ## Domain words
 
