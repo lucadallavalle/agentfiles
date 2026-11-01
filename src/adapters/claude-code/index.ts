@@ -3,13 +3,13 @@ import type { PluginMetadata } from "../../core/plugin.js";
 
 /**
  * `.claude-plugin/marketplace.json`: this repo is the marketplace and its one
- * plugin (`"source": "./"`). No `plugin.json`, so the entry is the manifest;
- * skills load from the default `skills/`. No `version`: installs track the
- * commit SHA.
+ * plugin (`"source": "./"`), installed as `<plugin>@<owner>`. No `plugin.json`,
+ * so the entry is the manifest; skills load from the default `skills/`. No
+ * `version`: installs track the commit SHA.
  */
 export function claudeCodeFiles(plugin: PluginMetadata): GeneratedFile[] {
   const marketplace = {
-    name: plugin.name,
+    name: plugin.marketplace,
     description: plugin.description,
     owner: plugin.author,
     plugins: [

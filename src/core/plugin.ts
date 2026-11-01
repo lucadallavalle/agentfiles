@@ -6,6 +6,8 @@ import { readSkills, skillProblems, type Skill } from "./skills.js";
 /** What every adapter needs to write its harness's manifests. */
 export interface PluginMetadata {
   name: string;
+  /** The GitHub owner of `repository`: unique per owner, unlike the plugin name. */
+  marketplace: string;
   description: string;
   author: { name: string };
   license: string;
@@ -33,14 +35,24 @@ export function readPluginMetadata(root: string): PluginMetadata {
   );
   if (problems.length > 0) throw new Error(problems.join("\n"));
 
+  const repository = pkg.repository.url
+    .replace(/^git\+/, "")
+    .replace(/\.git$/, "");
+  const owner = /^https:\/\/github\.com\/([A-Za-z0-9-]+)\/[^/]+$/.exec(
+    repository,
+  )?.[1];
+  if (!owner)
+    throw new Error(`repository ${repository} is not a GitHub repository URL`);
+
   return {
     name: pkg.name,
+    marketplace: owner.toLowerCase(),
     description: pkg.description,
     author: {
       name: typeof pkg.author === "string" ? pkg.author : pkg.author.name,
     },
     license: pkg.license,
-    repository: pkg.repository.url.replace(/^git\+/, "").replace(/\.git$/, ""),
+    repository,
     skills,
   };
 }

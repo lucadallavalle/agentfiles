@@ -28,6 +28,7 @@ describe("readPluginMetadata", () => {
   it("reads package.json and the skills", () => {
     expect(readPluginMetadata(repo(pkg, skill))).toEqual({
       name: "agentfiles",
+      marketplace: "owner",
       description: "Setup.",
       author: { name: "Owner" },
       license: "MIT",
@@ -51,6 +52,14 @@ describe("readPluginMetadata", () => {
   it("rejects a package.json without a repository", () => {
     const root = repo({ ...pkg, repository: undefined }, skill);
     expect(() => readPluginMetadata(root)).toThrow(/repository/);
+  });
+
+  it("rejects a repository outside GitHub", () => {
+    const root = repo(
+      { ...pkg, repository: { type: "git", url: "https://example.com/x.git" } },
+      skill,
+    );
+    expect(() => readPluginMetadata(root)).toThrow(/not a GitHub/);
   });
 
   it("rejects a non-portable skill", () => {

@@ -23,7 +23,7 @@ Claude Code (Codex and OpenCode plugins: roadmap step 2):
 claude plugin install agentfiles --marketplace lucadallavalle/agentfiles -s user
 ```
 
-Skills run as `/agentfiles:<skill>`. Update with `claude plugin update agentfiles@agentfiles`. Skill links made by earlier versions of `install.sh` in `~/.claude/skills/` stay until removed by hand.
+Skills run as `/agentfiles:<skill>`. Update with `claude plugin update agentfiles@lucadallavalle`. Skill links made by earlier versions of `install.sh` in `~/.claude/skills/` stay until removed by hand.
 
 ## Layout
 
