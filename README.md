@@ -25,7 +25,7 @@ opencode plugin add github:lucadallavalle/agentfiles
 codex plugin marketplace add lucadallavalle/agentfiles && codex plugin add agentfiles@lucadallavalle
 ```
 
-Claude Code: skills run as `/agentfiles:<skill>`; update with `claude plugin update agentfiles@lucadallavalle`. OpenCode: skill IDs are flat (`@grill`); a same-ID skill you already have wins. Codex: skills run as `$agentfiles:<skill>`. Skill links made by earlier versions of `install.sh` in `~/.claude/skills/` stay until removed by hand.
+Claude Code: skills run as `/agentfiles:<skill>`; update with `claude plugin update agentfiles@lucadallavalle`. OpenCode: skill IDs are flat (`@grill`); a same-ID skill you already have wins. Codex: skills run as `$agentfiles:<skill>`; update with `codex plugin marketplace upgrade`. Skill links made by earlier versions of `install.sh` in `~/.claude/skills/` stay until removed by hand.
 
 ## Layout
 
