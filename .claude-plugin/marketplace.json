@@ -1,0 +1,19 @@
+{
+  "name": "lucadallavalle",
+  "description": "Personal agent development setup for Claude Code, OpenCode and Codex",
+  "owner": {
+    "name": "Luca Dalla Valle"
+  },
+  "plugins": [
+    {
+      "name": "agentfiles",
+      "source": "./",
+      "description": "Personal agent development setup for Claude Code, OpenCode and Codex",
+      "author": {
+        "name": "Luca Dalla Valle"
+      },
+      "license": "MIT",
+      "repository": "https://github.com/lucadallavalle/agentfiles"
+    }
+  ]
+}
