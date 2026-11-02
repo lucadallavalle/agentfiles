@@ -6,7 +6,7 @@ Documentation guidelines: `/docs/documentation/README.md`. This repo is their so
 
 ## Gate
 
-`pnpm check && pnpm build`; CI runs the same. `check` is typecheck, eslint, prettier, vitest (including stale generated manifests: run `pnpm generate`) and `claude plugin validate --strict .`; `build` is `tsc` into `dist/`. No CLI yet; skills ship as plugins (README, Install).
+`pnpm check && pnpm compile`; CI runs the same. `check` is typecheck, eslint, prettier, vitest (including stale generated manifests: run `pnpm generate`) and `claude plugin validate --strict .`; `compile` is `tsc` into `dist/`. No `build`, `prepare` or other install script in `package.json`: they break `opencode plugin add github:…` ([decision log](docs/decisions.md)). No CLI yet; skills ship as plugins (README, Install).
 
 ## Domain words
 

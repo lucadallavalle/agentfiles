@@ -1,3 +1,4 @@
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
@@ -45,6 +46,8 @@ describe("skillProblems", () => {
     name: "grill",
     description: "Interview.",
     manualOnly: true,
+    path: "/skills/grill/SKILL.md",
+    content: "# Grill\n",
   };
 
   it("accepts a portable skill", () => {
@@ -83,6 +86,12 @@ describe("this repo's skills", () => {
       expect(skillProblems(skill)).toEqual([]);
     },
   );
+
+  it("reads the body after the frontmatter", () => {
+    const grill = skills.find((skill) => skill.id === "grill");
+    expect(grill?.path).toBe(join(repoSkills, "grill", "SKILL.md"));
+    expect(grill?.content).toMatch(/^\n# Grill\n/);
+  });
 
   it("keeps grill manual-only", () => {
     expect(skills.find((skill) => skill.id === "grill")?.manualOnly).toBe(true);

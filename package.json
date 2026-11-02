@@ -5,12 +5,12 @@
   "description": "Personal agent development setup for Claude Code, OpenCode and Codex",
   "scripts": {
     "test": "vitest run",
-    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.build.json",
+    "compile": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "generate": "pnpm build && node dist/generate.js",
+    "generate": "pnpm compile && node dist/generate.js",
     "validate:claude-code": "claude plugin validate --strict .",
     "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm validate:claude-code"
   },
@@ -21,6 +21,9 @@
     "url": "git+https://github.com/lucadallavalle/agentfiles.git"
   },
   "type": "module",
+  "exports": {
+    "./server": "./src/adapters/opencode/plugin.ts"
+  },
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
@@ -37,18 +40,17 @@
   "devDependencies": {
     "@anthropic-ai/claude-code": "2.1.309",
     "@eslint/js": "^10.0.1",
+    "@opencode/plugin": "2.2.5",
     "@types/node": "^24.19.2",
     "eslint": "^10.14.0",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.9.10",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.72.1",
-    "vitest": "^5.0.5"
+    "vitest": "^5.0.5",
+    "zod": "^4.6.7"
   },
   "engines": {
     "node": ">=24"
-  },
-  "dependencies": {
-    "zod": "^4.6.7"
   }
 }

@@ -8,6 +8,10 @@ export interface Skill {
   description: string | undefined;
   /** `disable-model-invocation: true`: only the user loads it. */
   manualOnly: boolean;
+  /** Absolute path of the `SKILL.md`. */
+  path: string;
+  /** The `SKILL.md` text after the frontmatter. */
+  content: string;
 }
 
 /** Portable skill ID, shared by the skill format and OpenCode. */
@@ -21,6 +25,13 @@ const MAX_DESCRIPTION_LENGTH = 1024;
  * silently means something different to a full YAML parser.
  */
 export function parseFrontmatter(text: string): Record<string, string> {
+  return splitFrontmatter(text).fields;
+}
+
+function splitFrontmatter(text: string): {
+  fields: Record<string, string>;
+  body: string;
+} {
   const lines = text.split(/\r?\n/);
   if (lines[0] !== "---")
     throw new Error("frontmatter must start on line 1 with ---");
@@ -39,7 +50,7 @@ export function parseFrontmatter(text: string): Record<string, string> {
       throw new Error(`line ${String(lineNumber)}: duplicate key ${key}`);
     fields[key] = scalar(raw.trim(), lineNumber);
   }
-  return fields;
+  return { fields, body: lines.slice(end + 1).join("\n") };
 }
 
 function scalar(raw: string, lineNumber: number): string {
@@ -74,8 +85,9 @@ export function readSkills(dir: string): Skill[] {
     .map((id) => {
       const path = join(dir, id, "SKILL.md");
       let fields: Record<string, string>;
+      let body: string;
       try {
-        fields = parseFrontmatter(readFileSync(path, "utf8"));
+        ({ fields, body } = splitFrontmatter(readFileSync(path, "utf8")));
       } catch (error) {
         throw new Error(`${path}: ${(error as Error).message}`, {
           cause: error,
@@ -86,6 +98,8 @@ export function readSkills(dir: string): Skill[] {
         name: fields.name,
         description: fields.description,
         manualOnly: fields["disable-model-invocation"] === "true",
+        path,
+        content: body,
       };
     });
 }

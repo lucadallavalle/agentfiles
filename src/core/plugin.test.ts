@@ -26,7 +26,8 @@ const skill = "---\nname: grill\ndescription: Interview.\n---\n";
 
 describe("readPluginMetadata", () => {
   it("reads package.json and the skills", () => {
-    expect(readPluginMetadata(repo(pkg, skill))).toEqual({
+    const root = repo(pkg, skill);
+    expect(readPluginMetadata(root)).toEqual({
       name: "agentfiles",
       marketplace: "owner",
       description: "Setup.",
@@ -39,6 +40,8 @@ describe("readPluginMetadata", () => {
           name: "grill",
           description: "Interview.",
           manualOnly: false,
+          path: join(root, "skills", "grill", "SKILL.md"),
+          content: "",
         },
       ],
     });
