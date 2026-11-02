@@ -18,7 +18,7 @@ In order; each step is one small PR. D-numbers refer to [ADR-001](adr/ADR-001_ge
   - Depends: spiral-review `init` installs its own plugin; the two plugins must not collide (skill and command names, hook order).
 - [ ] **3. User-level config** (D3, D4): global instructions (`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md` (path unverified), OpenCode's equivalent), settings, permissions, hooks and MCP servers per harness.
   - Needs: merge mechanism that never clobbers local edits (managed blocks in Markdown, owned-key tracking in JSON/TOML with a state file, or the harness's own include/import where it has one); what goes in the plugin vs in settings (Claude Code plugins can carry hooks and MCP servers); secrets as environment references only (public repo, D9); one neutral permissions model or per-harness lists.
-  - Depends: spiral-review user-level config (`~/.config/spiral-review`): planned, not in its MVP.
+  - Depends: spiral-review user-level config (`~/.config/spiral-review`): an MVP item in its roadmap, not built.
 - [ ] **4. CLI `agentfiles`** (D5, D8): TypeScript scaffold with the full gate, then:
   - `bootstrap`: one non-interactive command on a fresh or cloud machine: prerequisites, plugins (step 2), user-level config (step 3), spiral-review install and `spiral-review init` per harness it supports (Claude Code first).
   - `attach`: any repo, nothing committed (D1).
@@ -26,10 +26,10 @@ In order; each step is one small PR. D-numbers refer to [ADR-001](adr/ADR-001_ge
   - `doctor` / `doctor --fix`: drift between this repo and the machine or a repo, including stale copies of the common documentation in owned repos. Edited copies are only reported, never overwritten (D7).
   - Needs: how `bootstrap` gets Node 24 for `npx` on a bare machine; pin `npx github:…#<tag>` or run `main`; what `attach` must write at all once plugins and user-level config exist; skills such as `grill` read `docs/documentation/` from the repo, which foreign repos lack (ship the common documentation in the plugin?); whether hosted sessions (e.g. Claude Code on the web) can run `bootstrap` at all.
   - Depends:
-    - spiral-review on npm or otherwise installable without credentials (today: private repo, to be made public; version 0.0.0, not on npm).
-    - spiral-review R14, scriptable and idempotent `init` with per-harness flags. Not yet in its roadmap (it ends at R12).
-    - spiral-review R13, user-level config and `.git/info/exclude` for foreign repos, needed by `attach`. Not yet in its roadmap.
-    - spiral-review repo config: `.spiral-review.toml` exists in its design; the instructions file name (`REVIEW.md`) is still open there. `scaffold` must get both from spiral-review, not write them itself.
+    - spiral-review on npm or otherwise installable without credentials (today: public repo, version 0.0.0, not on npm).
+    - spiral-review R14, scriptable and idempotent `init` (all answers as flags): in its roadmap, not built; its MVP `init` is Claude Code only.
+    - spiral-review R13, user-level config and `.git/info/exclude` for foreign repos, needed by `attach`: in its roadmap, not built.
+    - spiral-review repo config: the instructions file is `REVIEW.md` (decided); whether to keep `.spiral-review.toml` is open there (R13). `scaffold` must get both from spiral-review, not write them itself.
 - [ ] **5. More skills:** only after a step of the development process has been repeated by hand, so the skill encodes real practice.
 
 ## Later
