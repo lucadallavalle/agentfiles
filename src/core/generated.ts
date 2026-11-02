@@ -1,15 +1,17 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { stringify } from "yaml";
 
 /** A committed file an adapter derives from the plugin metadata. */
 export interface GeneratedFile {
   /** Relative to the repo root, `/`-separated. */
   path: string;
-  /** Serialized as JSON. */
+  /** Serialized as YAML for a `.yaml` path, otherwise as JSON. */
   content: unknown;
 }
 
 export function serialize(file: GeneratedFile): string {
+  if (file.path.endsWith(".yaml")) return stringify(file.content);
   return `${JSON.stringify(file.content, null, 2)}\n`;
 }
 
