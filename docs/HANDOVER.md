@@ -1,15 +1,15 @@
 # Handover
 
-Updated: 2026-10-31, PR #7
+Updated: 2026-11-02, PRs #10 and #11
 
 ## Where we are
 
-Step 2 (packaging) is fully decided: plugin formats verified (#5, ROADMAP step 2) and every packaging decision recorded (#7, [decision log](decisions.md)). No code yet; `install.sh` still links the skills.
+Step 2 PRs 1, 2 and 4 are merged. #9 is the TypeScript scaffold. #10 adds a generated Claude Code marketplace, installed as `agentfiles@lucadallavalle`. #11 adds the OpenCode v2 plugin (`opencode plugin add github:lucadallavalle/agentfiles`, `@opencode/plugin` 2.2.5). Both plugins are installed on the owner's machine from `main` and load `grill` as manual-only. Left: PR 3 (Codex) and PR 5 (git hooks via `pnpm:devPreinstall`, delete `install.sh` and `post-merge`).
 
 ## Prove it
 
-Run: `pnpm install && pnpm check && pnpm build && pre-commit run --all-files`
-Expect: `All matched files use Prettier code style!`, `no code to build yet (docs/ROADMAP.md, step 2)`, every hook `Passed`.
+Run: `pnpm install && pnpm check && pnpm compile && pre-commit run --all-files`
+Expect: `All matched files use Prettier code style!`, `Tests  38 passed (38)`, `✔ Validation passed`, every hook `Passed`.
 
 ## Active chunk
 
@@ -17,20 +17,21 @@ None.
 
 ## Next action
 
-Step 2 PR 1: TypeScript scaffold with the full gate (D8: TypeScript 6 strict, Node 24, eslint, vitest, plain `tsc`), no features. After it merges, PR 2 (generator and Claude Code adapter) and PR 4 (OpenCode plugin) can run in parallel; PR 3 (Codex) follows PR 2, PR 5 (`prepare`, delete `install.sh`) comes last.
+Step 2 PR 3: Codex adapter in `src/adapters/codex/`. It writes the portable root `plugin.json`, `.agents/plugins/marketplace.json` (marketplace `lucadallavalle`) and `agents/openai.yaml` for each manual-only skill, all from `generatedFiles()` in `src/generate.ts`, with zod schemas in vitest. Codex CLI isn't installed on the owner's machine yet; the real install output must come from it before merge.
 
 ## Decisions not to reopen
 
 - User level only, one plugin per harness, neutral core plus adapters, spiral-review owns its setup: [ADR-001](adr/ADR-001_general-design.md).
-- Layout: content at the root (`skills/`), TypeScript in `src/`: [decision log](decisions.md).
-- Packaging (step 2): this repo is the marketplace for Claude Code and Codex, plugin `agentfiles`, no `version`, OpenCode plugin from `package.json` as TypeScript source, unprefixed skill IDs, generated and committed manifests, `claude plugin validate --strict` plus zod in the gate, five PRs: [decision log](decisions.md).
-- Common documentation copies are read-only in owned repos; sync is mechanical, first alignment per repo by an agent: [decision log](decisions.md).
-- Branch types are the Conventional Commits types plus `experiment`; squash merge only: [source control](documentation/source_control.md).
-- `install.sh` is replaced by the plugins and a `prepare` script: [decision log](decisions.md).
+- This repo is the marketplace and the plugin. The marketplace is named after the GitHub owner (`lucadallavalle`), the plugin is `agentfiles`, and there's no `version`. Manifests are generated (`pnpm generate`), committed and checked for staleness by the gate: [decision log](decisions.md).
+- No `build`, `prepare` or other install script in `package.json`; the build script is `compile`: [decision log](decisions.md).
+- pnpm stays, although Claude Code plugin installs skip its lockfile. `zod` is a devDependency until the CLI needs it: [decision log](decisions.md).
+- TypeScript 6 until typescript-eslint supports 7; move this repo and spiral-review together: [decision log](decisions.md).
+- Common documentation copies are read-only in owned repos: [decision log](decisions.md). Squash merge only: [source control](documentation/source_control.md).
 
 ## Open questions
 
-- Does npm run `prepare` when installing from git (`npx github:…`, `opencode plugin add github:…`)? Unverified (docs.npmjs.com unreachable); `prepare` must do nothing outside this repo's own checkout either way.
-- Does `claude plugin validate` run in CI without a login? Shown by PR 2's CI; fallback is zod only.
+- In OpenCode, does `@grill` load by hand in a session? Unconfirmed: `opencode run` failed on the account's model privacy setting (owner to check).
+- How does an OpenCode user update the plugin? In 2.2.5, `plugin check` and `plugin update` ignore git plugins, and re-adding the same ref reuses the cached commit. This belongs to `doctor` (step 4).
+- Does `pnpm:devPreinstall` run on `pnpm install` with pnpm 12 and stay a no-op outside this checkout? Verify in PR 5.
 - Make this repo and spiral-review public (decided, owner's action).
 - spiral-review R13 (user-level config, `.git/info/exclude`) and R14 (scriptable `init`) are not yet in spiral-review's roadmap.
