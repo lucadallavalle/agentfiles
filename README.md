@@ -24,7 +24,7 @@ claude plugin install agentfiles --marketplace lucadallavalle/agentfiles -s user
 opencode plugin add github:lucadallavalle/agentfiles
 ```
 
-Claude Code: skills run as `/agentfiles:<skill>`; update with `claude plugin update agentfiles@lucadallavalle`. OpenCode: skill IDs are flat (`@grill`); a same-ID skill you already have wins. Skill links made by earlier versions of `install.sh` in `~/.claude/skills/` stay until removed by hand.
+Claude Code: skills run as `/agentfiles:<skill>`; update with `claude plugin update agentfiles@lucadallavalle`. OpenCode: skill IDs are flat (`@grill`); a same-ID skill you already have wins. Skill links made by the former `install.sh` in `~/.claude/skills/` stay until removed by hand.
 
 ## Layout
 
@@ -52,4 +52,4 @@ AGENTS.md          gate command, domain words
 
 Gate: `pnpm install && pnpm check && pnpm compile` (see [AGENTS.md](AGENTS.md)).
 Manifests are generated from `package.json` and the skills: `pnpm generate`, then commit; the gate fails when they are stale. Test local edits with `claude --plugin-dir .` from a checkout named `agentfiles` (without `plugin.json` the directory name is the plugin name).
-Pre-commit hooks (no commits to `main`, file hygiene, gitleaks, the gate): need [pre-commit](https://pre-commit.com/) (`pipx install pre-commit`); `./install.sh` enables them through `.githooks/pre-commit`. Don't run `pre-commit install`: it refuses while `core.hooksPath` is set, and unsetting it disables the hooks in `.githooks/`.
+Pre-commit hooks (no commits to `main`, file hygiene, gitleaks, the gate): need [pre-commit](https://pre-commit.com/) (`pipx install pre-commit`); `pnpm install` enables them through `.githooks/pre-commit` (`pnpm:devPreinstall` sets `core.hooksPath`). Don't run `pre-commit install`: it refuses while `core.hooksPath` is set, and unsetting it disables the hooks in `.githooks/`.

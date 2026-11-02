@@ -4,6 +4,7 @@
   "private": true,
   "description": "Personal agent development setup for Claude Code, OpenCode and Codex",
   "scripts": {
+    "pnpm:devPreinstall": "if [ -z \"$(git rev-parse --show-prefix 2>/dev/null || echo outside)\" ]; then git config core.hooksPath .githooks; fi",
     "test": "vitest run",
     "compile": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
