@@ -2,19 +2,19 @@
 
 Work runs in three loops, usually in sequence. A loop is defined by its scope, not by the document type: an ADR can come out of any loop. Each loop has its own review; its merged output informs the next loop.
 
-| Loop         | Scope              | Artifacts                                                            | Review                                | Human       |
-| ------------ | ------------------ | -------------------------------------------------------------------- | ------------------------------------- | ----------- |
-| 1. Strategy  | product or epic    | `STRATEGY.md`, `ROADMAP.md`, ADRs                                    | dedicated docs PR                     | yes         |
-| 2. Feature   | one feature        | PRD (when product behaviour changes), implementation plan with tasks | dedicated docs PR                     | most likely |
-| 3. Execution | one task of a plan | code, tests, decision log rows (`Made By: agent`)                    | code PR against the gate and the plan | not usually |
+| Loop      | Scope               | Artifacts                                                             | Review                                | Owner                                                          |
+| --------- | ------------------- | --------------------------------------------------------------------- | ------------------------------------- | -------------------------------------------------------------- |
+| Strategy  | product or epic     | `STRATEGY.md`, `ROADMAP.md`, ADRs                                     | dedicated docs PR                     | reviews and merges                                             |
+| Feature   | one feature         | PRD (when product behaviour changes), implementation plan with chunks | dedicated docs PR                     | approves by merging                                            |
+| Execution | one chunk of a plan | code, tests, decision log rows (`Made By: agent`)                     | code PR against the gate and the plan | merges; reviews closely when spiral-review flags `needs-human` |
 
 Document formats and update policies: [README](./README.md). Where each decision is written: [Which level a decision belongs to](./README.md#which-level-a-decision-belongs-to).
 
 ## Loops
 
-1. **Strategy:** sets direction. Product documents (strategy, roadmap) and architecture (ADRs). Reviewed with the owner, e.g. a `grill` session, then merged.
-2. **Feature:** specifies one roadmap step. A PRD for what the feature does, an implementation plan ([template](./plan_template.md)) for how. The plan breaks the work into tasks and states which depend on each other and which can run in parallel. Reviewed like loop 1.
-3. **Execution:** agents implement the plan's tasks unattended. Done means the gate passes with real output ([Gate and Definition of Done](./README.md#gate-and-definition-of-done)). Reviewed by code review; an agent asks the owner only by the existing rules (e.g. a test or the gate looks wrong).
+- **Strategy:** sets direction. Product documents (strategy, roadmap) and architecture (ADRs). The owner reviews, e.g. in a `grill` session, and merges every PR.
+- **Feature:** specifies one roadmap step. A PRD for what the feature does, an implementation plan ([template](./plan_template.md)) for how. The plan breaks the work into execution chunks, one PR each, and states which depend on each other; the others can run in parallel. The owner approves the PRD or plan by merging it; execution starts only from a merged plan.
+- **Execution:** agents implement the plan's chunks unattended. Done means the gate passes with real output ([Gate and Definition of Done](./README.md#gate-and-definition-of-done)). The owner merges after reading the review digest; a repo may opt into spiral-review's merge policy to merge execution PRs without the owner. An agent asks the owner only by the existing rules (e.g. a test or the gate looks wrong). The owner reads `Made By: agent` decision log rows after merge.
 
 ## Feedback to an earlier loop
 
@@ -23,11 +23,18 @@ A later loop never silently changes an earlier loop's merged documents. What it 
 - a plan or PRD amendment ([Handling Changes to Immutable Documents](./README.md#handling-changes-to-immutable-documents));
 - a new ADR that supersedes one ([Superseding an ADR](./README.md#superseding-an-adr)).
 
-The amendment is reviewed in the same PR as the ongoing work. A PR that touches loop 1 artifacts needs the owner's review.
+The amendment or new ADR goes in the same PR as the ongoing work, and that PR needs the owner's review: spiral-review classifies it as strategy or feature and flags it `needs-human`. Checking off execution chunks is not an amendment. Classification, tiers and the merge policy live in spiral-review (its PRD-001).
 
-## Open
+## Loop of a path
 
-- Which rules make a PR that touches loop 1 or 2 artifacts need human review, and which low-risk docs changes or amendments may merge automatically. This logic lives in spiral-review (PR classification: docs-only or code; risk of the change).
-- A task command that turns a plan's tasks into an agent-friendly dependency graph (DAG), so independent tasks run in parallel. Tool and format TBD; the plan template gains dependencies and parallel groups with it.
-- How plan tasks map to the existing execution chunks and to PRs.
-- Loop of each artifact path, as a convention spiral-review reads to classify a PR (e.g. `docs/adr/`, `ROADMAP.md`, `STRATEGY.md` → strategy; PRDs and plans → feature; everything else → execution). Classification, escalators and merge policy live in spiral-review; only the convention lives here.
+Which loop a changed file belongs to, so spiral-review can classify a PR. A PR's loop is the highest among its files.
+
+| Loop      | Paths                                                                             |
+| --------- | --------------------------------------------------------------------------------- |
+| Strategy  | `**/docs/adr/**`, `**/ROADMAP.md`, `**/STRATEGY.md`                               |
+| Feature   | `**/docs/prd/**`, `**/docs/plans/**`, `**/docs/design/**`, `**/docs/decisions.md` |
+| Execution | everything else                                                                   |
+
+Exception: a change to `docs/decisions.md` that only appends `Made By: agent` rows is execution. Editing or removing a row, or adding one made by the owner, is feature.
+
+Classification, tiers, escalators and the merge policy live in spiral-review (its PRD-001); only this convention lives here.

@@ -35,3 +35,5 @@ In order; each step is one small PR. D-numbers refer to [ADR-001](adr/ADR-001_ge
 ## Later
 
 - spiral-review consumes the common documentation from here (D7); its own copy is replaced then.
+- Depends: spiral-review classifies a PR's loop from the paths convention in the [development process](documentation/development_process.md) (its PRD-001), and a docs-review mode for strategy and feature PRs (on its roadmap).
+- A dedicated task framework and DSL (TBD) for defining a plan's chunks, their dependency graph and running them in parallel; the plan template's `Depends:` lines are the interim format.

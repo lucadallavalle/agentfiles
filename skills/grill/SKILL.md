@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Grill
 
-Review step of the strategy and feature loops of the development process (`docs/documentation/development_process.md`, when the repo has it).
+The owner's review of a strategy or feature document before it merges (development process: `docs/documentation/development_process.md`, when the repo has it).
 
 Interview the owner relentlessly until you reach a shared understanding: nothing left silently assumed, so agents can later execute without reopening decisions.
 
@@ -15,7 +15,7 @@ Before starting, read what exists of: `AGENTS.md`, `docs/documentation/README.md
 ## Interview in rounds
 
 Map the design as a **design tree**: every decision branches into the decisions that hang off it.
-The **frontier** is every decision whose prerequisites are already settled: the questions you can ask _now_ without guessing at answers you haven't heard yet. Ask the whole frontier in one round, numbered, each with your recommended answer. Then wait.
+The **frontier** is every decision whose prerequisites are already settled: the questions you can ask _now_ without guessing at answers you haven't heard yet. Ask the whole frontier in one round (or one question at a time if the owner asks), numbered, each with your recommended answer. Then wait.
 
 ```
 ❓ **Q1** - **<question title>**: <question body, with the options when there are several>
@@ -46,12 +46,12 @@ The **frontier** is every decision whose prerequisites are already settled: the 
 
 Record each settled decision at its level (see "Which level a decision belongs to" in `docs/documentation/README.md`):
 
-- **Design** (what the feature does): update the document under review, if it is not yet merged. A merged PRD or plan is immutable: add an amendment instead.
-- **Implementation** choice the docs don't cover: a row in `docs/decisions.md`, `Made By: owner`, no ADR.
+- **Design** (what the feature does): update the document under review, if it is not yet merged. A merged PRD or plan is immutable: add an amendment instead. A merged ADR is superseded by a new one, never edited.
+- **Implementation** choice the docs don't cover: a row in `docs/decisions.md`, `Made By:` the owner's name, no ADR.
 - **Architecture**: only when all three hold: hard to reverse, surprising without context, a real trade-off between alternatives. Propose an ADR (`docs/adr/ADR-NNN_short-name.md`, next number, `docs/documentation/adr_template.md`) and add a decision log row linking to it. Otherwise it's a decision log row.
 
 Write as you go, not in a batch at the end. Be succinct. Create files only when you have something to write. If the repo has no `docs/documentation/`, ask the owner where outcomes go before writing any file.
 
 ## Done
 
-The session ends when the frontier is empty: every branch of the design tree visited. Summarize the settled decisions and where each was written, list anything still open, and wait for the owner to confirm shared understanding before planning starts. Do not plan or write code in this skill.
+The session ends when the frontier is empty: every branch of the design tree visited. Summarize the settled decisions and where each was written, list anything still open, and wait for the owner to confirm shared understanding before the document merges. Do not plan or write code in this skill.

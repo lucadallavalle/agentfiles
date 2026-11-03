@@ -21,3 +21,5 @@ Documentation guidelines: `/docs/documentation/README.md`. This repo is their so
 - foreign repo: a repo the owner only contributes to; agentfiles never adds a committed file to it. Avoid: external repo, third-party repo.
 - common documentation: the rules and templates in `docs/documentation/`, copied into owned repos. Avoid: shared docs, guidelines.
 - drift: a difference between what agentfiles would install and what a machine or repo has. Avoid: diff, mismatch.
+- loop: one of the strategy, feature and execution cycles of the development process, each with its own artifacts and review. Avoid: phase, stage, step.
+- chunk: one testable outcome of a plan, done in one agent session and one PR. Avoid: task, step.

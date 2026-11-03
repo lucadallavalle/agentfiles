@@ -47,9 +47,9 @@ AGENTS.md          gate command, domain words
 
 ## Skills
 
-| Skill   | Loop of the [development process](docs/documentation/development_process.md)                |
-| ------- | ------------------------------------------------------------------------------------------- |
-| `grill` | Strategy and feature: relentless interview on a plan, PRD, ADR or design (`/grill`, manual) |
+| Skill   | Loop of the [development process](docs/documentation/development_process.md)                               |
+| ------- | ---------------------------------------------------------------------------------------------------------- |
+| `grill` | Strategy and feature: the owner's review of a PRD, plan, ADR or design before it merges (`/grill`, manual) |
 
 ## Development
 
