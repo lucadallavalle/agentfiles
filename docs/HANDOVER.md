@@ -32,4 +32,3 @@ Step 3, user-level config: plan PR 1 (CLI scaffold); decisions are in the [roadm
 
 - How does an OpenCode user update the plugin? In 2.2.5, `plugin check` and `plugin update` ignore git plugins, and re-adding the same ref reuses the cached commit. This belongs to `doctor` (step 4).
 - `pnpm install` skips `pnpm:devPreinstall` when nothing needs installing, so an existing checkout keeps its old `core.hooksPath` until a real install.
-- spiral-review R13 (user-level config, `.git/info/exclude`) and R14 (scriptable `init`) are not yet in spiral-review's roadmap; R14 must also change only its own keys in harness settings.

@@ -23,6 +23,7 @@ In order; each step is one small PR. D-numbers refer to [ADR-001](adr/ADR-001_ge
     - OpenCode (V2): instructions `~/.config/opencode/AGENTS.md`, no `CLAUDE.md`; `instructions` array (`~/`, absolute, globs, URLs) concatenates across layers. Settings `opencode.json` / `.jsonc`, rewritten and reformatted by `mcp add` and `plugin add`. Permissions: ordered `{action, resource, effect}`, last match wins. `{env:VAR}`, `{file:…}`. Plugins add MCP servers (`ctx.mcp.transform`) and permissions only in code.
   - Decided ([decision log](decisions.md)): tracked entries with one drift rule (files and JSON/TOML keys, hash in a state file, edits reported, never overwritten, no managed blocks); plugins carry hooks, MCP servers, commands, settings carry the rest; env references only; a neutral shell-prefix permissions list; first content; `config/` and `~/.config/agentfiles/instructions.md`; spiral-review's config is never tracked; the CLI starts here.
   - PRs: (1) CLI scaffold, `doctor` without checks, bundling vs runtime dependencies; (2) core, `config/`, literal-secret gate test, Claude Code adapter; (3) Codex adapter (verify every `rules/*.rules` loads); (4) OpenCode adapter.
+  - Depends: spiral-review user-level config (`~/.config/spiral-review`): an MVP item in its roadmap, not built.
   - Depends: spiral-review's `init` changes only its own keys in harness settings (step 4 "Depends", R14).
 - [ ] **4. CLI `agentfiles`** (D5, D8): on the scaffold and `doctor` from step 3:
   - `bootstrap`: one non-interactive command on a fresh or cloud machine: prerequisites, plugins (step 2), user-level config (step 3), spiral-review install and `spiral-review init` per harness it supports (Claude Code first).
@@ -31,10 +32,10 @@ In order; each step is one small PR. D-numbers refer to [ADR-001](adr/ADR-001_ge
   - `doctor` / `doctor --fix`: adds drift between this repo and a repo, including stale copies of the common documentation in owned repos. Edited copies are only reported, never overwritten (D7).
   - Needs: how `bootstrap` gets Node 24 for `npx` on a bare machine; pin `npx github:…#<tag>` or run `main`; what `attach` must write at all once plugins and user-level config exist; skills such as `grill` read `docs/documentation/` from the repo, which foreign repos lack (ship the common documentation in the plugin?); whether hosted sessions (e.g. Claude Code on the web) can run `bootstrap` at all.
   - Depends:
-    - spiral-review on npm or otherwise installable without credentials (today: private repo, to be made public; version 0.0.0, not on npm).
-    - spiral-review R14, scriptable and idempotent `init` with per-harness flags, changing only its own keys in harness settings. Not yet in its roadmap (it ends at R12).
-    - spiral-review R13, user-level config and `.git/info/exclude` for foreign repos, needed by `attach`. Not yet in its roadmap.
-    - spiral-review repo config: `.spiral-review.toml` exists in its design; the instructions file name (`REVIEW.md`) is still open there. `scaffold` must get both from spiral-review, not write them itself.
+    - spiral-review on npm or otherwise installable without credentials (today: public repo, version 0.0.0, not on npm).
+    - spiral-review R14, scriptable and idempotent `init` (all answers as flags), changing only its own keys in harness settings: in its roadmap, not built; its MVP `init` is Claude Code only.
+    - spiral-review R13, user-level config and `.git/info/exclude` for foreign repos, needed by `attach`: in its roadmap, not built.
+    - spiral-review repo config: the instructions file is `REVIEW.md` (decided); whether to keep `.spiral-review.toml` is open there (R13). `scaffold` must get both from spiral-review, not write them itself.
 - [ ] **5. More skills:** only after a step of the development process has been repeated by hand, so the skill encodes real practice.
 
 ## Later
