@@ -17,7 +17,7 @@ None.
 
 ## Next action
 
-Step 3, user-level config: settle its "Needs" in the [roadmap](ROADMAP.md) with the owner (merge mechanism, plugin vs settings, secrets, permissions model) before any code.
+Step 3, user-level config: plan PR 1 (CLI scaffold); decisions are in the [roadmap](ROADMAP.md) and the [decision log](decisions.md).
 
 ## Decisions not to reopen
 
