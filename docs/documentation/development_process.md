@@ -30,3 +30,4 @@ The amendment is reviewed in the same PR as the ongoing work. A PR that touches 
 - Which rules make a PR that touches loop 1 or 2 artifacts need human review, and which low-risk docs changes or amendments may merge automatically. This logic lives in spiral-review (PR classification: docs-only or code; risk of the change).
 - A task command that turns a plan's tasks into an agent-friendly dependency graph (DAG), so independent tasks run in parallel. Tool and format TBD; the plan template gains dependencies and parallel groups with it.
 - How plan tasks map to the existing execution chunks and to PRs.
+- Loop of each artifact path, as a convention spiral-review reads to classify a PR (e.g. `docs/adr/`, `ROADMAP.md`, `STRATEGY.md` → strategy; PRDs and plans → feature; everything else → execution). Classification, escalators and merge policy live in spiral-review; only the convention lives here.
