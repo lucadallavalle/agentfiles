@@ -16,7 +16,7 @@ Documentation guidelines: `/docs/documentation/README.md`. This repo is their so
 - CLI: `agentfiles`, run in the shell to install plugins, merge user-level config, set up repos and report drift; never runs inside a session. Avoid: installer, script.
 - skill: a directory with a `SKILL.md`, written once for every harness. Avoid: prompt, command.
 - machine: a computer where harnesses run, local or cloud dev machine. Avoid: host, box.
-- user-level config: harness files under the home directory (`~/.claude`, `~/.codex`, `~/.config/opencode`). Avoid: global config.
+- user-level config: harness files under the home directory (`~/.claude`, `~/.codex`, `~/.config/opencode`) and agentfiles' own `~/.config/agentfiles`. Avoid: global config.
 - owned repo: a repo the owner controls; `scaffold` may commit to it. Avoid: my repo, project.
 - foreign repo: a repo the owner only contributes to; agentfiles never adds a committed file to it. Avoid: external repo, third-party repo.
 - common documentation: the rules and templates in `docs/documentation/`, copied into owned repos. Avoid: shared docs, guidelines.

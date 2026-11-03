@@ -24,11 +24,11 @@ In order; each step is one small PR. D-numbers refer to [ADR-001](adr/ADR-001_ge
   - Decided ([decision log](decisions.md)): tracked entries with one drift rule (files and JSON/TOML keys, hash in a state file, edits reported, never overwritten, no managed blocks); plugins carry hooks, MCP servers, commands, settings carry the rest; env references only; a neutral shell-prefix permissions list; first content; `config/` and `~/.config/agentfiles/instructions.md`; spiral-review's config is never tracked; the CLI starts here.
   - PRs: (1) CLI scaffold, `doctor` without checks, bundling vs runtime dependencies; (2) core, `config/`, literal-secret gate test, Claude Code adapter; (3) Codex adapter (verify every `rules/*.rules` loads); (4) OpenCode adapter.
   - Depends: spiral-review's `init` changes only its own keys in harness settings (step 4 "Depends", R14).
-- [ ] **4. CLI `agentfiles`** (D5, D8): TypeScript scaffold with the full gate, then:
+- [ ] **4. CLI `agentfiles`** (D5, D8): on the scaffold and `doctor` from step 3:
   - `bootstrap`: one non-interactive command on a fresh or cloud machine: prerequisites, plugins (step 2), user-level config (step 3), spiral-review install and `spiral-review init` per harness it supports (Claude Code first).
   - `attach`: any repo, nothing committed (D1).
   - `scaffold`: owned repos; writes and commits `AGENTS.md`, the docs structure with the common documentation, and spiral-review repo config.
-  - `doctor` / `doctor --fix`: drift between this repo and the machine or a repo, including stale copies of the common documentation in owned repos. Edited copies are only reported, never overwritten (D7).
+  - `doctor` / `doctor --fix`: adds drift between this repo and a repo, including stale copies of the common documentation in owned repos. Edited copies are only reported, never overwritten (D7).
   - Needs: how `bootstrap` gets Node 24 for `npx` on a bare machine; pin `npx github:…#<tag>` or run `main`; what `attach` must write at all once plugins and user-level config exist; skills such as `grill` read `docs/documentation/` from the repo, which foreign repos lack (ship the common documentation in the plugin?); whether hosted sessions (e.g. Claude Code on the web) can run `bootstrap` at all.
   - Depends:
     - spiral-review on npm or otherwise installable without credentials (today: private repo, to be made public; version 0.0.0, not on npm).
