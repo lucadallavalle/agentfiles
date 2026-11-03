@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Grill
 
-Step 2 of the development process: docs first → **grill** → plan → plan review → execution → code review.
+Review step of the strategy and feature loops of the development process (`docs/documentation/development_process.md`, when the repo has it).
 
 Interview the owner relentlessly until you reach a shared understanding: nothing left silently assumed, so agents can later execute without reopening decisions.
 

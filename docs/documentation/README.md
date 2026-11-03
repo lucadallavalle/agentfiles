@@ -16,6 +16,7 @@
 
 ## Guidelines
 
+- How work flows through the strategy, feature and execution loops: [development process](./development_process.md).
 - There are different types of documentation:
   1. Technical documentation - Project specific
      - Design documents (Architecture Decision Records - ADRs and decision logs)
