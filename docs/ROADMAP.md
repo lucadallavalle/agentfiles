@@ -36,8 +36,10 @@ In order; each step is one small PR. D-numbers refer to [ADR-001](adr/ADR-001_ge
     - spiral-review R14, scriptable and idempotent `init` (all answers as flags), changing only its own keys in harness settings: in its roadmap, not built; its MVP `init` is Claude Code only.
     - spiral-review R13, user-level config and `.git/info/exclude` for foreign repos, needed by `attach`: in its roadmap, not built.
     - spiral-review repo config: the instructions file is `REVIEW.md` (decided); whether to keep `.spiral-review.toml` is open there (R13). `scaffold` must get both from spiral-review, not write them itself.
-- [ ] **5. More skills:** only after a step of the development process has been repeated by hand, so the skill encodes real practice.
+- [ ] **5. More skills:** only after a part of the [development process](documentation/development_process.md) has been repeated by hand, so the skill encodes real practice.
 
 ## Later
 
 - spiral-review consumes the common documentation from here (D7); its own copy is replaced then.
+- Depends: spiral-review classifies a PR's loop from the paths convention in the [development process](documentation/development_process.md) (its PRD-001), and a docs-review mode for strategy and feature PRs (on its roadmap).
+- A dedicated task framework and DSL (TBD) for defining a plan's chunks, their dependency graph and running them in parallel; the plan template's `Depends:` lines are the interim format.

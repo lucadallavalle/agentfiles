@@ -1,7 +1,7 @@
 # agentfiles
 
 My agent development setup, like dotfiles but for coding agents: Claude Code, OpenCode and Codex.
-It encodes my development process once and applies it on every machine I code on, local or cloud. It never adds a committed file to a repo I only contribute to.
+It encodes my [development process](docs/documentation/development_process.md) once and applies it on every machine I code on, local or cloud. It never adds a committed file to a repo I only contribute to.
 
 Status: the Claude Code, OpenCode and Codex plugins are installable; user-level config and the `agentfiles` CLI are planned in the [roadmap](docs/ROADMAP.md). Design: [ADR-001](docs/adr/ADR-001_general-design.md); all decisions: [decision log](docs/decisions.md).
 
@@ -47,9 +47,9 @@ AGENTS.md          gate command, domain words
 
 ## Skills
 
-| Skill   | Step of the development process                                          |
-| ------- | ------------------------------------------------------------------------ |
-| `grill` | 2. Relentless interview on a plan, PRD, ADR or design (`/grill`, manual) |
+| Skill   | Loop of the [development process](docs/documentation/development_process.md)                               |
+| ------- | ---------------------------------------------------------------------------------------------------------- |
+| `grill` | Strategy and feature: the owner's review of a PRD, plan, ADR or design before it merges (`/grill`, manual) |
 
 ## Development
 

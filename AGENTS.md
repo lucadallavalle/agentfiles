@@ -22,3 +22,5 @@ Documentation guidelines: `/docs/documentation/README.md`. This repo is their so
 - common documentation: the rules and templates in `docs/documentation/`, copied into owned repos. Avoid: shared docs, guidelines.
 - tracked entry: a file or settings key agentfiles wrote and records in its state file. Avoid: owned key, managed key.
 - drift: a difference between what agentfiles would install and what a machine or repo has. Avoid: diff, mismatch.
+- loop: one of the strategy, feature and execution cycles of the development process, each with its own artifacts and review. Avoid: phase, stage, step.
+- chunk: one testable outcome of a plan, done in one agent session and one PR. Avoid: task, step.

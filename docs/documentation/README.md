@@ -16,6 +16,7 @@
 
 ## Guidelines
 
+- How work flows through the strategy, feature and execution loops: [development process](./development_process.md).
 - There are different types of documentation:
   1. Technical documentation - Project specific
      - Design documents (Architecture Decision Records - ADRs and decision logs)
@@ -155,7 +156,7 @@ This ADR supersedes [ADR-XXX: Previous Title](./ADR-XXX_previous-title.md).
 | Implementation | Decision log row, no ADR             | A choice the PRD/plan doesn't cover; the agent appends it with its reasoning |
 | Architecture   | ADR + decision log row linking to it | Architecture, public API/contract behaviour, or hard-to-reverse choices      |
 
-- Agents append implementation-level rows as they work (`Made By: agent`); the owner reviews them in the PR.
+- Agents append implementation-level rows as they work (`Made By: agent`); the owner reviews them after merge, in the decision log.
 - A reversed decision gets a new row that names the one it replaces; old rows are not deleted.
 
 ## Agent Execution
