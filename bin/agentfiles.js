@@ -4324,7 +4324,7 @@ const jsonc = {
 	insert: (text, key, index, value) => edit(text, [...key, index], value, true)
 };
 // src/adapters/claude-code/config.ts
-const harness$1 = "claude-code";
+const harness$2 = "claude-code";
 /**
 * `rules/agentfiles.md` imports the instructions copy (`@~/…` loads at
 * user level without a prompt); `settings.json` gets the keys from
@@ -4333,7 +4333,7 @@ const harness$1 = "claude-code";
 * order is irrelevant). `CLAUDE_CONFIG_DIR` moves everything.
 */
 const claudeCode = {
-	name: harness$1,
+	name: harness$2,
 	binary: "claude",
 	dir: (env, base) => envPath(env, "CLAUDE_CONFIG_DIR", join(base.home, ".claude")),
 	formats: [jsonc],
@@ -4345,7 +4345,7 @@ const claudeCode = {
 			"deny"
 		].flatMap((list) => config.permissions[list].map((prefix) => ({
 			kind: "element",
-			harness: harness$1,
+			harness: harness$2,
 			path: settings,
 			format: jsonc,
 			key: ["permissions", list],
@@ -4355,13 +4355,13 @@ const claudeCode = {
 		return [
 			{
 				kind: "file",
-				harness: harness$1,
+				harness: harness$2,
 				path: join(dir, "rules", "agentfiles.md"),
 				value: `@${instructions}\n`
 			},
-			...Object.entries(config.keys[harness$1] ?? {}).map(([key, value]) => ({
+			...Object.entries(config.keys[harness$2] ?? {}).map(([key, value]) => ({
 				kind: "key",
-				harness: harness$1,
+				harness: harness$2,
 				path: settings,
 				format: jsonc,
 				key: [key],
@@ -5595,17 +5595,22 @@ function verified(before, after, name, value) {
 	return after;
 }
 // src/adapters/codex/config.ts
-const harness = "codex";
+const harness$1 = "codex";
 /** Codex execpolicy decisions for the neutral lists. */
 const decisions = {
 	allow: "allow",
 	ask: "prompt",
 	deny: "forbidden"
 };
-// src/adapters/index.ts
-/** Every harness `doctor` checks, in step 2's order. */
-const adapters = [claudeCode, {
-	name: harness,
+/**
+* `config.toml` gets `developer_instructions` (Codex has no include, so the
+* shipped instructions are inlined) and the keys from `config/codex.json`;
+* `rules/agentfiles.rules` holds a `prefix_rule` per shell prefix, loaded
+* next to the TUI's `default.rules` (the stricter decision wins).
+* `CODEX_HOME` moves everything.
+*/
+const codex = {
+	name: harness$1,
 	binary: "codex",
 	dir: (env, base) => envPath(env, "CODEX_HOME", join(base.home, ".codex")),
 	formats: [toml],
@@ -5613,7 +5618,7 @@ const adapters = [claudeCode, {
 		const settings = join(dir, "config.toml");
 		const keys = {
 			developer_instructions: config.instructions,
-			...config.keys[harness]
+			...config.keys[harness$1]
 		};
 		const rules = [
 			"allow",
@@ -5622,19 +5627,75 @@ const adapters = [claudeCode, {
 		].flatMap((list) => config.permissions[list].map((prefix) => `prefix_rule(pattern = [${prefix.split(/\s+/).map((token) => JSON.stringify(token)).join(", ")}], decision = "${decisions[list]}")\n`));
 		return [...Object.entries(keys).map(([key, value]) => ({
 			kind: "key",
-			harness,
+			harness: harness$1,
 			path: settings,
 			format: toml,
 			key: [key],
 			value
 		})), {
 			kind: "file",
-			harness,
+			harness: harness$1,
 			path: join(dir, "rules", "agentfiles.rules"),
 			value: `# Written by agentfiles doctor --fix; edits are reported, not overwritten.\n${rules.join("")}`
 		}];
 	}
-}];
+};
+// src/adapters/opencode/config.ts
+const harness = "opencode";
+// src/adapters/index.ts
+/** Every harness `doctor` checks, in step 2's order. */
+const adapters = [
+	claudeCode,
+	codex,
+	{
+		name: harness,
+		binary: "opencode",
+		dir: (_, base) => join(base.config, "opencode"),
+		formats: [jsonc],
+		entries: ({ config, dir, instructions }) => {
+			const json = join(dir, "opencode.json");
+			const only = join(dir, "opencode.jsonc");
+			const path = !existsSync(json) && existsSync(only) ? only : json;
+			const rules = [
+				"allow",
+				"ask",
+				"deny"
+			].flatMap((effect) => config.permissions[effect].map((prefix) => ({
+				kind: "element",
+				harness,
+				path,
+				format: jsonc,
+				key: ["permissions"],
+				value: {
+					action: "shell",
+					resource: `${prefix} *`,
+					effect
+				},
+				at: "first"
+			})));
+			return [
+				{
+					kind: "element",
+					harness,
+					path,
+					format: jsonc,
+					key: ["instructions"],
+					value: instructions,
+					at: "last"
+				},
+				...Object.entries(config.keys[harness] ?? {}).map(([key, value]) => ({
+					kind: "key",
+					harness,
+					path,
+					format: jsonc,
+					key: [key],
+					value
+				})),
+				...rules
+			];
+		}
+	}
+];
 // node_modules/.pnpm/zod@4.6.7/node_modules/zod/v4/core/util.js
 function getEnumValues(entries) {
 	const numericValues = Object.values(entries).filter((v) => typeof v === "number");

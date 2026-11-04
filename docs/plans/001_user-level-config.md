@@ -141,6 +141,6 @@ Gate: `pnpm check && pnpm compile`
 - [x] C04 — `doctor --fix` writes Codex `developer_instructions` and `rules/agentfiles.rules`, and Codex applies that rules file next to `default.rules`
       Accept: `pnpm vitest run src/adapters/codex && codex debug prompt-input && codex execpolicy check --rules $CODEX_HOME/rules/agentfiles.rules --rules $CODEX_HOME/rules/default.rules git log` (fake home; shows `developer_instructions` and our prefixes; `allow`)
       Depends: C03
-- [ ] C05 — `doctor --fix` adds the instructions file and the shell rules, first and in allow, ask, deny order, to OpenCode's `opencode.json`, keeping the user's entries and comments
+- [x] C05 — `doctor --fix` adds the instructions file and the shell rules, first and in allow, ask, deny order, to OpenCode's `opencode.json`, keeping the user's entries and comments
       Accept: `pnpm vitest run src/adapters/opencode && opencode debug agents --standalone && opencode debug config --standalone` (fake home; our rules first, the `instructions` element)
       Depends: C04
