@@ -23,7 +23,7 @@ A later loop never silently changes an earlier loop's merged documents. What it 
 - a plan or PRD amendment ([Handling Changes to Immutable Documents](./README.md#handling-changes-to-immutable-documents));
 - a new ADR that supersedes one ([Superseding an ADR](./README.md#superseding-an-adr)).
 
-The amendment or new ADR goes in the same PR as the ongoing work, and that PR needs the owner's review: spiral-review classifies it as strategy or feature and flags it `needs-human`. Checking off execution chunks is not an amendment. Classification, tiers and the merge policy live in spiral-review (its PRD-001).
+The amendment or new ADR goes in the same PR as the ongoing work, and that PR needs the owner's review: spiral-review classifies it as strategy or feature and flags it `needs-human`. Checking off execution chunks, or the roadmap step they complete, is not an amendment. Classification, tiers and the merge policy live in spiral-review (its PRD-001).
 
 ## Loop of a path
 
@@ -36,5 +36,7 @@ Which loop a changed file belongs to, so spiral-review can classify a PR. A PR's
 | Execution | everything else                                                                   |
 
 Exception: a change to `docs/decisions.md` that only appends `Made By: agent` rows is execution. Editing or removing a row, adding one made by the owner, or adding one that replaces an earlier row ("Replaces: …") is feature.
+
+Exception: a change to `ROADMAP.md` that only checks a step's box is execution; it goes in the PR of the step's last chunk. Any other change to it is strategy.
 
 Classification, tiers, escalators and the merge policy live in spiral-review (its PRD-001); only this convention lives here.

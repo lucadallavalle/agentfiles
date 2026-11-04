@@ -1,10 +1,10 @@
 # Handover
 
-Updated: 2026-11-04, plan 001 C05 PR
+Updated: 2026-11-04, roadmap checkbox PR
 
 ## Where we are
 
-Plan 001 is executed: C01–C04 are merged (#21–#24), C05 (OpenCode adapter) is in its PR. `agentfiles doctor` / `doctor --fix` merges the instructions, permissions and `attribution` into Claude Code, Codex and OpenCode. ROADMAP step 3 isn't checked off: that is a strategy-loop change for the owner.
+ROADMAP step 3 is done: [plan 001](plans/001_user-level-config.md) C01–C05 are merged (#21–#25), and `agentfiles doctor` / `doctor --fix` merges the instructions, permissions and `attribution` into Claude Code, Codex and OpenCode. From now on a roadmap step's box is checked in the PR of its last chunk ([development process](documentation/development_process.md)).
 
 ## Prove it
 
@@ -13,11 +13,11 @@ Expect: `All matched files use Prettier code style!`, `Tests  139 passed (139)`,
 
 ## Active chunk
 
-Plan 001 C05, in review; then none.
+None.
 
 ## Next action
 
-After C05 merges: ask the owner what comes next (check off ROADMAP step 3, then step 4's open questions).
+Ask the owner what comes next: step 4's open questions in the [roadmap](ROADMAP.md).
 
 ## Decisions not to reopen
 
