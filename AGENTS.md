@@ -20,7 +20,7 @@ Documentation guidelines: `/docs/documentation/README.md`. This repo is their so
 - owned repo: a repo the owner controls; `scaffold` may commit to it. Avoid: my repo, project.
 - foreign repo: a repo the owner only contributes to; agentfiles never adds a committed file to it. Avoid: external repo, third-party repo.
 - common documentation: the rules and templates in `docs/documentation/`, copied into owned repos. Avoid: shared docs, guidelines.
-- tracked entry: a file or settings key agentfiles wrote and records in its state file. Avoid: owned key, managed key.
-- drift: a difference between what agentfiles would install and what a machine or repo has. Avoid: diff, mismatch.
+- tracked entry: a file, settings key or list element agentfiles wrote and records in its state file. Avoid: owned key, managed key.
+- drift: a difference between what agentfiles would install and what a machine or repo has; an entry is in sync, missing, outdated, edited, unshipped or in conflict. Avoid: diff, mismatch, drifted.
 - loop: one of the strategy, feature and execution cycles of the development process, each with its own artifacts and review. Avoid: phase, stage, step.
 - chunk: one testable outcome of a plan, done in one agent session and one PR. Avoid: task, step.
