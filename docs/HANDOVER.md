@@ -17,7 +17,7 @@ None.
 
 ## Next action
 
-Ask the owner what comes next: step 4's open questions in the [roadmap](ROADMAP.md).
+Write plan 002 from step 4's "Decided" line in the [roadmap](ROADMAP.md) and the decision log rows of 2026-11-04; fill C04–C06's commands from the fake-home facts in step 4's "Needs".
 
 ## Decisions not to reopen
 
@@ -36,5 +36,5 @@ Ask the owner what comes next: step 4's open questions in the [roadmap](ROADMAP.
 
 ## Open questions
 
-- How does an OpenCode user update the plugin? In 2.2.5, `plugin check` and `plugin update` ignore git plugins, and `plugin list --standalone` sees no git plugin. This belongs to `doctor` (step 4).
+- How OpenCode records the plugin re-added at a new ref, which is how `doctor --fix` updates it (plan 002 C06): fake-home check pending.
 - `pnpm install` skips `pnpm:devPreinstall` when nothing needs installing, so an existing checkout keeps its old `core.hooksPath` until a real install.
