@@ -1,23 +1,23 @@
 # Handover
 
-Updated: 2026-11-04, plan 001 C04 PR
+Updated: 2026-11-04, plan 001 C05 PR
 
 ## Where we are
 
-Step 3 is in the execution loop of [plan 001](plans/001_user-level-config.md). C01 (CLI, bundle, #21), C02 (core, #22) and C03 (Claude Code, #23) are merged. C04 (Codex: `developer_instructions` splice, `rules/agentfiles.rules`) is in its PR; the owner authorized the agent to merge C02–C05 once CI is green. C05 (OpenCode) is last.
+Plan 001 is executed: C01–C04 are merged (#21–#24), C05 (OpenCode adapter) is in its PR. `agentfiles doctor` / `doctor --fix` merges the instructions, permissions and `attribution` into Claude Code, Codex and OpenCode. ROADMAP step 3 isn't checked off: that is a strategy-loop change for the owner.
 
 ## Prove it
 
 Run: `pnpm install && pnpm check && pnpm compile`
-Expect: `All matched files use Prettier code style!`, `Tests  134 passed (134)`, `✔ Validation passed`, `compile` without errors.
+Expect: `All matched files use Prettier code style!`, `Tests  139 passed (139)`, `✔ Validation passed`, `compile` without errors.
 
 ## Active chunk
 
-Plan 001 C04, in review.
+Plan 001 C05, in review; then none.
 
 ## Next action
 
-After C04 merges: execute C05 (OpenCode adapter: `instructions` element and V2 `permissions` rules first in `opencode.json`, `jsonc` format) from a fresh branch off `origin/main`; verify the V1/V2 ordering with `opencode debug agents --standalone` and stop if it breaks "our rules first".
+After C05 merges: ask the owner what comes next (check off ROADMAP step 3, then step 4's open questions).
 
 ## Decisions not to reopen
 
@@ -31,10 +31,10 @@ After C04 merges: execute C05 (OpenCode adapter: `instructions` element and V2 `
 - Core: a `Format` edits text to text; adapters return `Entry` lists and register in `src/adapters/index.ts`; a broken state file stops the whole run: [decision log](decisions.md).
 - Claude Code rules are `Bash(<prefix> *)`; `attribution` is the object form; `jsonc` removal keeps neighbouring comments; the bundler prefers `module` over `main`: [decision log](decisions.md).
 - Codex: `developer_instructions` spliced by recorded exact text, `prefix_rule` decisions `allow`/`prompt`/`forbidden`: [decision log](decisions.md).
+- OpenCode: V2 `permissions` only, `<prefix> *` shell rules first; V1 `permission` isn't handled: [decision log](decisions.md).
 - Common documentation copies are read-only in owned repos: [decision log](decisions.md). Squash merge only: [source control](documentation/source_control.md).
 
 ## Open questions
 
-- How a V1 `permission.bash` object orders against V2 `permissions` rules in one OpenCode file: C05 verifies with `opencode debug agents --standalone`.
 - How does an OpenCode user update the plugin? In 2.2.5, `plugin check` and `plugin update` ignore git plugins, and `plugin list --standalone` sees no git plugin. This belongs to `doctor` (step 4).
 - `pnpm install` skips `pnpm:devPreinstall` when nothing needs installing, so an existing checkout keeps its old `core.hooksPath` until a real install.
