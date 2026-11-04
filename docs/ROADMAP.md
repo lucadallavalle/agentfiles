@@ -22,9 +22,7 @@ In order; each step is one small PR. D-numbers refer to [ADR-001](adr/ADR-001_ge
     - Codex: instructions `$CODEX_HOME/AGENTS.override.md`, else `AGENTS.md` (`~/.codex`); no include (`@` stays literal); `developer_instructions` reaches the prompt. Settings `~/.codex/config.toml`, rewritten by Codex (trust, marketplaces, `mcp add`, comments kept); profiles need `--profile` and replace arrays. Command rules: Starlark `prefix_rule` in `rules/*.rules`, the TUI writes `default.rules`, most restrictive wins. No `${VAR}`: `env_vars`, `bearer_token_env_var`, `env_http_headers`. Plugins carry hooks (each trusted via `/hooks`) and MCP servers.
     - OpenCode (V2): instructions `~/.config/opencode/AGENTS.md`, no `CLAUDE.md`; `instructions` array (`~/`, absolute, globs, URLs) concatenates across layers. Settings `opencode.json` / `.jsonc`, rewritten and reformatted by `mcp add` and `plugin add`. Permissions: ordered `{action, resource, effect}`, last match wins. `{env:VAR}`, `{file:…}`. Plugins add MCP servers (`ctx.mcp.transform`) and permissions only in code.
   - Decided ([decision log](decisions.md)): tracked entries with one drift rule (files and JSON/TOML keys, hash in a state file, edits reported, never overwritten, no managed blocks); plugins carry hooks, MCP servers, commands, settings carry the rest; env references only; a neutral shell-prefix permissions list; first content; `config/` and `~/.config/agentfiles/instructions.md`; spiral-review's config is never tracked; the CLI starts here.
-  - PRs: (1) CLI scaffold, `doctor` without checks, bundling vs runtime dependencies; (2) core, `config/`, literal-secret gate test, Claude Code adapter; (3) Codex adapter (verify every `rules/*.rules` loads); (4) OpenCode adapter.
-  - Depends: spiral-review user-level config (`~/.config/spiral-review`): an MVP item in its roadmap, not built.
-  - Depends: spiral-review's `init` changes only its own keys in harness settings (step 4 "Depends", R14).
+  - PRs: [plan 001](plans/001_user-level-config.md) C01–C05: CLI scaffold and bundle; core; Claude Code, Codex, OpenCode adapters. Codex loads every `rules/*.rules`, stricter wins (verified 2026-11-03).
 - [ ] **4. CLI `agentfiles`** (D5, D8): on the scaffold and `doctor` from step 3:
   - `bootstrap`: one non-interactive command on a fresh or cloud machine: prerequisites, plugins (step 2), user-level config (step 3), spiral-review install and `spiral-review init` per harness it supports (Claude Code first).
   - `attach`: any repo, nothing committed (D1).
@@ -35,6 +33,7 @@ In order; each step is one small PR. D-numbers refer to [ADR-001](adr/ADR-001_ge
     - spiral-review on npm or otherwise installable without credentials (today: public repo, version 0.0.0, not on npm).
     - spiral-review R14, scriptable and idempotent `init` (all answers as flags), changing only its own keys in harness settings: in its roadmap, not built; its MVP `init` is Claude Code only.
     - spiral-review R13, user-level config and `.git/info/exclude` for foreign repos, needed by `attach`: in its roadmap, not built.
+    - spiral-review user-level config (`~/.config/spiral-review`), where `bootstrap` passes the reviewer model to `init`: an MVP item in its roadmap, not built.
     - spiral-review repo config: the instructions file is `REVIEW.md` (decided); whether to keep `.spiral-review.toml` is open there (R13). `scaffold` must get both from spiral-review, not write them itself.
 - [ ] **5. More skills:** only after a part of the [development process](documentation/development_process.md) has been repeated by hand, so the skill encodes real practice.
 
