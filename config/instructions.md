@@ -1,0 +1,3 @@
+- Write documentation extremely succinctly; add none that wasn't asked for.
+- Be honest: find the best solution, don't try to please.
+- Never add AI attribution (such as `Co-Authored-By` trailers or "Generated with" lines) to commits or PRs.

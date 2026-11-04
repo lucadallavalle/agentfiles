@@ -1,23 +1,23 @@
 # Handover
 
-Updated: 2026-11-04, plan 001 C01 PR
+Updated: 2026-11-04, plan 001 C02 PR
 
 ## Where we are
 
-Step 3 is in the execution loop: [plan 001](plans/001_user-level-config.md) is merged. C01 (CLI scaffold, committed rolldown bundle `bin/agentfiles.js`, `doctor` without checks) waits in its PR for the owner to merge; C02–C05 follow serially.
+Step 3 is in the execution loop of [plan 001](plans/001_user-level-config.md). C01 (CLI scaffold, committed bundle) is merged (#21). C02 (core: state file, tracked entries and drift, `config/`, literal-secret test, test adapter, `doctor` wired) waits in its PR; C03–C05 add the harness adapters serially.
 
 ## Prove it
 
 Run: `pnpm install && pnpm check && pnpm compile`
-Expect: `All matched files use Prettier code style!`, `Tests  50 passed (50)`, `✔ Validation passed`, `compile` without errors.
+Expect: `All matched files use Prettier code style!`, `Tests  111 passed (111)`, `✔ Validation passed`, `compile` without errors.
 
 ## Active chunk
 
-Plan 001 C01, in review.
+Plan 001 C02, in review.
 
 ## Next action
 
-After the owner merges C01: execute C02 (core with a test adapter) from a fresh branch off `origin/main`.
+After C02 merges: execute C03 (Claude Code adapter, `jsonc-parser` as a `Format`) from a fresh branch off `origin/main`.
 
 ## Decisions not to reopen
 
@@ -28,6 +28,7 @@ After the owner merges C01: execute C02 (core with a test adapter) from a fresh 
 - This repo is the marketplace and the plugin; manifests and the bundle are generated, committed and checked by the gate; no `build`, `prepare` or other install script: [decision log](decisions.md).
 - pnpm stays (this machine has no npm: use `pnpm dlx npm@11`); TypeScript 6 until typescript-eslint supports 7: [decision log](decisions.md).
 - OpenCode checks run in a fake home with `--standalone`; `plugin add` has no such flag and writes only the fake home: [decision log](decisions.md).
+- Core: a `Format` edits text to text; adapters return `Entry` lists and register in `src/adapters/index.ts`; a broken state file stops the whole run: [decision log](decisions.md).
 - Common documentation copies are read-only in owned repos: [decision log](decisions.md). Squash merge only: [source control](documentation/source_control.md).
 
 ## Open questions
