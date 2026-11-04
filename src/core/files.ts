@@ -27,16 +27,17 @@ export interface Paths {
 export function paths(env: Env): Paths {
   const home = env.HOME;
   if (!home) throw new Error("HOME is not set");
-  // Unset or empty means the default, as in the XDG spec.
-  const xdg = (name: string, fallback: string) => {
-    const value = env[name];
-    return value !== undefined && value !== "" ? value : fallback;
-  };
   return {
     home,
-    config: xdg("XDG_CONFIG_HOME", join(home, ".config")),
-    state: xdg("XDG_STATE_HOME", join(home, ".local", "state")),
+    config: envPath(env, "XDG_CONFIG_HOME", join(home, ".config")),
+    state: envPath(env, "XDG_STATE_HOME", join(home, ".local", "state")),
   };
+}
+
+/** A directory variable; unset or empty means the default, as in the XDG spec. */
+export function envPath(env: Env, name: string, fallback: string): string {
+  const value = env[name];
+  return value !== undefined && value !== "" ? value : fallback;
 }
 
 /** `~/…` under the home directory, else the path unchanged. */

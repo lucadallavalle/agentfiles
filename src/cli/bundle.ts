@@ -13,7 +13,11 @@ export async function bundleCli(root: string): Promise<string> {
     cwd: root,
     input: join(root, "src/cli/index.ts"),
     platform: "node",
-    resolve: { extensionAlias: { ".js": [".ts", ".js"] } },
+    resolve: {
+      extensionAlias: { ".js": [".ts", ".js"] },
+      // jsonc-parser's `main` is UMD with requires rolldown can't follow.
+      mainFields: ["module", "main"],
+    },
     logLevel: "warn",
     write: false,
     output: {
