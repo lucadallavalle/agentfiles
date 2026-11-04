@@ -1,23 +1,23 @@
 # Handover
 
-Updated: 2026-11-04, plan 001 C03 PR
+Updated: 2026-11-04, plan 001 C04 PR
 
 ## Where we are
 
-Step 3 is in the execution loop of [plan 001](plans/001_user-level-config.md). C01 (CLI, bundle, #21) and C02 (core, #22) are merged. C03 (Claude Code adapter, `jsonc` format) is in its PR; the owner authorized the agent to merge C02–C05 once CI is green. C04 (Codex) and C05 (OpenCode) follow serially.
+Step 3 is in the execution loop of [plan 001](plans/001_user-level-config.md). C01 (CLI, bundle, #21), C02 (core, #22) and C03 (Claude Code, #23) are merged. C04 (Codex: `developer_instructions` splice, `rules/agentfiles.rules`) is in its PR; the owner authorized the agent to merge C02–C05 once CI is green. C05 (OpenCode) is last.
 
 ## Prove it
 
 Run: `pnpm install && pnpm check && pnpm compile`
-Expect: `All matched files use Prettier code style!`, `Tests  121 passed (121)`, `✔ Validation passed`, `compile` without errors.
+Expect: `All matched files use Prettier code style!`, `Tests  134 passed (134)`, `✔ Validation passed`, `compile` without errors.
 
 ## Active chunk
 
-Plan 001 C03, in review.
+Plan 001 C04, in review.
 
 ## Next action
 
-After C03 merges: execute C04 (Codex adapter: smol-toml read plus the verified splice of `developer_instructions`, `rules/agentfiles.rules`) from a fresh branch off `origin/main`.
+After C04 merges: execute C05 (OpenCode adapter: `instructions` element and V2 `permissions` rules first in `opencode.json`, `jsonc` format) from a fresh branch off `origin/main`; verify the V1/V2 ordering with `opencode debug agents --standalone` and stop if it breaks "our rules first".
 
 ## Decisions not to reopen
 
@@ -30,6 +30,7 @@ After C03 merges: execute C04 (Codex adapter: smol-toml read plus the verified s
 - OpenCode checks run in a fake home with `--standalone`; `plugin add` has no such flag and writes only the fake home: [decision log](decisions.md).
 - Core: a `Format` edits text to text; adapters return `Entry` lists and register in `src/adapters/index.ts`; a broken state file stops the whole run: [decision log](decisions.md).
 - Claude Code rules are `Bash(<prefix> *)`; `attribution` is the object form; `jsonc` removal keeps neighbouring comments; the bundler prefers `module` over `main`: [decision log](decisions.md).
+- Codex: `developer_instructions` spliced by recorded exact text, `prefix_rule` decisions `allow`/`prompt`/`forbidden`: [decision log](decisions.md).
 - Common documentation copies are read-only in owned repos: [decision log](decisions.md). Squash merge only: [source control](documentation/source_control.md).
 
 ## Open questions
