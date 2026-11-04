@@ -130,7 +130,7 @@ Error paths (C02 tests the first four):
 
 Gate: `pnpm check && pnpm compile`
 
-- [ ] C01 — `npx github:lucadallavalle/agentfiles#<sha> doctor` runs the committed bundle on a machine without a checkout and exits 0, and `opencode plugin add` still installs the plugin
+- [x] C01 — `npx github:lucadallavalle/agentfiles#<sha> doctor` runs the committed bundle on a machine without a checkout and exits 0, and `opencode plugin add` still installs the plugin
       Accept: `pnpm vitest run src/cli && pnpm dlx npm@11 exec --yes --package=github:lucadallavalle/agentfiles#<sha> -- agentfiles doctor && opencode plugin add github:lucadallavalle/agentfiles#<sha>` (fake home)
 - [ ] C02 — `doctor --fix` writes `~/.config/agentfiles/instructions.md` and a test adapter's file, key and list element into a fake home, reaching every state and error path, and a second run changes nothing
       Accept: `pnpm vitest run src/core src/cli`
