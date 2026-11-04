@@ -135,7 +135,7 @@ Gate: `pnpm check && pnpm compile`
 - [x] C02 — `doctor --fix` writes `~/.config/agentfiles/instructions.md` and a test adapter's file, key and list element into a fake home, reaching every state and error path, and a second run changes nothing
       Accept: `pnpm vitest run src/core src/cli`
       Depends: C01
-- [ ] C03 — `doctor --fix` merges the shipped instructions, permissions and `attribution` into a fake Claude Code home, and `doctor` reports an edited entry without overwriting it
+- [x] C03 — `doctor --fix` merges the shipped instructions, permissions and `attribution` into a fake Claude Code home, and `doctor` reports an edited entry without overwriting it
       Accept: `pnpm vitest run src/adapters/claude-code && claude -p "/context"` (fake home; lists `rules/agentfiles.md` and `instructions.md`)
       Depends: C02
 - [ ] C04 — `doctor --fix` writes Codex `developer_instructions` and `rules/agentfiles.rules`, and Codex applies that rules file next to `default.rules`
