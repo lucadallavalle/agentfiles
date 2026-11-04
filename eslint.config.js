@@ -5,7 +5,7 @@ import prettier from "eslint-config-prettier";
 import tseslint from "typescript-eslint";
 
 export default defineConfig(
-  { ignores: ["dist/", "coverage/", ".claude/"] },
+  { ignores: ["dist/", "coverage/", ".claude/", "bin/"] },
   eslint.configs.recommended,
   tseslint.configs.strictTypeChecked,
   tseslint.configs.stylisticTypeChecked,

@@ -3,7 +3,7 @@
 My agent development setup, like dotfiles but for coding agents: Claude Code, OpenCode and Codex.
 It encodes my [development process](docs/documentation/development_process.md) once and applies it on every machine I code on, local or cloud. It never adds a committed file to a repo I only contribute to.
 
-Status: the Claude Code, OpenCode and Codex plugins are installable; user-level config and the `agentfiles` CLI are planned in the [roadmap](docs/ROADMAP.md). Design: [ADR-001](docs/adr/ADR-001_general-design.md); all decisions: [decision log](docs/decisions.md).
+Status: the Claude Code, OpenCode and Codex plugins are installable; the `agentfiles` CLI runs (`npx github:lucadallavalle/agentfiles doctor`) but checks nothing yet; user-level config is [plan 001](docs/plans/001_user-level-config.md). Design: [ADR-001](docs/adr/ADR-001_general-design.md); all decisions: [decision log](docs/decisions.md).
 
 ## How it works
 
@@ -37,7 +37,8 @@ docs/
   ROADMAP.md
   HANDOVER.md      current state for the next session
 skills/<name>/     skills, one SKILL.md each, shared by every harness
-src/               TypeScript: core/, adapters/<harness>/, generate.ts (cli/ planned)
+src/               TypeScript: cli/, core/, adapters/<harness>/, generate.ts
+bin/agentfiles.js  CLI bundle, generated
 .claude-plugin/    Claude Code marketplace, generated
 .agents/plugins/   Codex marketplace, generated
 plugin.json        Codex plugin manifest, generated
@@ -54,5 +55,5 @@ AGENTS.md          gate command, domain words
 ## Development
 
 Gate: `pnpm install && pnpm check && pnpm compile` (see [AGENTS.md](AGENTS.md)).
-Manifests are generated from `package.json` and the skills: `pnpm generate`, then commit; the gate fails when they are stale. Test local edits with `claude --plugin-dir .` from a checkout named `agentfiles` (without `.claude-plugin/plugin.json` the directory name is the plugin name).
+Manifests are generated from `package.json` and the skills, the CLI bundle from `src/cli/` (rolldown): `pnpm generate`, then commit; the gate fails when they are stale. Test local edits with `claude --plugin-dir .` from a checkout named `agentfiles` (without `.claude-plugin/plugin.json` the directory name is the plugin name).
 Pre-commit hooks (no commits to `main`, file hygiene, gitleaks, the gate): need [pre-commit](https://pre-commit.com/) (`pipx install pre-commit`); `pnpm install` enables them through `.githooks/pre-commit` (`pnpm:devPreinstall` sets `core.hooksPath`). Don't run `pre-commit install`: it refuses while `core.hooksPath` is set, and unsetting it disables the hooks in `.githooks/`.
