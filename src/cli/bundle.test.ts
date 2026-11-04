@@ -25,7 +25,7 @@ describe(bundlePath, () => {
     expect(doctor()).toMatchObject({
       status: 1,
       stdout:
-        "claude-code not installed, skipped\nagentfiles ~/.config/agentfiles/instructions.md missing\n1 entry: 1 missing\n",
+        "claude-code not installed, skipped\ncodex not installed, skipped\nagentfiles ~/.config/agentfiles/instructions.md missing\n1 entry: 1 missing\n",
     });
     expect(doctor("--fix").status).toBe(0);
     expect(
@@ -33,7 +33,8 @@ describe(bundlePath, () => {
     ).toBe(readFileSync(join(root, "config/instructions.md"), "utf8"));
     expect(doctor()).toMatchObject({
       status: 0,
-      stdout: "claude-code not installed, skipped\n1 entry: 1 in sync\n",
+      stdout:
+        "claude-code not installed, skipped\ncodex not installed, skipped\n1 entry: 1 in sync\n",
     });
   });
 });

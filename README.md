@@ -3,7 +3,7 @@
 My agent development setup, like dotfiles but for coding agents: Claude Code, OpenCode and Codex.
 It encodes my [development process](docs/documentation/development_process.md) once and applies it on every machine I code on, local or cloud. It never adds a committed file to a repo I only contribute to.
 
-Status: the Claude Code, OpenCode and Codex plugins are installable; `agentfiles doctor` merges user-level config into Claude Code (Codex and OpenCode: [plan 001](docs/plans/001_user-level-config.md)). Design: [ADR-001](docs/adr/ADR-001_general-design.md); all decisions: [decision log](docs/decisions.md).
+Status: the Claude Code, OpenCode and Codex plugins are installable; `agentfiles doctor` merges user-level config into Claude Code and Codex (OpenCode: [plan 001](docs/plans/001_user-level-config.md)). Design: [ADR-001](docs/adr/ADR-001_general-design.md); all decisions: [decision log](docs/decisions.md).
 
 ## How it works
 
@@ -34,7 +34,7 @@ npx github:lucadallavalle/agentfiles doctor        # report drift; exit 0 in syn
 npx github:lucadallavalle/agentfiles doctor --fix  # write missing and outdated entries, remove unshipped ones
 ```
 
-`config/` is the shipped config; `doctor --fix` copies `config/instructions.md` to `~/.config/agentfiles/instructions.md` and merges files, settings keys and list elements into each installed harness (Claude Code: `rules/agentfiles.md` importing it, `settings.json` `attribution` and `Bash(<prefix> *)` permission rules), recording what it wrote in `~/.local/state/agentfiles/state.json` (XDG variables honored). An entry you edited, or one you already had with another value, is reported with the shipped value and never overwritten: restore that value, or, for a value you already had, remove yours and run `--fix`. To change shipped config, change `config/`. A harness running during `--fix` may rewrite its settings and drop our entries; the next `doctor` reports them as edited.
+`config/` is the shipped config; `doctor --fix` copies `config/instructions.md` to `~/.config/agentfiles/instructions.md` and merges files, settings keys and list elements into each installed harness (Claude Code: `rules/agentfiles.md` importing it, `settings.json` `attribution` and `Bash(<prefix> *)` permission rules; Codex: `developer_instructions` in `config.toml`, `prefix_rule`s in `rules/agentfiles.rules`), recording what it wrote in `~/.local/state/agentfiles/state.json` (XDG variables honored). An entry you edited, or one you already had with another value, is reported with the shipped value and never overwritten: restore that value, or, for a value you already had, remove yours and run `--fix`. To change shipped config, change `config/`. A harness running during `--fix` may rewrite its settings and drop our entries; the next `doctor` reports them as edited.
 
 ## Layout
 

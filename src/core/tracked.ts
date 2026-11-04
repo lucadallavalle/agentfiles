@@ -12,8 +12,15 @@ export interface Format {
   name: string;
   /** Throws when the text doesn't parse. */
   parse(text: string): unknown;
-  set(text: string, key: KeyPath, value: unknown): string;
-  remove(text: string, path: readonly (string | number)[]): string;
+  /** `previous` is the text agentfiles recorded for the key, if any. */
+  set(text: string, key: KeyPath, value: unknown, previous?: string): string;
+  remove(
+    text: string,
+    path: readonly (string | number)[],
+    previous?: string,
+  ): string;
+  /** The exact text `set` writes for a key, when the format edits by splicing it. */
+  written?(key: KeyPath, value: unknown): string;
   /** Inserts into the existing array at `key`. */
   insert(text: string, key: KeyPath, index: number, value: unknown): string;
 }
@@ -155,20 +162,21 @@ function indexOf(items: unknown[] | undefined, value: unknown): number {
   return items?.findIndex((item) => canonical(item) === want) ?? -1;
 }
 
-function record(
-  outcome: Pick<Outcome, "harness" | "kind" | "path">,
-  format: string | undefined,
-  key: KeyPath | undefined,
-  value: unknown,
-): StateRecord {
+function record(entry: Entry): StateRecord {
+  const base = {
+    harness: entry.harness,
+    kind: entry.kind,
+    path: entry.path,
+    hash: hash(entry.kind, entry.value),
+  };
+  if (entry.kind === "file") return base;
+  const written = entry.format.written?.(entry.key, entry.value);
   return {
-    harness: outcome.harness,
-    kind: outcome.kind,
-    path: outcome.path,
-    ...(format === undefined ? {} : { format }),
-    ...(key === undefined ? {} : { key: [...key] }),
-    ...(outcome.kind === "element" ? { value } : {}),
-    hash: hash(outcome.kind, value),
+    ...base,
+    format: entry.format.name,
+    key: [...entry.key],
+    ...(entry.kind === "element" ? { value: entry.value } : {}),
+    ...(entry.kind === "key" && written !== undefined ? { text: written } : {}),
   };
 }
 
@@ -260,7 +268,8 @@ export function planFile(
       const r = byId.get(outcome.id);
       if (!r) continue;
       if (r.kind === "file") out = undefined;
-      else if (r.kind === "key") out = format?.remove(out ?? "", r.key ?? []);
+      else if (r.kind === "key")
+        out = format?.remove(out ?? "", r.key ?? [], r.text);
       else {
         const index = indexOf(list(doc, r.key ?? [], path), r.value);
         out = format?.remove(out ?? "", [...(r.key ?? []), index]);
@@ -293,7 +302,12 @@ export function planFile(
     } else if (write) {
       if (entry.kind === "file") out = entry.value;
       else if (entry.kind === "key")
-        out = entry.format.set(out ?? "", entry.key, entry.value);
+        out = entry.format.set(
+          out ?? "",
+          entry.key,
+          entry.value,
+          byId.get(outcome.id)?.text,
+        );
       else {
         const items = list(doc, entry.key, path);
         out = items
@@ -311,11 +325,9 @@ export function planFile(
     const entry = outcome.entry;
     const old = byId.get(outcome.id);
     if (entry) {
-      const key = entry.kind === "file" ? undefined : entry.key;
-      const name = entry.kind === "file" ? undefined : entry.format.name;
       // In sync, the machine's value equals the shipped one.
       if (outcome.state === "in sync" || outcome.fixed)
-        next.push(record(outcome, name, key, entry.value));
+        next.push(record(entry));
       else if (old) next.push(old);
     } else if (old && !outcome.fixed) {
       next.push(old);

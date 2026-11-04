@@ -15,6 +15,8 @@ export const StateRecord = z.strictObject({
   /** The element itself, so it can be found and removed. */
   value: z.unknown().optional(),
   hash: z.string().regex(/^[0-9a-f]{64}$/),
+  /** The exact text written, for a format that splices it (TOML). */
+  text: z.string().optional(),
 });
 export type StateRecord = z.infer<typeof StateRecord>;
 
@@ -44,7 +46,8 @@ export function serializeState(records: readonly StateRecord[]): string {
   const entries = records
     .map((r) => [entryId(r), r] as const)
     .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
-    .map(([, r]) => r);
+    // The schema's key order, so equal records serialize equal.
+    .map(([, r]) => StateRecord.parse(r));
   return `${JSON.stringify({ version: 1, entries }, null, 2)}\n`;
 }
 
