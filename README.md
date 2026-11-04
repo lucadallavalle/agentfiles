@@ -3,7 +3,7 @@
 My agent development setup, like dotfiles but for coding agents: Claude Code, OpenCode and Codex.
 It encodes my [development process](docs/documentation/development_process.md) once and applies it on every machine I code on, local or cloud. It never adds a committed file to a repo I only contribute to.
 
-Status: the Claude Code, OpenCode and Codex plugins are installable; the `agentfiles` CLI runs (`npx github:lucadallavalle/agentfiles doctor`) but checks nothing yet; user-level config is [plan 001](docs/plans/001_user-level-config.md). Design: [ADR-001](docs/adr/ADR-001_general-design.md); all decisions: [decision log](docs/decisions.md).
+Status: the Claude Code, OpenCode and Codex plugins are installable; `agentfiles doctor` merges user-level config, so far only the instructions copy (harness adapters: [plan 001](docs/plans/001_user-level-config.md)). Design: [ADR-001](docs/adr/ADR-001_general-design.md); all decisions: [decision log](docs/decisions.md).
 
 ## How it works
 
@@ -27,6 +27,15 @@ codex plugin marketplace add lucadallavalle/agentfiles && codex plugin add agent
 
 Claude Code: skills run as `/agentfiles:<skill>`; update with `claude plugin update agentfiles@lucadallavalle`. OpenCode: skill IDs are flat (`@grill`); a same-ID skill you already have wins. Codex: skills run as `$agentfiles:<skill>`; update with `codex plugin marketplace upgrade`. Skill links made by the former `install.sh` in `~/.claude/skills/` stay until removed by hand.
 
+## User-level config
+
+```sh
+npx github:lucadallavalle/agentfiles doctor        # report drift; exit 0 in sync, 1 drift, 2 error
+npx github:lucadallavalle/agentfiles doctor --fix  # write missing and outdated entries, remove unshipped ones
+```
+
+`config/` is the shipped config; `doctor --fix` copies `config/instructions.md` to `~/.config/agentfiles/instructions.md` and merges files, settings keys and list elements into each installed harness, recording what it wrote in `~/.local/state/agentfiles/state.json` (XDG variables honored). An entry you edited, or one you already had with another value, is reported with the shipped value and never overwritten: restore that value, or, for a value you already had, remove yours and run `--fix`. To change shipped config, change `config/`. A harness running during `--fix` may rewrite its settings and drop our entries; the next `doctor` reports them as edited.
+
 ## Layout
 
 ```
@@ -37,6 +46,7 @@ docs/
   ROADMAP.md
   HANDOVER.md      current state for the next session
 skills/<name>/     skills, one SKILL.md each, shared by every harness
+config/            shipped user-level config: instructions, permissions, <harness>.json keys
 src/               TypeScript: cli/, core/, adapters/<harness>/, generate.ts
 bin/agentfiles.js  CLI bundle, generated
 .claude-plugin/    Claude Code marketplace, generated

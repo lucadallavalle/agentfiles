@@ -1,0 +1,13 @@
+{
+  "allow": [
+    "git status",
+    "git diff",
+    "git log",
+    "git show",
+    "gh pr view",
+    "gh pr diff",
+    "spiral-review"
+  ],
+  "ask": [],
+  "deny": []
+}

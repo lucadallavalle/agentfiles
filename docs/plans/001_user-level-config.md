@@ -132,7 +132,7 @@ Gate: `pnpm check && pnpm compile`
 
 - [x] C01 — `npx github:lucadallavalle/agentfiles#<sha> doctor` runs the committed bundle on a machine without a checkout and exits 0, and `opencode plugin add` still installs the plugin
       Accept: `pnpm vitest run src/cli && pnpm dlx npm@11 exec --yes --package=github:lucadallavalle/agentfiles#<sha> -- agentfiles doctor && opencode plugin add github:lucadallavalle/agentfiles#<sha>` (fake home)
-- [ ] C02 — `doctor --fix` writes `~/.config/agentfiles/instructions.md` and a test adapter's file, key and list element into a fake home, reaching every state and error path, and a second run changes nothing
+- [x] C02 — `doctor --fix` writes `~/.config/agentfiles/instructions.md` and a test adapter's file, key and list element into a fake home, reaching every state and error path, and a second run changes nothing
       Accept: `pnpm vitest run src/core src/cli`
       Depends: C01
 - [ ] C03 — `doctor --fix` merges the shipped instructions, permissions and `attribution` into a fake Claude Code home, and `doctor` reports an edited entry without overwriting it
