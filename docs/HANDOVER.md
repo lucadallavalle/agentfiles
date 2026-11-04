@@ -36,5 +36,5 @@ Write plan 002 from step 4's "Decided" line in the [roadmap](ROADMAP.md) and the
 
 ## Open questions
 
-- How OpenCode records the plugin re-added at a new ref, which is how `doctor --fix` updates it (plan 002 C06): fake-home check pending.
+- Plan 002 verifies: the Codex sequence that moves the installed plugin to a commit (C05); that `opencode plugin remove` + `add` leaves one entry (C06); Claude Code's SSH clone on a machine without keys (C07).
 - `pnpm install` skips `pnpm:devPreinstall` when nothing needs installing, so an existing checkout keeps its old `core.hooksPath` until a real install.
