@@ -1,6 +1,6 @@
 # Handover
 
-Updated: 2026-11-04, roadmap checkbox PR
+Updated: 2026-11-05, plan 002 PR
 
 ## Where we are
 
@@ -17,7 +17,7 @@ None.
 
 ## Next action
 
-Write plan 002 from step 4's "Decided" line in the [roadmap](ROADMAP.md) and the decision log rows of 2026-11-04; fill C04–C06's commands from the fake-home facts in step 4's "Needs".
+Once [plan 002](plans/002_cli.md) is merged, execute C01.
 
 ## Decisions not to reopen
 
@@ -36,5 +36,5 @@ Write plan 002 from step 4's "Decided" line in the [roadmap](ROADMAP.md) and the
 
 ## Open questions
 
-- Plan 002 verifies: the Codex sequence that moves the installed plugin to a commit (C05); that `opencode plugin remove` + `add` leaves one entry (C06); Claude Code's SSH clone on a machine without keys (C07).
+- [Plan 002](plans/002_cli.md) verifies, each with a fallback: the Codex sequence that moves the installed plugin to a commit (C05); that `opencode plugin remove` + `add` leaves one entry (C06); Claude Code's SSH clone on a machine without keys (C07).
 - `pnpm install` skips `pnpm:devPreinstall` when nothing needs installing, so an existing checkout keeps its old `core.hooksPath` until a real install.
