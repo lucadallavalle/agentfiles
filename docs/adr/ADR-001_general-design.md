@@ -25,11 +25,11 @@ I run three harnesses (Claude Code, OpenCode, Codex) on my machine and on cloud 
 - **D2 - One plugin per harness.** Skills, hooks and commands ship as one user-level plugin per harness. No symlinks into projects. Skills are written once in the shared `SKILL.md` format; per-harness manifests are generated or thin. Formats are verified from official docs in ROADMAP step 2; where a harness lacks a feature, the gap is documented, not emulated.
 - **D3 - Harness-neutral core, one adapter per harness.** Everything harness-specific (paths, manifest and config formats, install commands) lives in that harness's adapter; skills, rules and the CLI logic stay neutral.
 - **D4 - Merge, never clobber.** User-level config is merged idempotently: agentfiles changes only what it owns and leaves my local edits alone; a conflict is reported as drift, not overwritten. Mechanism decided in step 3.
-- **D5 - CLI `agentfiles`:** `bootstrap`, `attach`, `scaffold`, `doctor` (`--fix`); every command idempotent and safe to rerun. Run without a prior install: `npx github:lucadallavalle/agentfiles bootstrap`.
+- **D5 - CLI `agentfiles`:** `bootstrap`, `attach`, `scaffold`, `doctor` (`--fix`); every command idempotent and safe to rerun. Runs with plain `node` from a git clone at `~/.local/share/agentfiles` that `doctor --fix` keeps on `main`: `git clone https://github.com/lucadallavalle/agentfiles ~/.local/share/agentfiles && node ~/.local/share/agentfiles/bin/agentfiles.js bootstrap`.
 - **D6 - spiral-review owns its setup.** agentfiles calls `spiral-review init` and never reimplements it; missing spiral-review features are ROADMAP dependencies, not workarounds.
 - **D7 - Common documentation lives here.** `docs/documentation/` is the source of truth for my documentation rules and templates (imported from spiral-review); `scaffold` copies it into owned repos and `doctor --fix` updates the copies. Copies are read-only: a project records where it deviates in its own decision log; `doctor` reports an edited copy and `--fix` never overwrites it. spiral-review switches to consuming it later.
-- **D8 - Toolchain matches spiral-review** (its ADR-002 and decision log): TypeScript 6 strict, Node 24 (`devEngines.runtime`, `engines.node >=24`), pnpm, commander, zod, smol-toml, vitest, eslint + prettier, plain `tsc`. One gate, `pnpm check && pnpm build`, also in CI. Reason: one toolchain across my two TypeScript repos; no concrete reason to differ.
-- **D9 - Public repo.** So that `npx github:…` works on a fresh machine without credentials.
+- **D8 - Toolchain matches spiral-review** (its ADR-002 and decision log): TypeScript 6 strict, Node 24 for development (`devEngines.runtime`), the CLI bundle on Node ≥ 22 (`engines.node`; hosted images ship 22), pnpm, commander, zod, smol-toml, vitest, eslint + prettier, plain `tsc`. One gate, `pnpm check && pnpm build`, also in CI. Reason: one toolchain across my two TypeScript repos; no concrete reason to differ.
+- **D9 - Public repo.** So that cloning it works on a fresh machine without credentials.
 
 <a id="alternatives"></a>
 
@@ -51,5 +51,5 @@ I run three harnesses (Claude Code, OpenCode, Codex) on my machine and on cloud 
 - **Never clobbering means drift accumulates** until `doctor` is run; `doctor` is only as good as its definition of "owned".
 - **Copies of the common documentation drift** in owned repos when edited despite the rule; `doctor` reports them and the owner moves the change into the project's decision log or upstream into this repo.
 - **Not every machine can bootstrap.** Hosted sessions (e.g. Claude Code on the web) may not run a user-level setup step; they get neither plugins nor spiral-review (same gap as spiral-review's "Background and cloud agents").
-- **Public repo:** commit emails, my rules and prompts are world-readable; no secret, token or machine-specific path may ever be committed (settings and MCP config reference environment variables). `npx github:…` runs whatever is on `main`.
+- **Public repo:** commit emails, my rules and prompts are world-readable; no secret, token or machine-specific path may ever be committed (settings and MCP config reference environment variables). every machine runs whatever is on `main`.
 - **More code to maintain** than a shell script, for one user.

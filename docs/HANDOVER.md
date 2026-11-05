@@ -17,7 +17,7 @@ None.
 
 ## Next action
 
-Ask the owner what comes next: step 4's open questions in the [roadmap](ROADMAP.md).
+Write plan 002 from step 4's "Decided" line in the [roadmap](ROADMAP.md) and the decision log rows of 2026-11-04; fill C04–C06's commands from the fake-home facts in step 4's "Needs".
 
 ## Decisions not to reopen
 
@@ -36,5 +36,5 @@ Ask the owner what comes next: step 4's open questions in the [roadmap](ROADMAP.
 
 ## Open questions
 
-- How does an OpenCode user update the plugin? In 2.2.5, `plugin check` and `plugin update` ignore git plugins, and `plugin list --standalone` sees no git plugin. This belongs to `doctor` (step 4).
+- Plan 002 verifies: the Codex sequence that moves the installed plugin to a commit (C05); that `opencode plugin remove` + `add` leaves one entry (C06); Claude Code's SSH clone on a machine without keys (C07).
 - `pnpm install` skips `pnpm:devPreinstall` when nothing needs installing, so an existing checkout keeps its old `core.hooksPath` until a real install.
