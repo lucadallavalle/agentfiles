@@ -3,8 +3,8 @@ if (Number(process.versions.node.split(".")[0]) < 22) {
 	process.stderr.write("agentfiles needs Node 22 or later; this is Node " + process.versions.node + "\n");
 	process.exit(2);
 }
-import fs, { accessSync, chmodSync, constants, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
-import path, { basename, delimiter, dirname, join, relative, sep } from "node:path";
+import fs, { accessSync, chmodSync, constants, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, readlinkSync, realpathSync, renameSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
+import path, { basename, delimiter, dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { EventEmitter } from "node:events";
 import childProcess, { spawnSync } from "node:child_process";
@@ -12282,6 +12282,88 @@ function doctor(options) {
 		code
 	};
 }
+// src/core/bootstrap.ts
+/** Adds the owners not yet listed, case-insensitive; written only when one is new. */
+function addOwners(base, owners) {
+	const path = ownersPath(base);
+	const listed = readOwners(path);
+	const added = owners.filter((owner, i) => !listed.some((o) => o.toLowerCase() === owner.toLowerCase()) && owners.findIndex((o) => o.toLowerCase() === owner.toLowerCase()) === i);
+	if (!added.length) return [];
+	writeAtomic(path, `${JSON.stringify({ owners: [...listed, ...added] }, null, 2)}\n`);
+	return added.map((owner) => `agentfiles ${tilde(path, base.home)} owners[] ${JSON.stringify(owner)} missing, written`);
+}
+/** `~/.local/bin/agentfiles`, a symlink to the bundle; another file there is never replaced. */
+function link(root, base, path) {
+	const dir = join(base.home, ".local", "bin");
+	const file = join(dir, "agentfiles");
+	const target = join(root, bundlePath);
+	const shown = tilde(file, base.home);
+	const lines = [];
+	let stat;
+	try {
+		stat = lstatSync(file);
+	} catch {
+		stat = void 0;
+	}
+	if (!stat) {
+		mkdirSync(dir, { recursive: true });
+		symlinkSync(target, file);
+		lines.push(`agentfiles ${shown} missing, written`);
+	} else if (!stat.isSymbolicLink() || resolve(dirname(file), readlinkSync(file)) !== resolve(target)) lines.push(`agentfiles ${shown} conflict: not a link to ${tilde(target, base.home)}; left alone`);
+	if (!(path ?? "").split(delimiter).map((d) => resolve(d)).includes(resolve(dir))) lines.push(`agentfiles ${tilde(dir, base.home)} is not on PATH; add it to run agentfiles`);
+	return lines;
+}
+/**
+* spiral-review slot (ROADMAP step 4): its install and `spiral-review init`
+* per harness go here once spiral-review is installable without
+* credentials and R14 (scriptable `init`) exists. Nothing yet.
+*/
+function spiralReview() {
+	return [];
+}
+/**
+* Sets up this machine: checks the prerequisites (Node is the bundle's own
+* check), adds `--owner` names, links `~/.local/bin/agentfiles`, then runs
+* `doctor --fix`, whose exit code it returns.
+*/
+function bootstrap(options) {
+	const { env } = options;
+	let base;
+	try {
+		base = paths(env);
+	} catch (error) {
+		return {
+			lines: [`bootstrap error: ${error.message}`],
+			code: 2
+		};
+	}
+	const missing = [];
+	if (!onPath("git", env)) missing.push("git");
+	if (!options.adapters.some((a) => existsSync(a.dir(env, base)) || onPath(a.binary, env))) missing.push(`a harness (${options.adapters.map((a) => a.name).join(", ")})`);
+	if (missing.length) return {
+		lines: [`bootstrap error: missing prerequisites: ${missing.join(", ")}`],
+		code: 2
+	};
+	const lines = [];
+	try {
+		lines.push(...addOwners(base, options.owners));
+		lines.push(...link(options.root, base, env.PATH));
+	} catch (error) {
+		return {
+			lines: [...lines, `bootstrap error: ${error.message}`],
+			code: 2
+		};
+	}
+	lines.push(...spiralReview());
+	const result = doctor({
+		...options,
+		fix: true
+	});
+	return {
+		...result,
+		lines: [...lines, ...result.lines]
+	};
+}
 // src/cli/index.ts
 /** Exit codes: 0 in sync, 1 drift, 2 error (usage errors included). */
 function run(args, options) {
@@ -12292,13 +12374,25 @@ function run(args, options) {
 		writeErr: output.err
 	});
 	program.command("doctor").description("Report drift in user-level config and the current repo.").option("--fix", "write missing and outdated entries, remove unshipped ones").action((flags) => {
-		const result = doctor({
+		report(doctor({
 			root: options.root,
 			env: options.env,
 			cwd: options.cwd,
 			adapters: options.adapters,
 			fix: flags.fix === true
-		});
+		}));
+	});
+	program.command("bootstrap").description("Set up this machine: check prerequisites, link ~/.local/bin/agentfiles, run doctor --fix.").option("--owner <name>", "add an owner of owned repos (repeatable)", (name, names) => [...names, name], []).action((flags) => {
+		report(bootstrap({
+			root: options.root,
+			env: options.env,
+			cwd: options.cwd,
+			adapters: options.adapters,
+			owners: flags.owner
+		}));
+	});
+	/** Prints a result; after a fast-forward, the same argv runs again from the new bundle. */
+	function report(result) {
 		for (const line of result.lines) output.out(`${line}\n`);
 		code = result.code;
 		if (result.rerun) {
@@ -12307,7 +12401,7 @@ function run(args, options) {
 			output.err(again.stderr);
 			code = again.status ?? 2;
 		}
-	});
+	}
 	try {
 		program.parse(args, { from: "user" });
 	} catch (error) {

@@ -3,7 +3,8 @@ import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Command, CommanderError } from "commander";
 import { adapters } from "../adapters/index.js";
-import { doctor, type Adapter } from "../core/doctor.js";
+import { bootstrap } from "../core/bootstrap.js";
+import { doctor, type Adapter, type DoctorResult } from "../core/doctor.js";
 import type { Env } from "../core/files.js";
 import { rerun } from "../core/self.js";
 
@@ -39,22 +40,50 @@ export function run(args: readonly string[], options: RunOptions): number {
       "write missing and outdated entries, remove unshipped ones",
     )
     .action((flags: { fix?: true }) => {
-      const result = doctor({
-        root: options.root,
-        env: options.env,
-        cwd: options.cwd,
-        adapters: options.adapters,
-        fix: flags.fix === true,
-      });
-      for (const line of result.lines) output.out(`${line}\n`);
-      code = result.code;
-      if (result.rerun) {
-        const again = rerun(options.root, args, options);
-        output.out(again.stdout);
-        output.err(again.stderr);
-        code = again.status ?? 2;
-      }
+      report(
+        doctor({
+          root: options.root,
+          env: options.env,
+          cwd: options.cwd,
+          adapters: options.adapters,
+          fix: flags.fix === true,
+        }),
+      );
     });
+  program
+    .command("bootstrap")
+    .description(
+      "Set up this machine: check prerequisites, link ~/.local/bin/agentfiles, run doctor --fix.",
+    )
+    .option(
+      "--owner <name>",
+      "add an owner of owned repos (repeatable)",
+      (name: string, names: string[]) => [...names, name],
+      [],
+    )
+    .action((flags: { owner: string[] }) => {
+      report(
+        bootstrap({
+          root: options.root,
+          env: options.env,
+          cwd: options.cwd,
+          adapters: options.adapters,
+          owners: flags.owner,
+        }),
+      );
+    });
+
+  /** Prints a result; after a fast-forward, the same argv runs again from the new bundle. */
+  function report(result: DoctorResult): void {
+    for (const line of result.lines) output.out(`${line}\n`);
+    code = result.code;
+    if (result.rerun) {
+      const again = rerun(options.root, args, options);
+      output.out(again.stdout);
+      output.err(again.stderr);
+      code = again.status ?? 2;
+    }
+  }
 
   try {
     program.parse(args, { from: "user" });
@@ -65,7 +94,7 @@ export function run(args: readonly string[], options: RunOptions): number {
   return code;
 }
 
-// The bundle `bin/agentfiles.js` runs this; `npx` calls it through a symlink.
+// The bundle `bin/agentfiles.js` runs this, also through `~/.local/bin/agentfiles`.
 const self = fileURLToPath(import.meta.url);
 if (process.argv[1] && realpathSync(process.argv[1]) === self) {
   process.exitCode = run(process.argv.slice(2), {

@@ -1,23 +1,23 @@
 # Handover
 
-Updated: 2026-11-06, plan 002 C07 PR
+Updated: 2026-11-06, plan 002 C08 PR
 
 ## Where we are
 
-ROADMAP step 3 is done ([plan 001](plans/001_user-level-config.md)). Step 4 runs as [plan 002](plans/002_cli.md): C01–C06 merged (#29–#34: Node 22 floor, machine documentation copy, repo drift, the clone kept on `main`, plugin drift for Claude Code and Codex); C07 (OpenCode plugin, one entry verified, no fallback) is in review.
+ROADMAP step 3 is done ([plan 001](plans/001_user-level-config.md)). Step 4 runs as [plan 002](plans/002_cli.md): C01–C07 merged (#29–#35: Node 22 floor, machine documentation copy, repo drift, the clone kept on `main`, plugin drift for all three harnesses, no fallback used); C08 (`bootstrap --owner`, README setup and hosted snippet, step 4's box) is in review.
 
 ## Prove it
 
 Run: `pnpm install && pnpm check && pnpm compile`
-Expect: `All matched files use Prettier code style!`, `Tests  201 passed (201)`, `✔ Validation passed`, `compile` without errors.
+Expect: `All matched files use Prettier code style!`, `Tests  207 passed (207)`, `✔ Validation passed`, `compile` without errors.
 
 ## Active chunk
 
-Plan 002 C07.
+Plan 002 C08: waits for the owner's manual check (the README snippet as a Claude Code web environment's setup script; `/agentfiles:grill` and `rules/agentfiles.md` in `/context`). If it fails, record the session's `whoami` and `$HOME` and add the gap to ADR-001's consequences before merging.
 
 ## Next action
 
-Execute plan 002 C08 (`bootstrap`); its PR waits for the owner's manual Claude Code web check. Plugin chunks: `OLD` is C01's merge commit `14efdc4`.
+After C08 merges: ask the owner what comes next (step 5, or spiral-review's dependencies of step 4's slot). Plugin chunks: `OLD` is C01's merge commit `14efdc4`.
 
 ## Decisions not to reopen
 
