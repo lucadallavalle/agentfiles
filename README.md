@@ -17,11 +17,7 @@ Like dotfiles: the plugins are the config files, the CLI is what puts them in pl
 
 ## Install
 
-`agentfiles doctor --fix` installs and updates the plugin of each installed harness at the CLI's own commit (Claude Code: marketplace added by `https://github.com/lucadallavalle/agentfiles.git`, following `main`, then `plugin install agentfiles@lucadallavalle -s user`; when `main` has moved past the CLI's commit it reports `outdated: main is at <commit>`; Codex: marketplace pinned to the commit, `marketplace add lucadallavalle/agentfiles@<sha>` then `plugin add agentfiles@lucadallavalle`, moved by `plugin remove`, `marketplace remove` and both adds again). Plugin drift needs the CLI's clone without local changes at a commit of `main`, else it prints one skip line. A running session picks up a plugin update in its next session. Until OpenCode follows:
-
-```sh
-opencode plugin add github:lucadallavalle/agentfiles
-```
+`agentfiles doctor --fix` installs and updates the plugin of each installed harness at the CLI's own commit (Claude Code: marketplace added by `https://github.com/lucadallavalle/agentfiles.git`, following `main`, then `plugin install agentfiles@lucadallavalle -s user`; when `main` has moved past the CLI's commit it reports `outdated: main is at <commit>`; Codex: marketplace pinned to the commit, `marketplace add lucadallavalle/agentfiles@<sha>` then `plugin add agentfiles@lucadallavalle`, moved by `plugin remove`, `marketplace remove` and both adds again; OpenCode: `plugin add github:lucadallavalle/agentfiles#<sha>`, moved by `plugin remove` of our entry first, so one `plugins` entry remains). Plugin drift needs the CLI's clone without local changes at a commit of `main`, else it prints one skip line. A running session picks up a plugin update in its next session.
 
 Claude Code: skills run as `/agentfiles:<skill>`. OpenCode: skill IDs are flat (`@grill`); a same-ID skill you already have wins. Codex: skills run as `$agentfiles:<skill>`. Skill links made by the former `install.sh` in `~/.claude/skills/` stay until removed by hand.
 

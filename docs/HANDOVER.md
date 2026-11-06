@@ -1,23 +1,23 @@
 # Handover
 
-Updated: 2026-11-06, plan 002 C06 PR
+Updated: 2026-11-06, plan 002 C07 PR
 
 ## Where we are
 
-ROADMAP step 3 is done ([plan 001](plans/001_user-level-config.md)). Step 4 runs as [plan 002](plans/002_cli.md): C01–C05 merged (#29–#33: Node 22 floor, machine documentation copy, repo drift, the clone kept on `main`, plugin drift with Claude Code); C06 (Codex plugin, candidate sequence verified, no fallback) is in review.
+ROADMAP step 3 is done ([plan 001](plans/001_user-level-config.md)). Step 4 runs as [plan 002](plans/002_cli.md): C01–C06 merged (#29–#34: Node 22 floor, machine documentation copy, repo drift, the clone kept on `main`, plugin drift for Claude Code and Codex); C07 (OpenCode plugin, one entry verified, no fallback) is in review.
 
 ## Prove it
 
 Run: `pnpm install && pnpm check && pnpm compile`
-Expect: `All matched files use Prettier code style!`, `Tests  196 passed (196)`, `✔ Validation passed`, `compile` without errors.
+Expect: `All matched files use Prettier code style!`, `Tests  201 passed (201)`, `✔ Validation passed`, `compile` without errors.
 
 ## Active chunk
 
-Plan 002 C06.
+Plan 002 C07.
 
 ## Next action
 
-Execute plan 002 C07. Plugin chunks: `OLD` is C01's merge commit `14efdc4`.
+Execute plan 002 C08 (`bootstrap`); its PR waits for the owner's manual Claude Code web check. Plugin chunks: `OLD` is C01's merge commit `14efdc4`.
 
 ## Decisions not to reopen
 

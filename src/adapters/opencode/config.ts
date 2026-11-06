@@ -3,6 +3,7 @@ import { join } from "node:path";
 import type { Adapter } from "../../core/doctor.js";
 import { jsonc } from "../../core/jsonc.js";
 import type { Entry } from "../../core/tracked.js";
+import { opencodePlugin } from "./install.js";
 
 const harness = "opencode";
 
@@ -18,6 +19,7 @@ export const opencode: Adapter = {
   binary: "opencode",
   dir: (_, base) => join(base.config, "opencode"),
   formats: [jsonc],
+  plugin: opencodePlugin,
   entries: ({ config, dir, instructions }) => {
     const json = join(dir, "opencode.json");
     const only = join(dir, "opencode.jsonc");

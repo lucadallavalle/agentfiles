@@ -86,7 +86,10 @@ describe("opencode adapter", () => {
       ],
     });
 
-    expect(h.doctor("--fix").out).toMatch(/^\d+ entries: \d+ in sync\n$/);
+    // No git on PATH: no CLI commit, so plugin drift is one skip line.
+    expect(h.doctor("--fix").out).toMatch(
+      /^plugins skipped: the CLI doesn't run from a git clone\n\d+ entries: \d+ in sync\n$/,
+    );
     expect(h.read("opencode.json")).toBe(text);
   });
 
