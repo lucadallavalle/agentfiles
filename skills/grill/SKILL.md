@@ -6,7 +6,9 @@ disable-model-invocation: true
 
 # Grill
 
-The owner's review of a strategy or feature document before it merges (development process: `docs/documentation/development_process.md`, when the repo has it).
+The owner's review of a strategy or feature document before it merges (development process: `docs/documentation/development_process.md`).
+
+The common documentation is the repo's `docs/documentation/`; when the repo has none, read the machine copy in `${XDG_CONFIG_HOME:-~/.config}/agentfiles/documentation/` instead. Every `docs/documentation/` path below means whichever of the two you read.
 
 Interview the owner relentlessly until you reach a shared understanding: nothing left silently assumed, so agents can later execute without reopening decisions.
 
@@ -50,7 +52,7 @@ Record each settled decision at its level (see "Which level a decision belongs t
 - **Implementation** choice the docs don't cover: a row in `docs/decisions.md`, `Made By:` the owner's name, no ADR.
 - **Architecture**: only when all three hold: hard to reverse, surprising without context, a real trade-off between alternatives. Propose an ADR (`docs/adr/ADR-NNN_short-name.md`, next number, `docs/documentation/adr_template.md`) and add a decision log row linking to it. Otherwise it's a decision log row.
 
-Write as you go, not in a batch at the end. Be succinct. Create files only when you have something to write. If the repo has no `docs/documentation/`, ask the owner where outcomes go before writing any file.
+Write as you go, not in a batch at the end. Be succinct. Create files only when you have something to write. If the repo has no `docs/documentation/` of its own, ask the owner where outcomes go before writing any file.
 
 ## Done
 

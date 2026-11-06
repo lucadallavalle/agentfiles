@@ -1,23 +1,23 @@
 # Handover
 
-Updated: 2026-11-06, plan 002 C01 PR
+Updated: 2026-11-06, plan 002 C02 PR
 
 ## Where we are
 
-ROADMAP step 3 is done ([plan 001](plans/001_user-level-config.md)). Step 4 runs as [plan 002](plans/002_cli.md): C01 (the bundle exits 2 below Node 22, a CI job runs it on 22) is in review.
+ROADMAP step 3 is done ([plan 001](plans/001_user-level-config.md)). Step 4 runs as [plan 002](plans/002_cli.md): C01 merged (#29, Node 22 floor); C02 (machine copy of the common documentation, `grill` reads it) is in review.
 
 ## Prove it
 
 Run: `pnpm install && pnpm check && pnpm compile`
-Expect: `All matched files use Prettier code style!`, `Tests  140 passed (140)`, `✔ Validation passed`, `compile` without errors.
+Expect: `All matched files use Prettier code style!`, `Tests  143 passed (143)`, `✔ Validation passed`, `compile` without errors.
 
 ## Active chunk
 
-Plan 002 C01.
+Plan 002 C02.
 
 ## Next action
 
-Execute plan 002 C02.
+Execute plan 002 C03.
 
 ## Decisions not to reopen
 

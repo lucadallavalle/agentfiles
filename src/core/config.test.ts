@@ -1,4 +1,4 @@
-import { cpSync, mkdtempSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -10,6 +10,9 @@ const repo = fileURLToPath(new URL("../..", import.meta.url));
 function copy(): string {
   const root = mkdtempSync(join(tmpdir(), "agentfiles-config-"));
   cpSync(join(repo, "config"), join(root, "config"), { recursive: true });
+  mkdirSync(join(root, "docs", "documentation", "sub"), { recursive: true });
+  writeFileSync(join(root, "docs", "documentation", "b.md"), "b\n");
+  writeFileSync(join(root, "docs", "documentation", "sub", "a.md"), "a\n");
   return root;
 }
 
@@ -27,6 +30,28 @@ describe("config/", () => {
       h: { theme: "dark" },
       other: {},
     });
+  });
+
+  it("reads the common documentation, nested files by /-separated name", () => {
+    const root = copy();
+    expect(readConfig(root, []).documentation).toEqual([
+      {
+        name: "b.md",
+        text: "b\n",
+        source: join(root, "docs", "documentation", "b.md"),
+      },
+      {
+        name: "sub/a.md",
+        text: "a\n",
+        source: join(root, "docs", "documentation", "sub", "a.md"),
+      },
+    ]);
+  });
+
+  it("requires the common documentation", () => {
+    const root = copy();
+    rmSync(join(root, "docs"), { recursive: true });
+    expect(() => readConfig(root, [])).toThrow(/documentation/);
   });
 
   it.each([
