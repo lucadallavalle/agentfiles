@@ -146,7 +146,10 @@ describe("codex adapter", () => {
     );
 
     const before = h.text();
-    expect(h.doctor("--fix").out).toBe("3 entries: 3 in sync\n");
+    // No git on PATH: no CLI commit, so plugin drift is one skip line.
+    expect(h.doctor("--fix").out).toBe(
+      "plugins skipped: the CLI doesn't run from a git clone\n3 entries: 3 in sync\n",
+    );
     expect(h.text()).toBe(before);
   });
 

@@ -10120,7 +10120,7 @@ const Installed = array(looseObject({
 	version: string()
 }));
 const Marketplaces = array(looseObject({ name: string() }));
-const id = ({ plugin }) => `${plugin.name}@${plugin.marketplace}`;
+const id$1 = ({ plugin }) => `${plugin.name}@${plugin.marketplace}`;
 function json(context, args, schema) {
 	try {
 		return schema.parse(JSON.parse(harness$3(context, args)));
@@ -10140,7 +10140,7 @@ const claudeCodePlugin = {
 		"plugin",
 		"list",
 		"--json"
-	], Installed).find((p) => p.id === id(context) && p.scope === "user")?.version,
+	], Installed).find((p) => p.id === id$1(context) && p.scope === "user")?.version,
 	install: (context) => {
 		const { marketplace, repository } = context.plugin;
 		harness$3(context, json(context, [
@@ -10162,7 +10162,7 @@ const claudeCodePlugin = {
 		harness$3(context, [
 			"plugin",
 			"install",
-			id(context),
+			id$1(context),
 			"-s",
 			"user"
 		]);
@@ -10177,7 +10177,7 @@ const claudeCodePlugin = {
 		harness$3(context, [
 			"plugin",
 			"update",
-			id(context),
+			id$1(context),
 			"-s",
 			"user"
 		]);
@@ -11193,6 +11193,72 @@ function stringify(obj, { maxDepth = 1e3, numbersAsFloat = false, strictTemporal
 * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+// src/adapters/codex/install.ts
+function read$1(context) {
+	const path = join(context.dir, "config.toml");
+	let doc;
+	try {
+		doc = parse(readText(path) ?? "");
+	} catch (error) {
+		throw new Error(`${path}: ${error.message}`, { cause: error });
+	}
+	const table = (value) => value && typeof value === "object" ? value : void 0;
+	const { plugin } = context;
+	const marketplace = table(table(doc.marketplaces)?.[plugin.marketplace]);
+	const ref = marketplace?.ref;
+	return {
+		ref: typeof ref === "string" ? ref : void 0,
+		marketplace: marketplace !== void 0,
+		plugin: table(doc.plugins)?.[id(context)] !== void 0
+	};
+}
+const id = ({ plugin }) => `${plugin.name}@${plugin.marketplace}`;
+/** `owner/name@<commit>`, from the repository's GitHub URL. */
+const source = ({ plugin }, commit) => `${new URL(plugin.repository).pathname.slice(1)}@${commit}`;
+/**
+* The marketplace is pinned to the CLI's commit; its `ref` in
+* `config.toml` is the installed commit while the plugin is installed. A
+* pinned marketplace moves only by `marketplace remove` + `add …@<sha>`,
+* which leaves the plugin as it was, so the plugin is removed first and
+* added again: a failure midway leaves it missing, never a `ref` newer
+* than the plugin.
+*/
+const codexPlugin = {
+	pinned: true,
+	installed: (context) => {
+		const installed = read$1(context);
+		if (!installed.plugin) return void 0;
+		return installed.ref ?? "main";
+	},
+	install: (context, commit) => {
+		const { marketplace, ref } = read$1(context);
+		if (marketplace && ref !== commit) harness$3(context, [
+			"plugin",
+			"marketplace",
+			"remove",
+			context.plugin.marketplace
+		]);
+		if (!marketplace || ref !== commit) harness$3(context, [
+			"plugin",
+			"marketplace",
+			"add",
+			source(context, commit)
+		]);
+		harness$3(context, [
+			"plugin",
+			"add",
+			id(context)
+		]);
+	},
+	update: (context, commit) => {
+		harness$3(context, [
+			"plugin",
+			"remove",
+			id(context)
+		]);
+		codexPlugin.install(context, commit);
+	}
+};
 // src/core/tracked.ts
 /** JSON with sorted keys, so equal values compare and hash equal. */
 function canonical(value) {
@@ -11475,6 +11541,7 @@ const codex = {
 	binary: "codex",
 	dir: (env, base) => envPath(env, "CODEX_HOME", join(base.home, ".codex")),
 	formats: [toml],
+	plugin: codexPlugin,
 	entries: ({ config, dir }) => {
 		const settings = join(dir, "config.toml");
 		const keys = {
