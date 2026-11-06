@@ -1,23 +1,23 @@
 # Handover
 
-Updated: 2026-11-06, plan 002 C03 PR
+Updated: 2026-11-06, plan 002 C04 PR
 
 ## Where we are
 
-ROADMAP step 3 is done ([plan 001](plans/001_user-level-config.md)). Step 4 runs as [plan 002](plans/002_cli.md): C01 (#29, Node 22 floor) and C02 (#30, machine copy of the common documentation) merged; C03 (`owners`, repo drift, append-only hash list) is in review.
+ROADMAP step 3 is done ([plan 001](plans/001_user-level-config.md)). Step 4 runs as [plan 002](plans/002_cli.md): C01 (#29, Node 22 floor), C02 (#30, machine copy of the common documentation) and C03 (#31, repo drift) merged; C04 (the CLI's clone kept on `main`, one re-run) is in review.
 
 ## Prove it
 
 Run: `pnpm install && pnpm check && pnpm compile`
-Expect: `All matched files use Prettier code style!`, `Tests  170 passed (170)`, `✔ Validation passed`, `compile` without errors.
+Expect: `All matched files use Prettier code style!`, `Tests  176 passed (176)`, `✔ Validation passed`, `compile` without errors.
 
 ## Active chunk
 
-Plan 002 C03.
+Plan 002 C04.
 
 ## Next action
 
-Execute plan 002 C04.
+Execute plan 002 C05. Plugin chunks: `OLD` is C01's merge commit `14efdc4`.
 
 ## Decisions not to reopen
 

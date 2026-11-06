@@ -11555,6 +11555,78 @@ function repoDrift(options) {
 	}
 	return outcomes;
 }
+// src/core/self.ts
+/** The committed CLI bundle, relative to the repo root. */
+const bundlePath = "bin/agentfiles.js";
+/** Set in the re-run from the new bundle, so it never re-runs again. */
+const rerunVariable = "AGENTFILES_RERUN";
+/** Runs the same argv from the root's (new) bundle, once. */
+function rerun(root, args, options) {
+	return exec(process.execPath, [join(root, bundlePath), ...args], {
+		env: {
+			...options.env,
+			[rerunVariable]: "1"
+		},
+		cwd: options.cwd
+	});
+}
+function same(a, b) {
+	try {
+		return realpathSync(a) === realpathSync(b);
+	} catch {
+		return false;
+	}
+}
+/**
+* Keeps the CLI's clone on `main`: only when the root is a git checkout on
+* branch `main` without local changes, else one skip line. `doctor`
+* fetches and reports it behind; `--fix` fast-forwards it. Silent when the
+* root isn't a clone or git is missing. The re-run doesn't fetch again.
+*/
+function checkClone(options) {
+	const { root, env } = options;
+	const result = {
+		lines: [],
+		drift: false,
+		error: false,
+		rerun: false
+	};
+	const run = (...args) => git(args, root, env)?.trim();
+	const top = run("rev-parse", "--show-toplevel");
+	if (!top || !same(top, root)) return result;
+	const skip = (why) => {
+		result.lines.push(`agentfiles clone ${why}, skipped`);
+		return result;
+	};
+	if (run("symbolic-ref", "--short", "-q", "HEAD") !== "main") return skip("not on main");
+	if (run("status", "--porcelain") !== "") return skip("has local changes");
+	const rerun = env[rerunVariable] === "1";
+	if (!rerun && run("fetch", "--quiet", "origin") === void 0) {
+		result.lines.push("agentfiles clone can't check main (offline)");
+		return result;
+	}
+	const head = run("rev-parse", "HEAD");
+	const main = run("rev-parse", "--verify", "-q", "refs/remotes/origin/main");
+	if (!main) {
+		result.lines.push("agentfiles clone can't check main (offline)");
+		return result;
+	}
+	if (head === main) return result;
+	if (run("merge-base", "--is-ancestor", "HEAD", main) === void 0) return skip("ahead of main");
+	if (!options.fix) {
+		result.lines.push("agentfiles clone behind main");
+		result.drift = true;
+		return result;
+	}
+	if (run("merge", "--ff-only", "--quiet", main) === void 0) {
+		result.lines.push("agentfiles clone error: can't fast-forward to main");
+		result.error = true;
+		return result;
+	}
+	result.lines.push("agentfiles clone behind main, updated");
+	result.rerun = !rerun;
+	return result;
+}
 // src/core/state.ts
 /** What agentfiles wrote for one tracked entry. */
 const StateRecord = strictObject({
@@ -11642,12 +11714,18 @@ function summary(outcomes) {
 	return `${String(outcomes.length)} ${noun}${parts.length ? `: ${parts.join(", ")}` : ""}`;
 }
 /**
-* Checks every present harness, then the current repo, and, with `fix`,
+* Checks the CLI's clone, every present harness, then the current repo, and, with `fix`,
 * writes missing and outdated entries and removes unshipped ones. A harness
 * with a file that doesn't parse is skipped; the state file is written last.
 */
 function doctor(options) {
-	const lines = [];
+	const clone = checkClone(options);
+	const lines = [...clone.lines];
+	if (clone.rerun) return {
+		lines,
+		code: 0,
+		rerun: true
+	};
 	let base;
 	let config;
 	let records;
@@ -11658,8 +11736,9 @@ function doctor(options) {
 		stateFile = statePath(base);
 		records = readState(stateFile);
 	} catch (error) {
+		lines.push(`${self$1} error: ${error.message}`);
 		return {
-			lines: [`${self$1} error: ${error.message}`],
+			lines,
 			code: 2
 		};
 	}
@@ -11697,7 +11776,7 @@ function doctor(options) {
 			})
 		});
 	}
-	let code = 0;
+	let code = clone.error ? 2 : 0;
 	const outcomes = [];
 	const checked = new Set(groups.map((g) => g.harness));
 	const next = records.filter((r) => !checked.has(r.harness));
@@ -11752,7 +11831,7 @@ function doctor(options) {
 		lines.push(`${self$1} error: ${error.message}`);
 		code = 2;
 	}
-	if (code === 0 && !options.fix && [...outcomes, ...repo].some((o) => o.state !== "in sync")) code = 1;
+	if (code === 0 && !options.fix && (clone.drift || [...outcomes, ...repo].some((o) => o.state !== "in sync"))) code = 1;
 	return {
 		lines,
 		code
@@ -11777,6 +11856,12 @@ function run(args, options) {
 		});
 		for (const line of result.lines) output.out(`${line}\n`);
 		code = result.code;
+		if (result.rerun) {
+			const again = rerun(options.root, args, options);
+			output.out(again.stdout);
+			output.err(again.stderr);
+			code = again.status ?? 2;
+		}
 	});
 	try {
 		program.parse(args, { from: "user" });
