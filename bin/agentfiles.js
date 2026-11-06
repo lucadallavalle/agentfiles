@@ -11568,6 +11568,59 @@ const codex = {
 		}];
 	}
 };
+// src/adapters/opencode/install.ts
+/** `github:owner/name`, from the repository's GitHub URL. */
+const spec = ({ plugin }) => `github:${new URL(plugin.repository).pathname.slice(1)}`;
+/** Our `plugins` elements in `opencode.json` and `opencode.jsonc`. */
+function ours(context) {
+	const found = [];
+	for (const name of ["opencode.json", "opencode.jsonc"]) {
+		const path = join(context.dir, name);
+		const text = readText(path);
+		if (text === void 0) continue;
+		let doc;
+		try {
+			doc = jsonc.parse(text);
+		} catch (error) {
+			throw new Error(`${path}: ${error.message}`, { cause: error });
+		}
+		const plugins = doc.plugins;
+		if (!Array.isArray(plugins)) continue;
+		for (const item of plugins) if (typeof item === "string" && (item === spec(context) || item.startsWith(`${spec(context)}#`))) found.push(item);
+	}
+	return found;
+}
+/**
+* The `plugins` list is OpenCode's whole install record and caches are
+* keyed by ref, so the plugin is pinned: `plugin add
+* github:lucadallavalle/agentfiles#<sha>`. A new ref would append a second
+* entry, so every one of ours is removed by its exact specifier first
+* (verified with OpenCode 2.2.5: one entry remains).
+*/
+const opencodePlugin = {
+	pinned: true,
+	installed: (context) => {
+		const entries = ours(context);
+		if (!entries.length) return void 0;
+		if (entries.length > 1) return `${String(entries.length)} entries`;
+		return entries[0]?.split("#")[1] ?? "main";
+	},
+	install: (context, commit) => {
+		harness$3(context, [
+			"plugin",
+			"add",
+			`${spec(context)}#${commit}`
+		]);
+	},
+	update: (context, commit) => {
+		for (const entry of ours(context)) harness$3(context, [
+			"plugin",
+			"remove",
+			entry
+		]);
+		opencodePlugin.install(context, commit);
+	}
+};
 // src/adapters/opencode/config.ts
 const harness = "opencode";
 // src/adapters/index.ts
@@ -11580,6 +11633,7 @@ const adapters = [
 		binary: "opencode",
 		dir: (_, base) => join(base.config, "opencode"),
 		formats: [jsonc],
+		plugin: opencodePlugin,
 		entries: ({ config, dir, instructions }) => {
 			const json = join(dir, "opencode.json");
 			const only = join(dir, "opencode.jsonc");
