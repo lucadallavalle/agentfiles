@@ -3,6 +3,7 @@ import type { Adapter } from "../../core/doctor.js";
 import { envPath } from "../../core/files.js";
 import { jsonc } from "../../core/jsonc.js";
 import type { Entry } from "../../core/tracked.js";
+import { claudeCodePlugin } from "./install.js";
 
 const harness = "claude-code";
 
@@ -19,6 +20,7 @@ export const claudeCode: Adapter = {
   dir: (env, base) =>
     envPath(env, "CLAUDE_CONFIG_DIR", join(base.home, ".claude")),
   formats: [jsonc],
+  plugin: claudeCodePlugin,
   entries: ({ config, dir, instructions }) => {
     const settings = join(dir, "settings.json");
     const rules = (["allow", "ask", "deny"] as const).flatMap((list) =>

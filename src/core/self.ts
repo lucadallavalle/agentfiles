@@ -25,6 +25,44 @@ export interface CloneResult {
   rerun: boolean;
 }
 
+/** Overrides the CLI's commit for plugin drift; must be on `origin/main`. */
+export const commitVariable = "AGENTFILES_COMMIT";
+
+/** The reference for plugin drift, or why there is none. */
+export type CliCommit =
+  { commit: string } | { skip: string } | { error: string };
+
+/**
+ * The root's `HEAD` when the worktree is clean and `HEAD` is on the local
+ * `origin/main`; `AGENTFILES_COMMIT` overrides it, and one not on
+ * `origin/main` is an error.
+ */
+export function cliCommit(root: string, env: Env): CliCommit {
+  const run = (...args: string[]) => git(args, root, env)?.trim();
+  const top = run("rev-parse", "--show-toplevel");
+  const clone = top !== undefined && same(top, root);
+  const onMain = (commit: string) =>
+    run("merge-base", "--is-ancestor", commit, "refs/remotes/origin/main") !==
+    undefined;
+  const override = env[commitVariable];
+  if (override) {
+    const commit = clone
+      ? run("rev-parse", "--verify", "-q", `${override}^{commit}`)
+      : undefined;
+    if (!commit || !onMain(commit))
+      return {
+        error: `${commitVariable}=${override} is not a commit on origin/main`,
+      };
+    return { commit };
+  }
+  if (!clone) return { skip: "the CLI doesn't run from a git clone" };
+  if (run("status", "--porcelain") !== "")
+    return { skip: "the CLI's clone has local changes" };
+  const head = run("rev-parse", "HEAD");
+  if (!head || !onMain(head)) return { skip: "the CLI's commit isn't on main" };
+  return { commit: head };
+}
+
 /** Runs the same argv from the root's (new) bundle, once. */
 export function rerun(
   root: string,
