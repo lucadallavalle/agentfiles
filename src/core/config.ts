@@ -18,6 +18,16 @@ export type Permissions = z.infer<typeof Permissions>;
 /** Tracked keys in one harness's own key shape. */
 const Keys = z.record(z.string().min(1), z.json());
 
+/** Every sha256 the common documentation ever shipped, per file name, oldest first. */
+export const DocumentationHashes = z.record(
+  z.string().min(1),
+  z.array(z.string().regex(/^[0-9a-f]{64}$/)),
+);
+export type DocumentationHashes = z.infer<typeof DocumentationHashes>;
+
+/** Relative to the repo root; `pnpm generate` appends to it. */
+export const documentationHashesPath = "config/documentation-hashes.json";
+
 /** A file shipped as is, such as one of the common documentation. */
 export interface ShippedFile {
   /** Relative to its directory, `/`-separated. */
@@ -36,10 +46,12 @@ export interface ShippedConfig {
   keys: Record<string, Record<string, unknown>>;
   /** `docs/documentation/`, the common documentation, sorted by name. */
   documentation: ShippedFile[];
+  documentationHashes: DocumentationHashes;
 }
 
-/** Every file under `dir`, sorted by name. */
-function readFiles(dir: string): ShippedFile[] {
+/** The common documentation: every file under `docs/documentation/`, sorted by name. */
+export function readDocumentation(root: string): ShippedFile[] {
+  const dir = join(root, "docs", "documentation");
   return readdirSync(dir, { recursive: true, withFileTypes: true })
     .filter((entry) => entry.isFile())
     .map((entry) => {
@@ -82,6 +94,10 @@ export function readConfig(
     instructionsSource,
     permissions: read(join(dir, "permissions.json"), Permissions),
     keys,
-    documentation: readFiles(join(root, "docs", "documentation")),
+    documentation: readDocumentation(root),
+    documentationHashes: read(
+      join(root, documentationHashesPath),
+      DocumentationHashes,
+    ),
   };
 }

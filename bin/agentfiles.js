@@ -7,7 +7,7 @@ import fs, { accessSync, chmodSync, constants, existsSync, lstatSync, mkdirSync,
 import path, { basename, delimiter, dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { EventEmitter } from "node:events";
-import childProcess from "node:child_process";
+import childProcess, { spawnSync } from "node:child_process";
 import process$1 from "node:process";
 import { stripVTControlCharacters } from "node:util";
 import { createHash } from "node:crypto";
@@ -5358,7 +5358,7 @@ function entryId(entry) {
 * The drift rule. `current` is undefined when the machine lacks the entry;
 * the result is undefined when there is nothing left to track.
 */
-function classify(kind, shipped, recorded, current) {
+function classify$1(kind, shipped, recorded, current) {
 	const equal = (a, b) => kind === "file" ? a === b : canonical(a) === canonical(b);
 	if (!shipped) {
 		if (!recorded || !current) return void 0;
@@ -5436,7 +5436,7 @@ function planFile(path, text, entries, records, formats, fix) {
 		shippedIds.add(id);
 		const recorded = byId.get(id);
 		const found = current(entry);
-		const state = classify(entry.kind, entry, recorded, found);
+		const state = classify$1(entry.kind, entry, recorded, found);
 		if (!state) continue;
 		outcomes.push({
 			id,
@@ -5450,7 +5450,7 @@ function planFile(path, text, entries, records, formats, fix) {
 	}
 	for (const [id, recorded] of byId) {
 		if (shippedIds.has(id)) continue;
-		const state = classify(recorded.kind, void 0, recorded, current(recorded));
+		const state = classify$1(recorded.kind, void 0, recorded, current(recorded));
 		if (!state) continue;
 		outcomes.push({
 			id,
@@ -11356,8 +11356,13 @@ const Permissions = strictObject({
 ])).size === allow.length + ask.length + deny.length, "a prefix appears twice");
 /** Tracked keys in one harness's own key shape. */
 const Keys = record(string().min(1), json());
-/** Every file under `dir`, sorted by name. */
-function readFiles(dir) {
+/** Every sha256 the common documentation ever shipped, per file name, oldest first. */
+const DocumentationHashes = record(string().min(1), array(string().regex(/^[0-9a-f]{64}$/)));
+/** Relative to the repo root; `pnpm generate` appends to it. */
+const documentationHashesPath = "config/documentation-hashes.json";
+/** The common documentation: every file under `docs/documentation/`, sorted by name. */
+function readDocumentation(root) {
+	const dir = join(root, "docs", "documentation");
 	return readdirSync(dir, {
 		recursive: true,
 		withFileTypes: true
@@ -11394,8 +11399,161 @@ function readConfig(root, harnesses) {
 		instructionsSource,
 		permissions: read(join(dir, "permissions.json"), Permissions),
 		keys,
-		documentation: readFiles(join(root, "docs", "documentation"))
+		documentation: readDocumentation(root),
+		documentationHashes: read(join(root, documentationHashesPath), DocumentationHashes)
 	};
+}
+// src/core/owners.ts
+/** `~/.config/agentfiles/config.json`, written by `bootstrap --owner`. */
+const AgentfilesConfig = strictObject({ owners: array(string().trim().min(1)) });
+function ownersPath(base) {
+	return join(base.config, "agentfiles", "config.json");
+}
+/** The owners of owned repos; none when the file doesn't exist. Throws when it doesn't parse. */
+function readOwners(path) {
+	const text = readText(path);
+	if (text === void 0) return [];
+	try {
+		return AgentfilesConfig.parse(JSON.parse(text)).owners;
+	} catch (error) {
+		const message = error instanceof ZodError ? prettifyError(error) : String(error);
+		throw new Error(`${path}: ${message}`, { cause: error });
+	}
+}
+/**
+* The path segments of a remote URL, HTTPS or SSH, any host; undefined
+* for a local path, which has no owner.
+*/
+function urlPath(url) {
+	let path;
+	if (/^[a-z][a-z0-9+.-]*:\/\//i.test(url)) {
+		let parsed;
+		try {
+			parsed = new URL(url);
+		} catch {
+			return;
+		}
+		if (!parsed.host) return void 0;
+		path = parsed.pathname;
+	} else {
+		const scp = /^(?:[^@/]+@)?[^:/]+:(.+)$/.exec(url);
+		if (!scp?.[1]) return void 0;
+		path = scp[1];
+	}
+	const segments = path.split("/").filter(Boolean);
+	return segments.length ? segments : void 0;
+}
+/** `owner/name` in lower case, without `.git`. */
+function repoName(url) {
+	const [owner, name] = urlPath(url) ?? [];
+	if (!owner || !name) return void 0;
+	return `${owner}/${name.replace(/\.git$/, "")}`.toLowerCase();
+}
+/** Owned when there is a remote and every remote's owner is in `owners`, case-insensitive. */
+function isOwned(remotes, owners) {
+	const known = new Set(owners.map((owner) => owner.toLowerCase()));
+	return remotes.length > 0 && remotes.every((url) => {
+		const owner = urlPath(url)?.[0];
+		return owner !== void 0 && known.has(owner.toLowerCase());
+	});
+}
+// src/core/exec.ts
+/** Runs a program without a shell, in the run's environment (its `PATH` finds the program). */
+function exec(command, args, options) {
+	const result = spawnSync(command, args, {
+		cwd: options.cwd,
+		env: options.env,
+		encoding: "utf8",
+		stdio: [
+			"ignore",
+			"pipe",
+			"pipe"
+		]
+	});
+	if (result.error) return {
+		status: null,
+		stdout: "",
+		stderr: result.error.message
+	};
+	return {
+		status: result.status,
+		stdout: result.stdout,
+		stderr: result.stderr
+	};
+}
+/** Git's output, or undefined when it fails or git is missing. */
+function git(args, cwd, env) {
+	const result = exec("git", args, {
+		env,
+		cwd
+	});
+	return result.status === 0 ? result.stdout : void 0;
+}
+// src/core/repo.ts
+/** Where owned repos keep their copy of the common documentation. */
+const documentationDir = "docs/documentation";
+/** `package.json` `repository`, as `owner/name`. */
+function ownName(root) {
+	try {
+		const url = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).repository?.url;
+		return typeof url === "string" ? repoName(url) : void 0;
+	} catch {
+		return;
+	}
+}
+/**
+* A copy equal to the shipped file is in sync, one with any shipped hash
+* outdated (or unshipped when no longer shipped), any other edited.
+*/
+function classify(shipped, known, current) {
+	if (current === void 0) return shipped === void 0 ? void 0 : "missing";
+	if (current === shipped) return "in sync";
+	const old = known.has(hash("file", current));
+	if (shipped === void 0) return old ? "unshipped" : "edited";
+	return old ? "outdated" : "edited";
+}
+/**
+* Drift of the common documentation copies in the repo at `cwd`; none
+* outside a git repo, in a foreign repo or in the CLI's own repo. With
+* `fix`, writes missing and outdated copies and removes unshipped ones;
+* never commits.
+*/
+function repoDrift(options) {
+	const { env } = options;
+	const top = git(["rev-parse", "--show-toplevel"], options.cwd, env)?.trim();
+	if (!top) return [];
+	const remotes = (git([
+		"config",
+		"--get-regexp",
+		"^remote\\..*\\.url$"
+	], top, env) ?? "").split("\n").filter(Boolean).map((line) => line.slice(line.indexOf(" ") + 1));
+	if (!isOwned(remotes, options.owners)) return [];
+	const own = ownName(options.root);
+	if (own && remotes.some((url) => repoName(url) === own)) return [];
+	const shipped = new Map(options.documentation.map((f) => [f.name, f.text]));
+	const names = [.../* @__PURE__ */ new Set([...shipped.keys(), ...Object.keys(options.hashes)])].sort();
+	const outcomes = [];
+	for (const name of names) {
+		const path = `${documentationDir}/${name}`;
+		const file = join(top, ...path.split("/"));
+		const text = shipped.get(name);
+		const state = classify(text, new Set(options.hashes[name]), readText(file));
+		if (!state) continue;
+		let fixed = false;
+		if (options.fix && text !== void 0 && (state === "missing" || state === "outdated")) {
+			writeAtomic(file, text);
+			fixed = true;
+		} else if (options.fix && state === "unshipped") {
+			remove$1(file);
+			fixed = true;
+		}
+		outcomes.push({
+			path,
+			state,
+			fixed
+		});
+	}
+	return outcomes;
 }
 // src/core/state.ts
 /** What agentfiles wrote for one tracked entry. */
@@ -11484,9 +11642,9 @@ function summary(outcomes) {
 	return `${String(outcomes.length)} ${noun}${parts.length ? `: ${parts.join(", ")}` : ""}`;
 }
 /**
-* Checks every present harness and, with `fix`, writes missing and outdated
-* entries and removes unshipped ones. A harness with a file that doesn't
-* parse is skipped; the state file is written last.
+* Checks every present harness, then the current repo, and, with `fix`,
+* writes missing and outdated entries and removes unshipped ones. A harness
+* with a file that doesn't parse is skipped; the state file is written last.
 */
 function doctor(options) {
 	const lines = [];
@@ -11571,14 +11729,30 @@ function doctor(options) {
 		}
 	}
 	for (const outcome of outcomes) if (outcome.state !== "in sync") lines.push(describe(outcome, base.home));
-	lines.push(summary(outcomes));
+	let repo = [];
+	try {
+		repo = repoDrift({
+			cwd: options.cwd,
+			env: options.env,
+			root: options.root,
+			documentation: config.documentation,
+			hashes: config.documentationHashes,
+			owners: readOwners(ownersPath(base)),
+			fix: options.fix
+		});
+	} catch (error) {
+		lines.push(`repo error: ${error.message}`);
+		code = 2;
+	}
+	for (const outcome of repo) if (outcome.state !== "in sync") lines.push(`repo ${outcome.path} ${outcome.state}${outcome.fixed ? `, ${verbs[outcome.state] ?? "fixed"}` : ""}`);
+	lines.push(summary([...outcomes, ...repo]));
 	if (options.fix && serializeState(next) !== serializeState(records)) try {
 		writeState(stateFile, next);
 	} catch (error) {
 		lines.push(`${self$1} error: ${error.message}`);
 		code = 2;
 	}
-	if (code === 0 && !options.fix && outcomes.some((o) => o.state !== "in sync")) code = 1;
+	if (code === 0 && !options.fix && [...outcomes, ...repo].some((o) => o.state !== "in sync")) code = 1;
 	return {
 		lines,
 		code
@@ -11593,10 +11767,11 @@ function run(args, options) {
 		writeOut: output.out,
 		writeErr: output.err
 	});
-	program.command("doctor").description("Report drift in user-level config.").option("--fix", "write missing and outdated entries, remove unshipped ones").action((flags) => {
+	program.command("doctor").description("Report drift in user-level config and the current repo.").option("--fix", "write missing and outdated entries, remove unshipped ones").action((flags) => {
 		const result = doctor({
 			root: options.root,
 			env: options.env,
+			cwd: options.cwd,
 			adapters: options.adapters,
 			fix: flags.fix === true
 		});
@@ -11615,6 +11790,7 @@ const self = fileURLToPath(import.meta.url);
 if (process.argv[1] && realpathSync(process.argv[1]) === self) process.exitCode = run(process.argv.slice(2), {
 	root: dirname(dirname(self)),
 	env: process.env,
+	cwd: process.cwd(),
 	adapters,
 	output: {
 		out: (text) => process.stdout.write(text),

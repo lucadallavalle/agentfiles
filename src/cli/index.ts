@@ -16,6 +16,8 @@ export interface RunOptions {
   /** The repo root, holding `config/`. */
   root: string;
   env: Env;
+  /** The current directory, for the `repo` group. */
+  cwd: string;
   adapters: readonly Adapter[];
   output: Output;
 }
@@ -30,7 +32,7 @@ export function run(args: readonly string[], options: RunOptions): number {
     .configureOutput({ writeOut: output.out, writeErr: output.err });
   program
     .command("doctor")
-    .description("Report drift in user-level config.")
+    .description("Report drift in user-level config and the current repo.")
     .option(
       "--fix",
       "write missing and outdated entries, remove unshipped ones",
@@ -39,6 +41,7 @@ export function run(args: readonly string[], options: RunOptions): number {
       const result = doctor({
         root: options.root,
         env: options.env,
+        cwd: options.cwd,
         adapters: options.adapters,
         fix: flags.fix === true,
       });
@@ -61,6 +64,7 @@ if (process.argv[1] && realpathSync(process.argv[1]) === self) {
   process.exitCode = run(process.argv.slice(2), {
     root: dirname(dirname(self)),
     env: process.env,
+    cwd: process.cwd(),
     adapters,
     output: {
       out: (text) => process.stdout.write(text),

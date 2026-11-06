@@ -102,6 +102,7 @@ function fakeHome() {
       const code = run(["doctor", ...args], {
         root,
         env,
+        cwd: home,
         adapters: [codex],
         output: { out: (text) => (out += text), err: () => undefined },
       });

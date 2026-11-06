@@ -43,6 +43,7 @@ function fakeHome() {
       const code = run(["doctor", ...args], {
         root,
         env,
+        cwd: home,
         adapters: [opencode],
         output: { out: (text) => (out += text), err: () => undefined },
       });
@@ -94,7 +95,11 @@ describe("opencode adapter", () => {
     const base = mkdtempSync(join(tmpdir(), "agentfiles-opencode-root-"));
     mkdirSync(join(base, "config"));
     mkdirSync(join(base, "docs", "documentation"), { recursive: true });
-    for (const file of ["instructions.md", "opencode.json"])
+    for (const file of [
+      "instructions.md",
+      "opencode.json",
+      "documentation-hashes.json",
+    ])
       writeFileSync(
         join(base, "config", file),
         readFileSync(join(root, "config", file)),
@@ -105,6 +110,7 @@ describe("opencode adapter", () => {
     );
     run(["doctor", "--fix"], {
       root: base,
+      cwd: base,
       env: {
         HOME: join(h.dir, "..", ".."),
         XDG_CONFIG_HOME: join(h.dir, ".."),
