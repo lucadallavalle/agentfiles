@@ -23,14 +23,17 @@ import { run } from "./index.js";
 const repo = fileURLToPath(new URL("../..", import.meta.url));
 
 /**
- * A temp dir holding a copy of `config/` (the root) and a home with the
- * variables from "Harnesses and paths" pointing into it.
+ * A temp dir holding a copy of `config/` and one common documentation file
+ * (the root) and a home with the variables from "Harnesses and paths"
+ * pointing into it.
  */
 function fakeHome(harness: "dir" | "binary" | "none" = "dir") {
   const base = mkdtempSync(join(tmpdir(), "agentfiles-cli-"));
   const root = join(base, "repo");
   const home = join(base, "home");
   cpSync(join(repo, "config"), join(root, "config"), { recursive: true });
+  mkdirSync(join(root, "docs", "documentation"), { recursive: true });
+  writeFileSync(join(root, "docs", "documentation", "README.md"), "# Docs\n");
   const bin = join(base, "bin");
   mkdirSync(bin);
   mkdirSync(home);
@@ -161,7 +164,7 @@ describe("doctor --fix", () => {
     expect(h.tree()).toEqual(before);
 
     const check = h.run(["doctor"]);
-    const total = 3 + 2 * allow.length;
+    const total = 4 + 2 * allow.length;
     expect(check).toEqual({
       code: 0,
       out: `${String(total)} entries: ${String(total)} in sync\n`,
@@ -295,6 +298,40 @@ describe("doctor", () => {
     );
   });
 
+  it("keeps the machine copy of the common documentation", () => {
+    const h = fakeHome();
+    const docs = join(h.root, "docs", "documentation");
+    expect(h.run(["doctor", "--fix"]).out).toContain(
+      "agentfiles ~/.config/agentfiles/documentation/README.md missing, written\n",
+    );
+    expect(h.read(".config/agentfiles/documentation/README.md")).toBe(
+      "# Docs\n",
+    );
+
+    mkdirSync(join(docs, "sub"));
+    writeFileSync(join(docs, "sub", "new.md"), "new\n");
+    writeFileSync(join(docs, "README.md"), "# Docs v2\n");
+    h.write(".config/agentfiles/documentation/README.md", "# Docs\n");
+    const fix = h.run(["doctor", "--fix"]);
+    expect(fix.out).toContain(
+      "agentfiles ~/.config/agentfiles/documentation/README.md outdated, updated\n",
+    );
+    expect(fix.out).toContain(
+      "agentfiles ~/.config/agentfiles/documentation/sub/new.md missing, written\n",
+    );
+
+    rmSync(join(docs, "sub"), { recursive: true });
+    h.write(".config/agentfiles/documentation/README.md", "mine\n");
+    const check = h.run(["doctor", "--fix"]);
+    expect(check.out).toContain(
+      "agentfiles ~/.config/agentfiles/documentation/sub/new.md unshipped, removed\n",
+    );
+    expect(check.out).toContain(
+      `agentfiles ~/.config/agentfiles/documentation/README.md edited: shipped ${join(docs, "README.md")}; restore it\n`,
+    );
+    expect(h.read(".config/agentfiles/documentation/README.md")).toBe("mine\n");
+  });
+
   it("names the instructions copy by absolute path outside HOME", () => {
     const h = fakeHome();
     const outside = mkdtempSync(join(tmpdir(), "agentfiles-xdg-"));
@@ -310,7 +347,7 @@ describe("harnesses", () => {
     const h = fakeHome("none");
     const fix = h.run(["doctor", "--fix"]);
     expect(fix.out).toContain("test-harness not installed, skipped\n");
-    expect(fix.out).toContain("1 entry: 1 fixed\n");
+    expect(fix.out).toContain("2 entries: 2 fixed\n");
     expect(existsSync(h.at(".test-harness"))).toBe(false);
     expect(h.run(["doctor"]).code).toBe(0);
   });

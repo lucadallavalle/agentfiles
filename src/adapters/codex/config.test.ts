@@ -82,6 +82,7 @@ function fakeHome() {
   const base = mkdtempSync(join(tmpdir(), "agentfiles-codex-"));
   const root = join(base, "repo");
   cpSync(join(repo, "config"), join(root, "config"), { recursive: true });
+  mkdirSync(join(root, "docs", "documentation"), { recursive: true });
   const home = join(base, "home");
   const dir = join(home, ".codex");
   mkdirSync(dir, { recursive: true });

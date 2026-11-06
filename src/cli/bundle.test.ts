@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync } from "node:fs";
+import { mkdtempSync, readdirSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -48,10 +48,21 @@ describe(bundlePath, () => {
         env,
         encoding: "utf8",
       });
+    const skipped =
+      "claude-code not installed, skipped\ncodex not installed, skipped\nopencode not installed, skipped\n";
+    const docs = readdirSync(join(root, "docs/documentation")).sort();
+    const total = String(1 + docs.length);
     expect(doctor()).toMatchObject({
       status: 1,
-      stdout:
-        "claude-code not installed, skipped\ncodex not installed, skipped\nopencode not installed, skipped\nagentfiles ~/.config/agentfiles/instructions.md missing\n1 entry: 1 missing\n",
+      stdout: [
+        skipped,
+        "agentfiles ~/.config/agentfiles/instructions.md missing\n",
+        ...docs.map(
+          (doc) =>
+            `agentfiles ~/.config/agentfiles/documentation/${doc} missing\n`,
+        ),
+        `${total} entries: ${total} missing\n`,
+      ].join(""),
     });
     expect(doctor("--fix").status).toBe(0);
     expect(
@@ -59,8 +70,7 @@ describe(bundlePath, () => {
     ).toBe(readFileSync(join(root, "config/instructions.md"), "utf8"));
     expect(doctor()).toMatchObject({
       status: 0,
-      stdout:
-        "claude-code not installed, skipped\ncodex not installed, skipped\nopencode not installed, skipped\n1 entry: 1 in sync\n",
+      stdout: `${skipped}${total} entries: ${total} in sync\n`,
     });
   });
 });

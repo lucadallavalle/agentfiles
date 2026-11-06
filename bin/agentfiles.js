@@ -3,8 +3,8 @@ if (Number(process.versions.node.split(".")[0]) < 22) {
 	process.stderr.write("agentfiles needs Node 22 or later; this is Node " + process.versions.node + "\n");
 	process.exit(2);
 }
-import fs, { accessSync, chmodSync, constants, existsSync, lstatSync, mkdirSync, readFileSync, realpathSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
-import path, { basename, delimiter, dirname, join, sep } from "node:path";
+import fs, { accessSync, chmodSync, constants, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
+import path, { basename, delimiter, dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { EventEmitter } from "node:events";
 import childProcess from "node:child_process";
@@ -11356,6 +11356,20 @@ const Permissions = strictObject({
 ])).size === allow.length + ask.length + deny.length, "a prefix appears twice");
 /** Tracked keys in one harness's own key shape. */
 const Keys = record(string().min(1), json());
+/** Every file under `dir`, sorted by name. */
+function readFiles(dir) {
+	return readdirSync(dir, {
+		recursive: true,
+		withFileTypes: true
+	}).filter((entry) => entry.isFile()).map((entry) => {
+		const source = join(entry.parentPath, entry.name);
+		return {
+			name: relative(dir, source).split(sep).join("/"),
+			text: readFileSync(source, "utf8"),
+			source
+		};
+	}).sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+}
 function read(path, schema) {
 	try {
 		return schema.parse(JSON.parse(readFileSync(path, "utf8")));
@@ -11364,7 +11378,7 @@ function read(path, schema) {
 		throw new Error(`${path}: ${message}`, { cause: error });
 	}
 }
-/** Reads and validates `<root>/config/`; throws on the first invalid file. */
+/** Reads and validates `<root>/config/` and the common documentation; throws on the first invalid file. */
 function readConfig(root, harnesses) {
 	const dir = join(root, "config");
 	const instructionsSource = join(dir, "instructions.md");
@@ -11379,7 +11393,8 @@ function readConfig(root, harnesses) {
 		instructions,
 		instructionsSource,
 		permissions: read(join(dir, "permissions.json"), Permissions),
-		keys
+		keys,
+		documentation: readFiles(join(root, "docs", "documentation"))
 	};
 }
 // src/core/state.ts
@@ -11499,7 +11514,13 @@ function doctor(options) {
 			path: instructionsPath,
 			value: config.instructions,
 			source: config.instructionsSource
-		}]
+		}, ...config.documentation.map((file) => ({
+			kind: "file",
+			harness: self$1,
+			path: join(base.config, self$1, "documentation", file.name),
+			value: file.text,
+			source: file.source
+		}))]
 	}];
 	const formats = /* @__PURE__ */ new Map();
 	for (const adapter of options.adapters) {

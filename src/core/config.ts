@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join, relative, sep } from "node:path";
 import { z } from "zod";
 
 const Prefixes = z.array(z.string().trim().min(1));
@@ -18,6 +18,15 @@ export type Permissions = z.infer<typeof Permissions>;
 /** Tracked keys in one harness's own key shape. */
 const Keys = z.record(z.string().min(1), z.json());
 
+/** A file shipped as is, such as one of the common documentation. */
+export interface ShippedFile {
+  /** Relative to its directory, `/`-separated. */
+  name: string;
+  text: string;
+  /** Absolute. */
+  source: string;
+}
+
 export interface ShippedConfig {
   /** `config/instructions.md`. */
   instructions: string;
@@ -25,6 +34,23 @@ export interface ShippedConfig {
   permissions: Permissions;
   /** `config/<harness>.json` per harness; empty when it doesn't exist. */
   keys: Record<string, Record<string, unknown>>;
+  /** `docs/documentation/`, the common documentation, sorted by name. */
+  documentation: ShippedFile[];
+}
+
+/** Every file under `dir`, sorted by name. */
+function readFiles(dir: string): ShippedFile[] {
+  return readdirSync(dir, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => {
+      const source = join(entry.parentPath, entry.name);
+      return {
+        name: relative(dir, source).split(sep).join("/"),
+        text: readFileSync(source, "utf8"),
+        source,
+      };
+    })
+    .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
 }
 
 function read<T>(path: string, schema: z.ZodType<T>): T {
@@ -37,7 +63,7 @@ function read<T>(path: string, schema: z.ZodType<T>): T {
   }
 }
 
-/** Reads and validates `<root>/config/`; throws on the first invalid file. */
+/** Reads and validates `<root>/config/` and the common documentation; throws on the first invalid file. */
 export function readConfig(
   root: string,
   harnesses: readonly string[],
@@ -56,5 +82,6 @@ export function readConfig(
     instructionsSource,
     permissions: read(join(dir, "permissions.json"), Permissions),
     keys,
+    documentation: readFiles(join(root, "docs", "documentation")),
   };
 }

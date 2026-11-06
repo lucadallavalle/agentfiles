@@ -147,6 +147,13 @@ export function doctor(options: DoctorOptions): DoctorResult {
           value: config.instructions,
           source: config.instructionsSource,
         },
+        ...config.documentation.map((file): Entry => ({
+          kind: "file",
+          harness: self,
+          path: join(base.config, self, "documentation", file.name),
+          value: file.text,
+          source: file.source,
+        })),
       ],
     },
   ];

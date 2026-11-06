@@ -93,6 +93,7 @@ describe("opencode adapter", () => {
     const h = fakeHome();
     const base = mkdtempSync(join(tmpdir(), "agentfiles-opencode-root-"));
     mkdirSync(join(base, "config"));
+    mkdirSync(join(base, "docs", "documentation"), { recursive: true });
     for (const file of ["instructions.md", "opencode.json"])
       writeFileSync(
         join(base, "config", file),
