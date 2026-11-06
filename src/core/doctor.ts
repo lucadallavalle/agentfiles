@@ -13,6 +13,7 @@ import {
 } from "./files.js";
 import { ownersPath, readOwners } from "./owners.js";
 import { repoDrift, type RepoOutcome } from "./repo.js";
+import { checkClone } from "./self.js";
 import {
   readState,
   serializeState,
@@ -60,6 +61,8 @@ export interface DoctorResult {
   lines: string[];
   /** `doctor`: 0 in sync, 1 drift, 2 error. `--fix`: 0, or 2 on error. */
   code: 0 | 1 | 2;
+  /** `--fix` moved the CLI's clone: the caller runs the same argv from the new bundle. */
+  rerun?: true;
 }
 
 /** The pseudo-harness for agentfiles' own files. */
@@ -119,12 +122,15 @@ interface Group {
 }
 
 /**
- * Checks every present harness, then the current repo, and, with `fix`,
+ * Checks the CLI's clone, every present harness, then the current repo, and, with `fix`,
  * writes missing and outdated entries and removes unshipped ones. A harness
  * with a file that doesn't parse is skipped; the state file is written last.
  */
 export function doctor(options: DoctorOptions): DoctorResult {
-  const lines: string[] = [];
+  // The clone goes first: the rest then runs from the new commit.
+  const clone = checkClone(options);
+  const lines = [...clone.lines];
+  if (clone.rerun) return { lines, code: 0, rerun: true };
   let base: Paths;
   let config: ShippedConfig;
   let records: StateRecord[];
@@ -138,7 +144,8 @@ export function doctor(options: DoctorOptions): DoctorResult {
     stateFile = statePath(base);
     records = readState(stateFile);
   } catch (error) {
-    return { lines: [`${self} error: ${(error as Error).message}`], code: 2 };
+    lines.push(`${self} error: ${(error as Error).message}`);
+    return { lines, code: 2 };
   }
 
   const instructionsPath = join(base.config, self, "instructions.md");
@@ -181,7 +188,7 @@ export function doctor(options: DoctorOptions): DoctorResult {
     });
   }
 
-  let code: 0 | 1 | 2 = 0;
+  let code: 0 | 1 | 2 = clone.error ? 2 : 0;
   const outcomes: Outcome[] = [];
   const checked = new Set(groups.map((g) => g.harness));
   // Records of skipped or failing harnesses stay as they are.
@@ -260,7 +267,7 @@ export function doctor(options: DoctorOptions): DoctorResult {
   if (
     code === 0 &&
     !options.fix &&
-    [...outcomes, ...repo].some((o) => o.state !== "in sync")
+    (clone.drift || [...outcomes, ...repo].some((o) => o.state !== "in sync"))
   )
     code = 1;
   return { lines, code };

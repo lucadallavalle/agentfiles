@@ -1,8 +1,7 @@
 import { join } from "node:path";
 import { build } from "rolldown";
 
-/** The committed CLI bundle, relative to the repo root. */
-export const bundlePath = "bin/agentfiles.js";
+export { bundlePath } from "../core/self.js";
 
 /** The lowest Node major the bundle runs on, as `engines.node`. */
 const nodeFloor = 22;

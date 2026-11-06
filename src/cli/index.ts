@@ -5,6 +5,7 @@ import { Command, CommanderError } from "commander";
 import { adapters } from "../adapters/index.js";
 import { doctor, type Adapter } from "../core/doctor.js";
 import type { Env } from "../core/files.js";
+import { rerun } from "../core/self.js";
 
 /** Where the CLI prints; tests pass their own. */
 export interface Output {
@@ -47,6 +48,12 @@ export function run(args: readonly string[], options: RunOptions): number {
       });
       for (const line of result.lines) output.out(`${line}\n`);
       code = result.code;
+      if (result.rerun) {
+        const again = rerun(options.root, args, options);
+        output.out(again.stdout);
+        output.err(again.stderr);
+        code = again.status ?? 2;
+      }
     });
 
   try {
