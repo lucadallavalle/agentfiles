@@ -2,6 +2,7 @@ import { join } from "node:path";
 import type { Adapter } from "../../core/doctor.js";
 import { envPath } from "../../core/files.js";
 import type { Entry } from "../../core/tracked.js";
+import { codexPlugin } from "./install.js";
 import { toml } from "./toml.js";
 
 const harness = "codex";
@@ -21,6 +22,7 @@ export const codex: Adapter = {
   binary: "codex",
   dir: (env, base) => envPath(env, "CODEX_HOME", join(base.home, ".codex")),
   formats: [toml],
+  plugin: codexPlugin,
   entries: ({ config, dir }) => {
     const settings = join(dir, "config.toml");
     const keys = {
