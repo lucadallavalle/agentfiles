@@ -16,7 +16,12 @@ const env = {
 };
 
 const git = (cwd: string, ...args: string[]) =>
-  execFileSync("git", args, { cwd, env, encoding: "utf8" }).trim();
+  execFileSync("git", args, {
+    cwd,
+    env,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "ignore"],
+  }).trim();
 
 /** A bare `origin` with one commit on `main`, and a clone of it. */
 function clone() {
