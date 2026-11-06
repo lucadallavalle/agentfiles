@@ -17,15 +17,14 @@ Like dotfiles: the plugins are the config files, the CLI is what puts them in pl
 
 ## Install
 
-`agentfiles bootstrap` will run these.
+`agentfiles doctor --fix` installs and updates the plugin of each installed harness at the CLI's own commit (Claude Code: marketplace added by `https://github.com/lucadallavalle/agentfiles.git`, following `main`, then `plugin install agentfiles@lucadallavalle -s user`; when `main` has moved past the CLI's commit it reports `outdated: main is at <commit>`). Plugin drift needs the CLI's clone without local changes at a commit of `main`, else it prints one skip line. A running session picks up a plugin update in its next session. Until Codex and OpenCode follow:
 
 ```sh
-claude plugin install agentfiles --marketplace lucadallavalle/agentfiles -s user
 opencode plugin add github:lucadallavalle/agentfiles
 codex plugin marketplace add lucadallavalle/agentfiles && codex plugin add agentfiles@lucadallavalle
 ```
 
-Claude Code: skills run as `/agentfiles:<skill>`; update with `claude plugin update agentfiles@lucadallavalle`. OpenCode: skill IDs are flat (`@grill`); a same-ID skill you already have wins. Codex: skills run as `$agentfiles:<skill>`; update with `codex plugin marketplace upgrade`. Skill links made by the former `install.sh` in `~/.claude/skills/` stay until removed by hand.
+Claude Code: skills run as `/agentfiles:<skill>`. OpenCode: skill IDs are flat (`@grill`); a same-ID skill you already have wins. Codex: skills run as `$agentfiles:<skill>`; update with `codex plugin marketplace upgrade`. Skill links made by the former `install.sh` in `~/.claude/skills/` stay until removed by hand.
 
 ## User-level config
 
@@ -74,4 +73,5 @@ AGENTS.md          gate command, domain words
 
 Gate: `pnpm install && pnpm check && pnpm compile` (see [AGENTS.md](AGENTS.md)).
 Manifests are generated from `package.json` and the skills, the CLI bundle from `src/cli/` (rolldown): `pnpm generate`, then commit; the gate fails when they are stale. Test local edits with `claude --plugin-dir .` from a checkout named `agentfiles` (without `.claude-plugin/plugin.json` the directory name is the plugin name).
+`AGENTFILES_COMMIT=<sha>` sets the commit plugin drift compares with, for checks from a branch: it must be on `origin/main`, else `doctor` exits 2.
 Pre-commit hooks (no commits to `main`, file hygiene, gitleaks, the gate): need [pre-commit](https://pre-commit.com/) (`pipx install pre-commit`); `pnpm install` enables them through `.githooks/pre-commit` (`pnpm:devPreinstall` sets `core.hooksPath`). Don't run `pre-commit install`: it refuses while `core.hooksPath` is set, and unsetting it disables the hooks in `.githooks/`.

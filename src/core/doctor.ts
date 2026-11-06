@@ -13,7 +13,9 @@ import {
 } from "./files.js";
 import { ownersPath, readOwners } from "./owners.js";
 import { repoDrift, type RepoOutcome } from "./repo.js";
-import { checkClone } from "./self.js";
+import { readPluginMetadata } from "./plugin.js";
+import { pluginDrift, type PluginHarness, type PluginPart } from "./plugins.js";
+import { checkClone, cliCommit } from "./self.js";
 import {
   readState,
   serializeState,
@@ -38,6 +40,8 @@ export interface Adapter {
   dir(env: Env, base: Paths): string;
   formats: readonly Format[];
   entries(context: AdapterContext): Entry[];
+  /** Installs and updates the harness's plugin; none when not yet supported. */
+  plugin?: PluginPart;
 }
 
 export interface AdapterContext {
@@ -122,7 +126,8 @@ interface Group {
 }
 
 /**
- * Checks the CLI's clone, every present harness, then the current repo, and, with `fix`,
+ * Checks the CLI's clone, the plugins, every present harness's config, then
+ * the current repo, and, with `fix`,
  * writes missing and outdated entries and removes unshipped ones. A harness
  * with a file that doesn't parse is skipped; the state file is written last.
  */
@@ -171,6 +176,7 @@ export function doctor(options: DoctorOptions): DoctorResult {
     },
   ];
   const formats = new Map<string, Format>();
+  const withPlugin: PluginHarness[] = [];
   for (const adapter of options.adapters) {
     for (const format of adapter.formats) formats.set(format.name, format);
     const dir = adapter.dir(options.env, base);
@@ -178,6 +184,13 @@ export function doctor(options: DoctorOptions): DoctorResult {
       lines.push(`${adapter.name} not installed, skipped`);
       continue;
     }
+    if (adapter.plugin)
+      withPlugin.push({
+        name: adapter.name,
+        dir,
+        binary: adapter.binary,
+        part: adapter.plugin,
+      });
     groups.push({
       harness: adapter.name,
       entries: adapter.entries({
@@ -188,7 +201,18 @@ export function doctor(options: DoctorOptions): DoctorResult {
     });
   }
 
-  let code: 0 | 1 | 2 = clone.error ? 2 : 0;
+  // Plugin installs rewrite harness settings, so they go before the merges.
+  const plugins = pluginDrift(withPlugin, {
+    commit: withPlugin.length
+      ? cliCommit(options.root, options.env)
+      : { skip: "" },
+    env: options.env,
+    fix: options.fix,
+    plugin: () => readPluginMetadata(options.root),
+  });
+  lines.push(...plugins.lines);
+
+  let code: 0 | 1 | 2 = clone.error || plugins.error ? 2 : 0;
   const outcomes: Outcome[] = [];
   const checked = new Set(groups.map((g) => g.harness));
   // Records of skipped or failing harnesses stay as they are.
@@ -254,7 +278,7 @@ export function doctor(options: DoctorOptions): DoctorResult {
       lines.push(
         `repo ${outcome.path} ${outcome.state}${outcome.fixed ? `, ${verbs[outcome.state] ?? "fixed"}` : ""}`,
       );
-  lines.push(summary([...outcomes, ...repo]));
+  lines.push(summary([...plugins.outcomes, ...outcomes, ...repo]));
 
   if (options.fix && serializeState(next) !== serializeState(records)) {
     try {
@@ -267,7 +291,10 @@ export function doctor(options: DoctorOptions): DoctorResult {
   if (
     code === 0 &&
     !options.fix &&
-    (clone.drift || [...outcomes, ...repo].some((o) => o.state !== "in sync"))
+    (clone.drift ||
+      [...plugins.outcomes, ...outcomes, ...repo].some(
+        (o) => o.state !== "in sync",
+      ))
   )
     code = 1;
   return { lines, code };

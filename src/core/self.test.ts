@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { run } from "../cli/index.js";
-import { checkClone } from "./self.js";
+import { checkClone, cliCommit } from "./self.js";
 
 const env = {
   HOME: mkdtempSync(join(tmpdir(), "agentfiles-self-home-")),
@@ -126,6 +126,49 @@ describe("the CLI's clone", () => {
       drift: false,
       error: false,
       rerun: false,
+    });
+  });
+
+  it("is the plugins' reference when clean and on origin/main", () => {
+    const c = clone();
+    expect(cliCommit(c.root, env)).toEqual({ commit: c.head() });
+    const main = c.advance();
+    git(c.root, "fetch", "-q", "origin");
+    // Behind origin/main is still on it.
+    expect(cliCommit(c.root, env)).toEqual({ commit: c.head() });
+    expect(cliCommit(c.root, { ...env, AGENTFILES_COMMIT: main })).toEqual({
+      commit: main,
+    });
+    expect(
+      cliCommit(c.root, { ...env, AGENTFILES_COMMIT: main.slice(0, 9) }),
+    ).toEqual({ commit: main });
+  });
+
+  it("skips with local changes, off origin/main and outside a clone", () => {
+    const c = clone();
+    writeFileSync(join(c.root, "x"), "x");
+    expect(cliCommit(c.root, env)).toEqual({
+      skip: "the CLI's clone has local changes",
+    });
+    git(c.root, "add", "x");
+    git(c.root, "commit", "-q", "-m", "local");
+    expect(cliCommit(c.root, env)).toEqual({
+      skip: "the CLI's commit isn't on main",
+    });
+    expect(
+      cliCommit(mkdtempSync(join(tmpdir(), "agentfiles-plain-")), env),
+    ).toEqual({ skip: "the CLI doesn't run from a git clone" });
+  });
+
+  it("errs on an override that isn't a commit on origin/main", () => {
+    const c = clone();
+    git(c.root, "commit", "-q", "--allow-empty", "-m", "local");
+    const local = c.head();
+    expect(cliCommit(c.root, { ...env, AGENTFILES_COMMIT: local })).toEqual({
+      error: `AGENTFILES_COMMIT=${local} is not a commit on origin/main`,
+    });
+    expect(cliCommit(c.root, { ...env, AGENTFILES_COMMIT: "nope" })).toEqual({
+      error: "AGENTFILES_COMMIT=nope is not a commit on origin/main",
     });
   });
 
