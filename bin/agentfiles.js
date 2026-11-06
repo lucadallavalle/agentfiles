@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+if (Number(process.versions.node.split(".")[0]) < 22) {
+	process.stderr.write("agentfiles needs Node 22 or later; this is Node " + process.versions.node + "\n");
+	process.exit(2);
+}
 import fs, { accessSync, chmodSync, constants, existsSync, lstatSync, mkdirSync, readFileSync, realpathSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import path, { basename, delimiter, dirname, join, sep } from "node:path";
 import { fileURLToPath } from "node:url";
