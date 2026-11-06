@@ -11,6 +11,8 @@ import {
   type Env,
   type Paths,
 } from "./files.js";
+import { ownersPath, readOwners } from "./owners.js";
+import { repoDrift, type RepoOutcome } from "./repo.js";
 import {
   readState,
   serializeState,
@@ -48,6 +50,8 @@ export interface DoctorOptions {
   /** The repo root, holding `config/`. */
   root: string;
   env: Env;
+  /** The current directory: its repo gets the `repo` group. */
+  cwd: string;
   adapters: readonly Adapter[];
   fix: boolean;
 }
@@ -85,7 +89,9 @@ function describe(outcome: Outcome, home: string): string {
   return label;
 }
 
-function summary(outcomes: readonly Outcome[]): string {
+function summary(
+  outcomes: readonly Pick<Outcome, "state" | "fixed">[],
+): string {
   const counts = new Map<string, number>();
   for (const outcome of outcomes) {
     const key = outcome.fixed ? "fixed" : outcome.state;
@@ -113,9 +119,9 @@ interface Group {
 }
 
 /**
- * Checks every present harness and, with `fix`, writes missing and outdated
- * entries and removes unshipped ones. A harness with a file that doesn't
- * parse is skipped; the state file is written last.
+ * Checks every present harness, then the current repo, and, with `fix`,
+ * writes missing and outdated entries and removes unshipped ones. A harness
+ * with a file that doesn't parse is skipped; the state file is written last.
  */
 export function doctor(options: DoctorOptions): DoctorResult {
   const lines: string[] = [];
@@ -220,7 +226,28 @@ export function doctor(options: DoctorOptions): DoctorResult {
 
   for (const outcome of outcomes)
     if (outcome.state !== "in sync") lines.push(describe(outcome, base.home));
-  lines.push(summary(outcomes));
+
+  let repo: RepoOutcome[] = [];
+  try {
+    repo = repoDrift({
+      cwd: options.cwd,
+      env: options.env,
+      root: options.root,
+      documentation: config.documentation,
+      hashes: config.documentationHashes,
+      owners: readOwners(ownersPath(base)),
+      fix: options.fix,
+    });
+  } catch (error) {
+    lines.push(`repo error: ${(error as Error).message}`);
+    code = 2;
+  }
+  for (const outcome of repo)
+    if (outcome.state !== "in sync")
+      lines.push(
+        `repo ${outcome.path} ${outcome.state}${outcome.fixed ? `, ${verbs[outcome.state] ?? "fixed"}` : ""}`,
+      );
+  lines.push(summary([...outcomes, ...repo]));
 
   if (options.fix && serializeState(next) !== serializeState(records)) {
     try {
@@ -230,7 +257,11 @@ export function doctor(options: DoctorOptions): DoctorResult {
       code = 2;
     }
   }
-  if (code === 0 && !options.fix && outcomes.some((o) => o.state !== "in sync"))
+  if (
+    code === 0 &&
+    !options.fix &&
+    [...outcomes, ...repo].some((o) => o.state !== "in sync")
+  )
     code = 1;
   return { lines, code };
 }

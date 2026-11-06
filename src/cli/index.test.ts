@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import {
   chmodSync,
   cpSync,
@@ -67,12 +68,13 @@ function fakeHome(harness: "dir" | "binary" | "none" = "dir") {
         typeof value === "string" ? value : JSON.stringify(value),
       );
     },
-    run: (args: string[], over: Env = env) => {
+    run: (args: string[], over: Env = env, cwd = base) => {
       let out = "";
       let err = "";
       const code = run(args, {
         root,
         env: over,
+        cwd,
         adapters: [testAdapter],
         output: {
           out: (text) => (out += text),
@@ -339,6 +341,51 @@ describe("doctor", () => {
     expect(h.read(".test-harness/rules/agentfiles.md")).toBe(
       `@${join(outside, "agentfiles", "instructions.md")}\n`,
     );
+  });
+});
+
+describe("repo", () => {
+  it("reports the common documentation copies of an owned repo; --fix writes them", () => {
+    const h = fakeHome();
+    const env = {
+      ...h.env,
+      PATH: `${h.at("../bin")}:${process.env.PATH ?? ""}`,
+    };
+    const repo = h.at("x");
+    mkdirSync(repo);
+    // Only this env: a git hook's GIT_DIR would point git at this checkout.
+    const git = (...args: string[]) =>
+      execFileSync("git", args, { cwd: repo, env, stdio: "ignore" });
+    git("init", "-q");
+    git("remote", "add", "origin", "git@github.com:me/x.git");
+    h.run(["doctor", "--fix"]);
+
+    // Not an owner yet: foreign, silent.
+    expect(h.run(["doctor"], env, repo)).toMatchObject({ code: 0 });
+    h.write(".config/agentfiles/config.json", '{"owners": ["me"]}');
+    const check = h.run(["doctor"], env, repo);
+    expect(check.code).toBe(1);
+    expect(check.out).toContain("repo docs/documentation/README.md missing\n");
+    expect(h.run(["doctor", "--fix"], env, repo).out).toContain(
+      "repo docs/documentation/README.md missing, written\n",
+    );
+    expect(h.read("x/docs/documentation/README.md")).toBe("# Docs\n");
+
+    h.write("x/docs/documentation/README.md", "mine\n");
+    expect(h.run(["doctor"], env, repo)).toMatchObject({ code: 1 });
+    const fix = h.run(["doctor", "--fix"], env, repo);
+    expect(fix.code).toBe(0);
+    expect(fix.out).toContain("repo docs/documentation/README.md edited\n");
+    expect(h.read("x/docs/documentation/README.md")).toBe("mine\n");
+  });
+
+  it("exits 2 when config.json doesn't parse, after the other groups", () => {
+    const h = fakeHome();
+    h.write(".config/agentfiles/config.json", "{");
+    const fix = h.run(["doctor", "--fix"]);
+    expect(fix.code).toBe(2);
+    expect(fix.out).toMatch(/^repo error: .*config\.json: /m);
+    expect(h.read(instructions)).toBe(shipped);
   });
 });
 

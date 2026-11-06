@@ -36,6 +36,7 @@ function fakeHome(configDir = ".claude") {
     const code = run(["doctor", ...args], {
       root,
       env,
+      cwd: home,
       adapters: [claudeCode],
       output: { out: (text) => (out += text), err: () => undefined },
     });
