@@ -3,19 +3,29 @@
 My agent development setup, like dotfiles but for coding agents: Claude Code, OpenCode and Codex.
 It encodes my [development process](docs/documentation/development_process.md) once and applies it on every machine I code on, local or cloud. It never adds a committed file to a repo I only contribute to.
 
-Status: the Claude Code, OpenCode and Codex plugins are installable; `agentfiles doctor` merges user-level config into Claude Code, Codex and OpenCode ([plan 001](docs/plans/001_user-level-config.md)). Design: [ADR-001](docs/adr/ADR-001_general-design.md); all decisions: [decision log](docs/decisions.md).
+Status: `agentfiles bootstrap` sets up a machine and `agentfiles doctor` keeps it in sync: the plugins of Claude Code, Codex and OpenCode at the CLI's commit, their user-level config, the common documentation, and the copies in owned repos ([plan 001](docs/plans/001_user-level-config.md), [plan 002](docs/plans/002_cli.md)). Design: [ADR-001](docs/adr/ADR-001_general-design.md); all decisions: [decision log](docs/decisions.md).
 
 ## How it works
 
-|              | Plugins                                                    | CLI `agentfiles`                                                                                          |
-| ------------ | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| What         | skills, hooks and commands, one plugin per harness         | sets up and checks: installs the plugins, merges user-level config, sets up repos                         |
-| Runs         | inside a harness session (`/grill`, a hook firing)         | in the shell, once per machine (`bootstrap`) or repo (`attach`, `scaffold`), and to find drift (`doctor`) |
-| Installed by | the CLI, then updated by the harness's own plugin commands | `npx github:lucadallavalle/agentfiles …`, no prior install                                                |
+|              | Plugins                                            | CLI `agentfiles`                                                                                          |
+| ------------ | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| What         | skills, hooks and commands, one plugin per harness | sets up and checks: installs the plugins, merges user-level config, sets up repos                         |
+| Runs         | inside a harness session (`/grill`, a hook firing) | in the shell, once per machine (`bootstrap`) or repo (`attach`, `scaffold`), and to find drift (`doctor`) |
+| Installed by | the CLI, through the harness's own plugin commands | a git clone at `~/.local/share/agentfiles`, run with `node` ([Setup](#setup))                             |
 
-Like dotfiles: the plugins are the config files, the CLI is what puts them in place. Plugins, not files copied by the CLI, so each harness installs, updates and namespaces them itself and nothing overwrites my edits; the cost is one adapter per plugin format. Both are planned ([roadmap](docs/ROADMAP.md) steps 2 and 4).
+Like dotfiles: the plugins are the config files, the CLI is what puts them in place. Plugins, not files copied by the CLI, so each harness installs, updates and namespaces them itself and nothing overwrites my edits; the cost is one adapter per plugin format.
 
-## Install
+## Setup
+
+```sh
+{ [ -d ~/.local/share/agentfiles ] || git clone https://github.com/lucadallavalle/agentfiles ~/.local/share/agentfiles; } && node ~/.local/share/agentfiles/bin/agentfiles.js bootstrap --owner lucadallavalle
+```
+
+Needs Node 22 or later, `git` and at least one harness; `bootstrap` never installs a harness and exits 2 naming what's missing. It adds each `--owner` (repeatable) to `owners` in `~/.config/agentfiles/config.json`, links `~/.local/bin/agentfiles` to the bundle (and says so when that directory isn't on `PATH`; it never edits shell files or replaces another file there), then runs `doctor --fix`, whose exit code it returns. Safe to rerun. spiral-review's install and `init` will join it (roadmap step 4).
+
+Hosted sessions (Claude Code on the web, Codex cloud) get no user-level config of their own: put the same line in the environment's setup script, which runs before each session (as root on Claude Code on the web). Codex cloud is unverified.
+
+## Plugins
 
 `agentfiles doctor --fix` installs and updates the plugin of each installed harness at the CLI's own commit (Claude Code: marketplace added by `https://github.com/lucadallavalle/agentfiles.git`, following `main`, then `plugin install agentfiles@lucadallavalle -s user`; when `main` has moved past the CLI's commit it reports `outdated: main is at <commit>`; Codex: marketplace pinned to the commit, `marketplace add lucadallavalle/agentfiles@<sha>` then `plugin add agentfiles@lucadallavalle`, moved by `plugin remove`, `marketplace remove` and both adds again; OpenCode: `plugin add github:lucadallavalle/agentfiles#<sha>`, moved by `plugin remove` of our entry first, so one `plugins` entry remains). Plugin drift needs the CLI's clone without local changes at a commit of `main`, else it prints one skip line. A running session picks up a plugin update in its next session.
 
@@ -24,11 +34,11 @@ Claude Code: skills run as `/agentfiles:<skill>`. OpenCode: skill IDs are flat (
 ## User-level config
 
 ```sh
-npx github:lucadallavalle/agentfiles doctor        # report drift; exit 0 in sync, 1 drift, 2 error
-npx github:lucadallavalle/agentfiles doctor --fix  # write missing and outdated entries, remove unshipped ones
+agentfiles doctor        # report drift; exit 0 in sync, 1 drift, 2 error
+agentfiles doctor --fix  # write missing and outdated entries, remove unshipped ones
 ```
 
-The CLI needs Node 22 or later and exits 2 on older versions. `config/` is the shipped config; `doctor --fix` copies `config/instructions.md` to `~/.config/agentfiles/instructions.md` and the common documentation to `~/.config/agentfiles/documentation/` (skills read it when a repo has no `docs/documentation/`), and merges files, settings keys and list elements into each installed harness (Claude Code: `rules/agentfiles.md` importing it, `settings.json` `attribution` and `Bash(<prefix> *)` permission rules; Codex: `developer_instructions` in `config.toml`, `prefix_rule`s in `rules/agentfiles.rules`; OpenCode: the `instructions` element and V2 `permissions` shell rules, first so your own rules win, in `opencode.json`, or `opencode.jsonc` when it's the only file), recording what it wrote in `~/.local/state/agentfiles/state.json` (XDG variables honored). An entry you edited, or one you already had with another value, is reported with the shipped value and never overwritten: restore that value, or, for a value you already had, remove yours and run `--fix`. To change shipped config, change `config/`. OpenCode: only V2 `permissions` are supported; V1 `permission` rules in the same file resolve before ours, so ours override them. A harness running during `--fix` may rewrite its settings and drop our entries; the next `doctor` reports them as edited.
+The CLI exits 2 below Node 22. `config/` is the shipped config; `doctor --fix` copies `config/instructions.md` to `~/.config/agentfiles/instructions.md` and the common documentation to `~/.config/agentfiles/documentation/` (skills read it when a repo has no `docs/documentation/`), and merges files, settings keys and list elements into each installed harness (Claude Code: `rules/agentfiles.md` importing it, `settings.json` `attribution` and `Bash(<prefix> *)` permission rules; Codex: `developer_instructions` in `config.toml`, `prefix_rule`s in `rules/agentfiles.rules`; OpenCode: the `instructions` element and V2 `permissions` shell rules, first so your own rules win, in `opencode.json`, or `opencode.jsonc` when it's the only file), recording what it wrote in `~/.local/state/agentfiles/state.json` (XDG variables honored). An entry you edited, or one you already had with another value, is reported with the shipped value and never overwritten: restore that value, or, for a value you already had, remove yours and run `--fix`. To change shipped config, change `config/`. OpenCode: only V2 `permissions` are supported; V1 `permission` rules in the same file resolve before ours, so ours override them. A harness running during `--fix` may rewrite its settings and drop our entries; the next `doctor` reports them as edited.
 
 ## Updating the CLI
 
