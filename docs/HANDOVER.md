@@ -1,10 +1,10 @@
 # Handover
 
-Updated: 2026-11-06, plan 002 C08 PR
+Updated: 2026-11-08, after plan 002
 
 ## Where we are
 
-ROADMAP step 3 is done ([plan 001](plans/001_user-level-config.md)). Step 4 runs as [plan 002](plans/002_cli.md): C01–C07 merged (#29–#35: Node 22 floor, machine documentation copy, repo drift, the clone kept on `main`, plugin drift for all three harnesses, no fallback used); C08 (`bootstrap --owner`, README setup and hosted snippet, step 4's box) is in review.
+ROADMAP step 4 is done: [plan 002](plans/002_cli.md) C01–C08 are merged (#29–#36), and `agentfiles bootstrap` / `doctor --fix` set up a machine (plugins at the CLI's commit, user-level config, the documentation copy) and owned repos' copies. `attach`, `scaffold` and the spiral-review slot wait on spiral-review. So far only run in fake homes.
 
 ## Prove it
 
@@ -13,11 +13,11 @@ Expect: `All matched files use Prettier code style!`, `Tests  207 passed (207)`,
 
 ## Active chunk
 
-Plan 002 C08: waits for the owner's manual check (the README snippet as a Claude Code web environment's setup script; `/agentfiles:grill` and `rules/agentfiles.md` in `/context`). If it fails, record the session's `whoami` and `$HOME` and add the gap to ADR-001's consequences before merging.
+None.
 
 ## Next action
 
-After C08 merges: ask the owner what comes next (step 5, or spiral-review's dependencies of step 4's slot). Plugin chunks: `OLD` is C01's merge commit `14efdc4`.
+The owner runs the README one-liner on a real machine (`--fix` changes the real harness config) and the Claude Code web check (Open questions). Then step 5, through the strategy loop; candidate skill: executing a plan chunk by chunk, done by hand for plans 001 and 002.
 
 ## Decisions not to reopen
 
@@ -33,8 +33,12 @@ After C08 merges: ask the owner what comes next (step 5, or spiral-review's depe
 - Codex: `developer_instructions` spliced by recorded exact text, `prefix_rule` decisions `allow`/`prompt`/`forbidden`: [decision log](decisions.md).
 - OpenCode: V2 `permissions` only, `<prefix> *` shell rules first; V1 `permission` isn't handled: [decision log](decisions.md).
 - Common documentation copies are read-only in owned repos: [decision log](decisions.md). Squash merge only: [source control](documentation/source_control.md).
+- The CLI runs from a clone at `~/.local/share/agentfiles` kept on `main`; its commit is the plugins' reference; `AGENTFILES_COMMIT` must be on `origin/main`: [plan 002](plans/002_cli.md), [decision log](decisions.md).
+- Claude Code's marketplace follows `main` by HTTPS; Codex and OpenCode are pinned to the commit: [plan 002](plans/002_cli.md), [decision log](decisions.md).
+- Owned means a remote exists and every remote's owner is in `owners`; a copy is unedited when its hash is in the append-only list: [decision log](decisions.md).
 
 ## Open questions
 
-- [Plan 002](plans/002_cli.md) verifies, each with a fallback: the Codex sequence that moves the installed plugin to a commit (C05); that `opencode plugin remove` + `add` leaves one entry (C06); Claude Code's SSH clone on a machine without keys (C07).
+- Claude Code web check not recorded: the README snippet as an environment's setup script should list `/agentfiles:grill` and `rules/agentfiles.md` in `/context`. If not, record the session's `whoami` and `$HOME` and add the gap to ADR-001's consequences.
+- Codex cloud is unverified until run.
 - `pnpm install` skips `pnpm:devPreinstall` when nothing needs installing, so an existing checkout keeps its old `core.hooksPath` until a real install.
