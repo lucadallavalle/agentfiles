@@ -1,10 +1,10 @@
 # Handover
 
-Updated: 2026-11-08, after plan 002
+Updated: 2026-11-10, after the first real-machine run
 
 ## Where we are
 
-ROADMAP step 4 is done: [plan 002](plans/002_cli.md) C01–C08 are merged (#29–#36), and `agentfiles bootstrap` / `doctor --fix` set up a machine (plugins at the CLI's commit, user-level config, the documentation copy) and owned repos' copies. `attach`, `scaffold` and the spiral-review slot wait on spiral-review. So far only run in fake homes.
+ROADMAP step 4 is done: [plan 002](plans/002_cli.md) C01–C08 are merged (#29–#36), and `agentfiles bootstrap` / `doctor --fix` set up a machine (plugins at the CLI's commit, user-level config, the documentation copy) and owned repos' copies. `attach`, `scaffold` and the spiral-review slot wait on spiral-review. The owner's machine is bootstrapped (Claude Code 2.1.319, Codex 0.167.0, OpenCode 2.2.6): `agentfiles doctor` reports 31 entries in sync. Claude Code `attribution` ships as `false` since #38.
 
 ## Prove it
 
@@ -17,7 +17,7 @@ None.
 
 ## Next action
 
-The owner runs the README one-liner on a real machine (`--fix` changes the real harness config) and the Claude Code web check (Open questions). Then step 5, through the strategy loop; candidate skill: executing a plan chunk by chunk, done by hand for plans 001 and 002.
+The owner runs the Claude Code web check (Open questions). Step 5 starts in the strategy loop: choose which repeated practice becomes a skill (candidate: executing a plan chunk by chunk, done by hand for plans 001 and 002), then a feature doc and plan.
 
 ## Decisions not to reopen
 
@@ -41,4 +41,6 @@ The owner runs the README one-liner on a real machine (`--fix` changes the real 
 
 - Claude Code web check not recorded: the README snippet as an environment's setup script should list `/agentfiles:grill` and `rules/agentfiles.md` in `/context`. If not, record the session's `whoami` and `$HOME` and add the gap to ADR-001's consequences.
 - Codex cloud is unverified until run.
+- Claude Code before 2.1.281 rejects `attribution: false` and skips the whole `settings.json` ([decision log](decisions.md)).
+- Without `git` on `PATH`, plugin drift says "the CLI doesn't run from a git clone", which misnames the cause.
 - `pnpm install` skips `pnpm:devPreinstall` when nothing needs installing, so an existing checkout keeps its old `core.hooksPath` until a real install.
