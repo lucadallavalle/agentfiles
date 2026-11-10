@@ -80,7 +80,7 @@ describe("claude-code adapter", () => {
         allow: ["Read(~/notes/**)", ...allow.map((p) => `Bash(${p} *)`)],
         defaultMode: "plan",
       },
-      attribution: { commit: "", pr: "", sessionUrl: false },
+      attribution: false,
     });
 
     const before = h.text();
@@ -102,13 +102,13 @@ describe("claude-code adapter", () => {
   it("reports an edited entry without overwriting it", () => {
     const h = fakeHome();
     h.doctor("--fix");
-    const edited = jsonc.set(h.text(), ["attribution", "commit"], "mine");
+    const edited = jsonc.set(h.text(), ["attribution"], true);
     h.write(edited);
 
     const check = h.doctor();
     expect(check.code).toBe(1);
     expect(check.out).toContain(
-      `claude-code ${h.settings.replace(/^.*\/\.claude/, "~/.claude")} attribution edited: shipped {"commit":"","pr":"","sessionUrl":false}; restore it\n`,
+      `claude-code ${h.settings.replace(/^.*\/\.claude/, "~/.claude")} attribution edited: shipped false; restore it\n`,
     );
     expect(h.doctor("--fix").code).toBe(0);
     expect(h.text()).toBe(edited);
