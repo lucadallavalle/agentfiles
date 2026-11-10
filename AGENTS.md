@@ -24,3 +24,5 @@ Documentation guidelines: `/docs/documentation/README.md`. This repo is their so
 - drift: a difference between what agentfiles would install and what a machine or repo has; an entry is in sync, missing, outdated, edited, unshipped or in conflict. Avoid: diff, mismatch, drifted.
 - loop: one of the strategy, feature and execution cycles of the development process, each with its own artifacts and review. Avoid: phase, stage, step.
 - chunk: one testable outcome of a plan, done in one agent session and one PR. Avoid: task, step.
+- orchestrator: the session that runs `execute-plan` for one plan. Avoid: coordinator, lead.
+- implementer: the subagent that does one chunk for the orchestrator. Avoid: worker, dev agent.
