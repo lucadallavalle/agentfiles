@@ -1,6 +1,6 @@
 # Handover
 
-Updated: 2026-11-10, after the first real-machine run and the step 5 grill (#40)
+Updated: 2026-11-10, plan 003 PR
 
 ## Where we are
 
@@ -17,7 +17,7 @@ None.
 
 ## Next action
 
-The owner runs the Claude Code web check (Open questions). Write plan 003 for ROADMAP step 5 from its entry and the 2026-11-10 decision rows; grill and merge it; run chunks 1–3 by prompt and 4–5 with `/agentfiles:execute-plan … merge`.
+The owner runs the Claude Code web check (Open questions). Grill [plan 003](plans/003_skills.md) on its PR, merge it, then execute C01–C03 by prompt and C04–C05 with `/agentfiles:execute-plan docs/plans/003_skills.md merge` after `doctor --fix` and a new session.
 
 ## Decisions not to reopen
 
