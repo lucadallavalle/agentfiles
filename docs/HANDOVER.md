@@ -1,10 +1,10 @@
 # Handover
 
-Updated: 2026-11-10, after the first real-machine run
+Updated: 2026-11-10, after the first real-machine run and the step 5 grill (#40)
 
 ## Where we are
 
-ROADMAP step 4 is done: [plan 002](plans/002_cli.md) C01–C08 are merged (#29–#36), and `agentfiles bootstrap` / `doctor --fix` set up a machine (plugins at the CLI's commit, user-level config, the documentation copy) and owned repos' copies. `attach`, `scaffold` and the spiral-review slot wait on spiral-review. The owner's machine is bootstrapped (Claude Code 2.1.319, Codex 0.167.0, OpenCode 2.2.6): `agentfiles doctor` reports 31 entries in sync. Claude Code `attribution` ships as `false` since #38.
+ROADMAP step 4 is done: [plan 002](plans/002_cli.md) C01–C08 are merged (#29–#36), and `agentfiles bootstrap` / `doctor --fix` set up a machine (plugins at the CLI's commit, user-level config, the documentation copy) and owned repos' copies. `attach`, `scaffold` and the spiral-review slot wait on spiral-review. The owner's machine is bootstrapped (Claude Code 2.1.319, Codex 0.167.0, OpenCode 2.2.6): `agentfiles doctor` reports 31 entries in sync. Claude Code `attribution` ships as `false` since #38. Step 5's skills, order and done criterion are decided (#40).
 
 ## Prove it
 
@@ -17,7 +17,7 @@ None.
 
 ## Next action
 
-The owner runs the Claude Code web check (Open questions). Step 5 starts in the strategy loop: choose which repeated practice becomes a skill (candidate: executing a plan chunk by chunk, done by hand for plans 001 and 002), then a feature doc and plan.
+The owner runs the Claude Code web check (Open questions). Write plan 003 for ROADMAP step 5 from its entry and the 2026-11-10 decision rows; grill and merge it; run chunks 1–3 by prompt and 4–5 with `/agentfiles:execute-plan … merge`.
 
 ## Decisions not to reopen
 
@@ -27,6 +27,7 @@ The owner runs the Claude Code web check (Open questions). Step 5 starts in the 
 - The CLI is a committed rolldown bundle written by `pnpm generate`, no runtime dependencies; `jsonc-parser` for JSON/JSONC, smol-toml plus a verified splice for TOML; five serial chunks: [decision log](decisions.md).
 - This repo is the marketplace and the plugin; manifests and the bundle are generated, committed and checked by the gate; no `build`, `prepare` or other install script: [decision log](decisions.md).
 - pnpm stays (this machine has no npm: use `pnpm dlx npm@11`); TypeScript 6 until typescript-eslint supports 7: [decision log](decisions.md).
+- Step 5: `review-chunk`, `execute-plan`, `write-plan` and a `grill` change, in one plan in that order (after the common documentation rules); done when `execute-plan` runs chunks 4 and 5: [ROADMAP](ROADMAP.md) step 5, [decision log](decisions.md).
 - OpenCode checks run in a fake home with `--standalone`; `plugin add` has no such flag and writes only the fake home: [decision log](decisions.md).
 - Core: a `Format` edits text to text; adapters return `Entry` lists and register in `src/adapters/index.ts`; a broken state file stops the whole run: [decision log](decisions.md).
 - Claude Code rules are `Bash(<prefix> *)`; `attribution` is `false`; `jsonc` removal keeps neighbouring comments; the bundler prefers `module` over `main`: [decision log](decisions.md).
