@@ -39,9 +39,21 @@ In order; each step is one small PR. D-numbers refer to [ADR-001](adr/ADR-001_ge
     - spiral-review user-level config (`~/.config/spiral-review`), where `bootstrap` passes the reviewer model to `init`: an MVP item in its roadmap, not built.
     - spiral-review repo config: the instructions file is `REVIEW.md` (decided); whether to keep `.spiral-review.toml` is open there (R13). `scaffold` must get both from spiral-review, not write them itself.
 - [ ] **5. More skills:** only after a part of the [development process](documentation/development_process.md) has been repeated by hand, so the skill encodes real practice.
+  - Evidence 2026-11-10 (this repo's PRs #1–#39, two other owned repos, owner prompts in session transcripts, BMAD-METHOD as reference): plan execution (this repo 13 chunks by 2 pasted prompts; ~75 chunks by 16 prompts elsewhere, orchestrator with one subagent per chunk, fresh-context reviewer, 3 parallel runs), plan writing (~35 plans), grills, ~40 "give me the prompt" hand-offs between sessions, handover stale 3 times.
+  - Decided ([decision log](decisions.md)), one plan, chunks in order:
+    1. Common documentation: Open questions empty before a plan merges; disjoint-files rule covers shared config, schema and setup; handover written as of after its PR merges; `questionable` marker on agent decision rows. This repo's fake-home Accept setup moves to `AGENTS.md`.
+    2. `review-chunk` (model-invoked): a fresh-context review of one PR against its plan (scope, Accept, tests not weakened, decision rows, chunk box) and of its code; findings verified and triaged (fix, defer, wrong plan, owner question), at most 3 fix rounds. Code review goes to spiral-review when installed.
+    3. `execute-plan` (manual-only): orchestrates a merged plan from `HANDOVER.md`; one implementer subagent per chunk in its own worktree (tests first), `review-chunk` in a fresh subagent, gate and Accept re-run by the orchestrator; serial, parallel only for chunks with no `Depends:` path and disjoint files; merges only when invoked with `merge`; owns the handover.
+    4. `write-plan` (model-invoked): a plan from the common `plan_template.md` (repo copy, else the machine's), as a docs PR.
+    5. `grill`: pushes outcomes to the open PR's branch after the gate; edits an unmerged plan in place.
+  - Done when the five chunks are merged with the gate passing, and chunks 4 and 5 ran through the merged `/agentfiles:execute-plan … merge` (after `doctor --fix` and a new session), its report in chunk 5's PR, which checks this box.
+  - Each skill ends by naming the next one; project-specific steps stay in each repo's `AGENTS.md` and `Accept:` lines.
+  - Needs (when spiral-review's `pr` ships): how `review-chunk` hands code review to spiral-review: which command, whose findings and triage win (`dismiss` vs the 3-round cap), whether plan-conformance findings reach the digest, and whether `execute-plan` opens PRs through `ship`.
+  - Depends: spiral-review `pr` / `pr --create` and `dismiss` (MVP in its roadmap, not built).
 
 ## Later
 
 - spiral-review consumes the common documentation from here (D7); its own copy is replaced then.
 - Depends: spiral-review classifies a PR's loop from the paths convention in the [development process](documentation/development_process.md) (its PRD-001), and a docs-review mode for strategy and feature PRs (on its roadmap).
+- Skills for closing a plan, reviewing agent decision rows, and a retrospective across a plan's chunks: wait for repeated practice (step 5).
 - A dedicated task framework and DSL (TBD) for defining a plan's chunks, their dependency graph and running them in parallel; the plan template's `Depends:` lines are the interim format.
