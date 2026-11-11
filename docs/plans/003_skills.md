@@ -111,7 +111,7 @@ None.
 
 Gate: `pnpm check && pnpm compile`
 
-- [ ] C01 — The common documentation has the four rules, the machine copy updates through `doctor --fix`, and `AGENTS.md` has the fake-home Accept setup loading the worktree's skills
+- [x] C01 — The common documentation has the four rules, the machine copy updates through `doctor --fix`, and `AGENTS.md` has the fake-home Accept setup loading the worktree's skills
       Accept: gate; a `grep` per rule; fake home: `node bin/agentfiles.js doctor --fix` writes the new copies, a second `doctor` exits 0, and the setup shows `grill` manual-only: `codex debug prompt-input` omits `agentfiles:grill`, OpenCode has `{"id":"grill","autoinvoke":false}`, `claude plugin details` lists it
 - [ ] C02 — `review-chunk` loads model-invoked in all three harnesses and catches a seeded defect: on a local branch replaying #36 with one test assertion weakened and C08's box unchecked it flags both as fixes; on PR #36 against plan 002 C08 none of its fix findings is false
       Accept: gate; fake home: `codex debug prompt-input` lists `agentfiles:review-chunk`, OpenCode has no `autoinvoke: false` for it, `claude plugin details` lists it; both reports (fresh subagents following the branch's `SKILL.md`) in the PR, each fix finding on #36 checked against the code by the C02 session

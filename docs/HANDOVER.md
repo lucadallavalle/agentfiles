@@ -1,10 +1,10 @@
 # Handover
 
-Updated: 2026-11-12, plan 003 grill
+Updated: 2026-11-12, plan 003 C01
 
 ## Where we are
 
-ROADMAP step 4 is done: [plan 002](plans/002_cli.md) C01–C08 are merged (#29–#36), and `agentfiles bootstrap` / `doctor --fix` set up a machine (plugins at the CLI's commit, user-level config, the documentation copy) and owned repos' copies. `attach`, `scaffold` and the spiral-review slot wait on spiral-review. The owner's machine is bootstrapped (Claude Code 2.1.319, Codex 0.167.0, OpenCode 2.2.6): `agentfiles doctor` reports 31 entries in sync. Claude Code `attribution` ships as `false` since #38. Step 5's skills, order and done criterion are decided (#40); [plan 003](plans/003_skills.md) is grilled on #41, no open questions.
+ROADMAP step 4 is done: [plan 002](plans/002_cli.md) C01–C08 are merged (#29–#36), and `agentfiles bootstrap` / `doctor --fix` set up a machine (plugins at the CLI's commit, user-level config, the documentation copy) and owned repos' copies. `attach`, `scaffold` and the spiral-review slot wait on spiral-review. The owner's machine is bootstrapped (Claude Code 2.1.319, Codex 0.167.0, OpenCode 2.2.6): `agentfiles doctor` reports 31 entries in sync. Claude Code `attribution` ships as `false` since #38. Step 5's skills, order and done criterion are decided (#40); [plan 003](plans/003_skills.md) is merged (#41). Its C01 is merged (#42): the common documentation has an Open questions section for plans, disjoint files that include shared config, schema and setup, a handover written as of after its PR merges and the `agent (questionable)` marker; `AGENTS.md` has the fake-home setup that loads a worktree's skills. The machine's and owned repos' copies report `outdated` until `doctor --fix`.
 
 ## Prove it
 
@@ -17,7 +17,7 @@ None.
 
 ## Next action
 
-The owner runs the Claude Code web check (Open questions). The owner confirms [plan 003](plans/003_skills.md) and merges #41, then executes C01–C03 by prompt and C04–C05 with `/agentfiles:execute-plan docs/plans/003_skills.md merge` after `doctor --fix` and a new session.
+Execute [plan 003](plans/003_skills.md) C02 (`review-chunk`), then C03, by prompt; C04–C05 with `/agentfiles:execute-plan docs/plans/003_skills.md merge` after `doctor --fix` and a new session. The owner runs the Claude Code web check (Open questions).
 
 ## Decisions not to reopen
 
@@ -29,7 +29,8 @@ The owner runs the Claude Code web check (Open questions). The owner confirms [p
 - pnpm stays (this machine has no npm: use `pnpm dlx npm@11`); TypeScript 6 until typescript-eslint supports 7: [decision log](decisions.md).
 - Step 5: `review-chunk`, `execute-plan`, `write-plan` and a `grill` change, in one plan in that order (after the common documentation rules); done when `execute-plan` runs chunks 4 and 5: [ROADMAP](ROADMAP.md) step 5, [decision log](decisions.md).
 - Plan 003: fake-home checks load the worktree's skills (`doctor --fix` can't); the review loop runs on the pushed branch before the PR, same reviewer each round; `review-chunk` has its own code pass only until spiral-review's `pr`: [plan 003](plans/003_skills.md), [decision log](decisions.md).
-- OpenCode checks run in a fake home with `--standalone`; `plugin add` has no such flag and writes only the fake home: [decision log](decisions.md).
+- Harness checks run in a fake home under `/tmp`; a worktree's skills load from its root in a fake home `doctor` hasn't written, OpenCode through `opencode serve` without `--standalone` (it stops before plugins load): [AGENTS.md](../AGENTS.md), [decision log](decisions.md).
+- A `questionable` agent row has `agent (questionable)` in **Made By**: [decision log template](documentation/decision_log_template.md).
 - Core: a `Format` edits text to text; adapters return `Entry` lists and register in `src/adapters/index.ts`; a broken state file stops the whole run: [decision log](decisions.md).
 - Claude Code rules are `Bash(<prefix> *)`; `attribution` is `false`; `jsonc` removal keeps neighbouring comments; the bundler prefers `module` over `main`: [decision log](decisions.md).
 - Codex: `developer_instructions` spliced by recorded exact text, `prefix_rule` decisions `allow`/`prompt`/`forbidden`: [decision log](decisions.md).
@@ -41,6 +42,8 @@ The owner runs the Claude Code web check (Open questions). The owner confirms [p
 
 ## Open questions
 
+- The owner confirms the 2026-11-12 decision row on `opencode serve` without `--standalone`: the agent wrote it under the owner's name, from plan 003 and the owner's prompt for C01 (#42's review comment).
+- The fake-home block in `AGENTS.md` uses the fixed port 4797 and prints nothing when OpenCode's skills don't load within 30 s; fine while chunks run serially.
 - Claude Code web check not recorded: the README snippet as an environment's setup script should list `/agentfiles:grill` and `rules/agentfiles.md` in `/context`. If not, record the session's `whoami` and `$HOME` and add the gap to ADR-001's consequences.
 - Codex cloud is unverified until run.
 - Claude Code before 2.1.281 rejects `attribution: false` and skips the whole `settings.json` ([decision log](decisions.md)).
