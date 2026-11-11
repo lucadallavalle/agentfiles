@@ -40,7 +40,7 @@ Ship the skills that encode how plans are written, reviewed and executed, replac
 
 ## Technical Approach
 
-Each skill is one `skills/<id>/SKILL.md`, written once for every harness, in `grill`'s style: short, imperative, pointing at `AGENTS.md` and the common documentation instead of restating them. Single file: the OpenCode plugin registers only the `SKILL.md` body, so a skill can't rely on sibling files. Project-specific steps (gate, Accept environment, extra checks) come from the repo's `AGENTS.md` and the plan's `Accept:` lines, never from the skill. Each skill ends by naming the next one.
+Each skill is one `skills/<id>/SKILL.md`, written once for every harness, in `grill`'s style: short, imperative, pointing at `AGENTS.md` and the common documentation instead of restating them. Single file: whether OpenCode lets the model read a plugin skill's sibling files is unverified; one file needs no check. Project-specific steps (gate, Accept environment, extra checks) come from the repo's `AGENTS.md` and the plan's `Accept:` lines, never from the skill. Each skill ends by naming the next one.
 
 ### Key Decisions
 
@@ -51,72 +51,75 @@ Each skill is one `skills/<id>/SKILL.md`, written once for every harness, in `gr
 | Per-chunk steps (orchestrator) | Branch `<type>/plan-NNN-cNN-<slug>` from fresh `origin/main`; implementer subagent in its own worktree; tests first; gate and Accept (as `AGENTS.md` and the plan say); chunk box; `Made By: agent` rows, `questionable` where judgement was used; PR; `review-chunk`; orchestrator re-runs gate and Accept; handover; merge per `merge` | Plans 001, 002 and the owner's later prompts elsewhere                 |
 | PR body                        | First line `Plan NNN CNN: <chunk line>`; bullets; `## Gate` and `## Accept` with real output, no machine-specific paths; decision rows and deviations listed                                                                                                                                                                             | Plan 002's PRs; replaced by spiral-review's format once `ship` is used |
 | Implementer brief              | The chunk line, Accept and the plan sections it touches, files to read (paths, not content), what parallel chunks it must not touch; returns PR, gate output, rows, deviations                                                                                                                                                           | BMAD's worker contract; the owner's prompts                            |
-| Final report                   | Merged PRs, decision rows (questionable first), fallbacks used, anything open, next step                                                                                                                                                                                                                                                 | Plan 002's prompt                                                      |
+| Resume                         | Active chunk with an open PR: resume at review; a pushed branch without PR: a new implementer on it; else start. Without `merge` it stops after opening the PR(s); an unmerged PR a next chunk depends on: report and stop                                                                                                               | Usage limits and locked keys interrupt runs                            |
+| Final report                   | Merged PRs, decision rows (questionable first), fallbacks used, anything open, next step; a comment on the last chunk's PR after its merge                                                                                                                                                                                               | Plan 002's prompt; a PR body can't report its own merge                |
 | `review-chunk` input           | A PR number (or the current branch); finds the plan and chunk from the PR body or branch; reads the plan and the diff only                                                                                                                                                                                                               | Never the implementer's summary                                        |
+| `review-chunk` output          | The report as a PR comment when a PR exists, also returned to the caller                                                                                                                                                                                                                                                                 | Evidence on the PR, not a summary                                      |
 | `write-plan` output            | `docs/plans/NNN_<slug>.md` (next free number, checking open branches), on `docs/plan-NNN-<slug>`, a ready docs PR; undecided points in Open questions for the grill                                                                                                                                                                      | Plans 001, 002 and the owner's plan prompts                            |
 
 ### Risks & Trade-offs
 
-| Risk/Trade-off                                                                            | Impact | Mitigation                                                                                 |
-| ----------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------ |
-| A skill's behaviour can't be proven by the gate                                           | High   | C04 and C05 run through `execute-plan`; `review-chunk` runs on a merged PR in C02's Accept |
-| Continuing a subagent differs per harness                                                 | Medium | A new implementer with the findings where SendMessage isn't available                      |
-| `execute-plan` loaded mid-plan: the session that runs C04 must start after `doctor --fix` | Low    | Handover's Next action after C03 says so                                                   |
-| Model-invoked skills add descriptions to every session's context                          | Low    | Descriptions stay short                                                                    |
+| Risk/Trade-off                                                                            | Impact | Mitigation                                                                                                               |
+| ----------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------ |
+| A skill's behaviour can't be proven by the gate                                           | High   | `review-chunk` on #36 and a seeded defect (C02) and on C03's PR; `write-plan` once in C04; `execute-plan` on C04 and C05 |
+| Continuing a subagent differs per harness                                                 | Medium | A new implementer with the findings where SendMessage isn't available                                                    |
+| Claude Code shows no skill's invocation without a model call                              | Low    | The frontmatter, `claude plugin validate --strict` and `claude plugin details` listing the skill                         |
+| `execute-plan` loaded mid-plan: the session that runs C04 must start after `doctor --fix` | Low    | Handover's Next action after C03 says so                                                                                 |
+| Model-invoked skills add descriptions to every session's context                          | Low    | Descriptions stay short                                                                                                  |
 
 ## Implementation
 
 ### Files to Create
 
-| File Path                      | Purpose                                     | Chunk |
-| ------------------------------ | ------------------------------------------- | ----- |
-| `skills/review-chunk/SKILL.md` | Review one PR against its plan and its code | C02   |
-| `skills/execute-plan/SKILL.md` | Orchestrate a merged plan's chunks          | C03   |
-| `skills/write-plan/SKILL.md`   | Write a plan from the common template       | C04   |
+| File Path                                | Purpose                                     | Chunk |
+| ---------------------------------------- | ------------------------------------------- | ----- |
+| `skills/review-chunk/SKILL.md`           | Review one PR against its plan and its code | C02   |
+| `skills/execute-plan/SKILL.md`           | Orchestrate a merged plan's chunks          | C03   |
+| `skills/execute-plan/agents/openai.yaml` | Manual-only in Codex (`pnpm generate`)      | C03   |
+| `skills/write-plan/SKILL.md`             | Write a plan from the common template       | C04   |
 
 ### Files to Modify
 
-| File Path                                          | Why                                                                                                   | Chunk   |
-| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------- |
-| `docs/documentation/plan_template.md`              | An Open questions section, empty before merge; disjoint files include shared config, schema and setup | C01     |
-| `docs/documentation/README.md`                     | Handover written as of after its PR merges                                                            | C01     |
-| `docs/documentation/decision_log_template.md`      | `questionable` marker on agent rows                                                                   | C01     |
-| `config/documentation-hashes.json`                 | New shipped hashes (`pnpm generate`)                                                                  | C01     |
-| `AGENTS.md`                                        | Fake-home Accept setup                                                                                | C01     |
-| `skills/grill/SKILL.md`                            | Push to the PR branch after the gate; edit an unmerged plan in place; name the next skill             | C05     |
-| Generated manifests, `skills/*/agents/openai.yaml` | `pnpm generate`                                                                                       | C02–C05 |
-| `README.md`                                        | Skills list                                                                                           | C02–C05 |
-| `docs/ROADMAP.md`                                  | Step 5's box                                                                                          | C05     |
+| File Path                                     | Why                                                                                                   | Chunk   |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------- |
+| `docs/documentation/plan_template.md`         | An Open questions section, empty before merge; disjoint files include shared config, schema and setup | C01     |
+| `docs/documentation/README.md`                | Handover written as of after its PR merges                                                            | C01     |
+| `docs/documentation/decision_log_template.md` | `questionable` marker on agent rows                                                                   | C01     |
+| `config/documentation-hashes.json`            | New shipped hashes (`pnpm generate`)                                                                  | C01     |
+| `AGENTS.md`                                   | Fake-home Accept setup                                                                                | C01     |
+| `skills/grill/SKILL.md`                       | Push to the PR branch after the gate; edit an unmerged plan in place; name the next skill             | C05     |
+| `README.md`                                   | Skills list                                                                                           | C02–C05 |
+| `docs/ROADMAP.md`                             | Step 5's box                                                                                          | C05     |
 
 ## Testing Strategy
 
-No code changes; the gate checks manifests, `openai.yaml` for manual-only skills and the documentation hash list. Each skill chunk checks in a fake home (setup in `AGENTS.md` after C01) that the harnesses list it with the right invocation. Behaviour is proven by use: `review-chunk` on a merged PR (C02), `execute-plan` on C04 and C05.
+No code changes; the gate checks manifests, `openai.yaml` for manual-only skills and the documentation hash list. Each skill chunk checks in a fake home (setup in `AGENTS.md` after C01) that the harnesses load the worktree's skills with the right invocation: Codex `codex debug prompt-input`, OpenCode `autoinvoke` from `GET /api/skill` on `opencode serve`, Claude Code `claude plugin details`. `doctor --fix` can't: it installs only commits on `origin/main`. Behaviour is proven by use: `review-chunk` in C02 and on C03's PR, `write-plan` in C04, `execute-plan` on C04 and C05. Until a skill is installed, a fresh subagent follows the branch's `SKILL.md`.
 
 ## Acceptance Criteria
 
 - The four skills load in Claude Code, Codex and OpenCode with the decided invocation.
-- C04 and C05 merged through `/agentfiles:execute-plan docs/plans/003_skills.md merge`, its report in C05's PR.
+- C04 and C05 merged through `/agentfiles:execute-plan docs/plans/003_skills.md merge`, its final report a comment on C05's PR.
 - All tests passing.
 
 ## Open questions
 
-- How a fake home proves OpenCode's invocation for a plugin skill (`autoinvoke`): step 2 verified it once; which command does C02's Accept use?
+None.
 
 ## Execution
 
 Gate: `pnpm check && pnpm compile`
 
-- [ ] C01 — The common documentation has the four rules, the machine copy updates through `doctor --fix`, and `AGENTS.md` has the fake-home Accept setup
-      Accept: `pnpm generate && git diff --exit-code config/` after committing, then in a fake home `node bin/agentfiles.js doctor --fix` writes the new copies and a second `doctor` exits 0
-- [ ] C02 — `review-chunk` loads model-invoked in all three harnesses, and run on PR #36 against plan 002 C08 it reports plan conformance and triaged findings
-      Accept: gate; fake home: `codex debug prompt-input` lists `agentfiles:review-chunk`, Claude Code and OpenCode list it (Open question); its report on #36 in the PR
+- [ ] C01 — The common documentation has the four rules, the machine copy updates through `doctor --fix`, and `AGENTS.md` has the fake-home Accept setup loading the worktree's skills
+      Accept: gate; a `grep` per rule; fake home: `node bin/agentfiles.js doctor --fix` writes the new copies, a second `doctor` exits 0, and the setup shows `grill` manual-only: `codex debug prompt-input` omits `agentfiles:grill`, OpenCode has `{"id":"grill","autoinvoke":false}`, `claude plugin details` lists it
+- [ ] C02 — `review-chunk` loads model-invoked in all three harnesses and catches a seeded defect: on PR #36 against plan 002 C08 it reports no fix findings; on a local branch replaying #36 with one test assertion weakened and C08's box unchecked it flags both as fixes
+      Accept: gate; fake home: `codex debug prompt-input` lists `agentfiles:review-chunk`, OpenCode has no `autoinvoke: false` for it, `claude plugin details` lists it; both reports (fresh subagent following the branch's `SKILL.md`) in the PR
       Depends: C01
 - [ ] C03 — `execute-plan` loads manual-only in all three harnesses, and the handover's Next action tells the owner to run `doctor --fix`, start a new session and run `/agentfiles:execute-plan docs/plans/003_skills.md merge`
-      Accept: gate; fake home: `codex debug prompt-input` omits `agentfiles:execute-plan` and `$agentfiles:execute-plan` loads; Claude Code and OpenCode likewise
+      Accept: gate; fake home: `codex debug prompt-input` omits `agentfiles:execute-plan`, OpenCode has `autoinvoke: false`, `claude plugin details` lists it; `review-chunk` from `main` (fresh subagent) commented on the PR
       Depends: C02
-- [ ] C04 — `write-plan` loads model-invoked in all three harnesses; run through `execute-plan`
-      Accept: gate; fake home as C02; the PR was opened by `execute-plan`'s implementer and reviewed by `review-chunk`
+- [ ] C04 — `write-plan` loads model-invoked in all three harnesses and writes a plan from the machine copy's template; run through `execute-plan`
+      Accept: gate; fake home as C02; in a temporary git repo without `docs/documentation/` and without a remote, `write-plan` on a one-line request writes `docs/plans/001_<slug>.md` with Execution and Open questions, the file in the PR; the PR opened by `execute-plan`'s implementer has `review-chunk`'s comment
       Depends: C03
-- [ ] C05 — `grill` pushes outcomes to the PR branch after the gate, edits an unmerged plan in place and names the next skill; run through `execute-plan`, whose final report is in this PR, which checks step 5's box
-      Accept: gate; fake home: `grill` still manual-only; the PR has `execute-plan`'s report
+- [ ] C05 — `grill` pushes outcomes to the PR branch after the gate, edits an unmerged plan in place and names the next skill; run through `execute-plan`, whose final report is a comment on this PR, which checks step 5's box
+      Accept: gate; fake home: `grill` still manual-only (as C01); `execute-plan`'s final report commented on the PR after its merge
       Depends: C04
