@@ -70,9 +70,10 @@ AGENTS.md          gate command, domain words
 
 ## Skills
 
-| Skill   | Loop of the [development process](docs/documentation/development_process.md)                               |
-| ------- | ---------------------------------------------------------------------------------------------------------- |
-| `grill` | Strategy and feature: the owner's review of a PRD, plan, ADR or design before it merges (`/grill`, manual) |
+| Skill          | Loop of the [development process](docs/documentation/development_process.md)                               |
+| -------------- | ---------------------------------------------------------------------------------------------------------- |
+| `grill`        | Strategy and feature: the owner's review of a PRD, plan, ADR or design before it merges (`/grill`, manual) |
+| `review-chunk` | Execution: reviews one chunk's PR or branch against its plan and its code (model-invoked)                  |
 
 ## Development
 
