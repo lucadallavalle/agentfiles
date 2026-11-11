@@ -182,3 +182,4 @@ Besides roles and conventions, each project's `AGENTS.md` has:
 
 - `docs/HANDOVER.md` ([template](./handover_template.md)) holds the current state: where we are, how to prove it, the next action, decisions not to reopen.
 - An agent reads it at the start of a session and overwrites it at the end. History lives in PRs, commits and the decision log, not here.
+- It is written as of after its PR merges: that PR's work is done, and the next action is what follows the merge.

@@ -141,6 +141,10 @@ Sections marked **[Required]** must always be included. Sections marked **[If Ap
 - [Specific, measurable outcome 2]
 - All tests passing
 
+## Open questions [Required for Medium/Large]
+
+[Points still to decide with the owner. Empty ("None.") before the plan merges.]
+
 ## Execution [Required for Medium/Large]
 
 Gate: `[gate command from AGENTS.md]`
@@ -159,7 +163,7 @@ Gate: `[gate command from AGENTS.md]`
 - A chunk is one testable outcome, small enough for one agent session, written as a sentence that is true when it's done.
 - Each chunk has an `Accept:` command. A chunk is checked only when that command and the gate pass, with the real output in the commit or PR (see [Gate and Definition of Done](./README.md#gate-and-definition-of-done)).
 - A chunk is done in one PR. A chunk that needs others first has a `Depends:` line listing them; without it, it can start at once.
-- Chunks without a dependency path between them must touch disjoint files; otherwise add a dependency.
+- Chunks without a dependency path between them must touch disjoint files, shared config, schema and setup included; otherwise add a dependency.
 - Checking a box is progress tracking, not a change to the plan. Adding, removing or rewording a chunk after approval is an amendment.
 
 ---
@@ -200,4 +204,5 @@ Multiple amendments are appended chronologically.
 | API Changes           | New or modified endpoints/DTOs                 |
 | Database Changes      | Schema or migration changes needed             |
 | Configuration Changes | App settings or deployment config changes      |
+| Open questions        | Medium/large plans; empty before merge         |
 | Execution             | Medium/large plans that agents carry out       |
