@@ -10,7 +10,7 @@ Documentation guidelines: `/docs/documentation/README.md`. This repo is their so
 
 ## Fake home
 
-Accept lines never touch the real user-level config: they run in a fake home under `/tmp` (OpenCode also reads `.claude/skills` from parent directories), removed afterwards. `doctor --fix` installs only commits on `origin/main`, so a worktree's skills are loaded from its root, in a fake home `doctor` hasn't written. Needs `jq`.
+Accept lines never touch the real user-level config: they run in a fake home under `/tmp` (OpenCode also reads `.claude/skills` from parent directories); remove `$F` afterwards. `doctor --fix` installs only commits on `origin/main`, so a worktree's skills are loaded from its root, in a fake home `doctor` hasn't written. Needs `jq`.
 
 ```sh
 F=$(mktemp -d) && mkdir -p $F/.codex $F/.config/opencode
