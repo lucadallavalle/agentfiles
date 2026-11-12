@@ -38,7 +38,7 @@ In order; each step is one small PR. D-numbers refer to [ADR-001](adr/ADR-001_ge
     - spiral-review R13, user-level config and `.git/info/exclude` for foreign repos, needed by `attach`: in its roadmap, not built.
     - spiral-review user-level config (`~/.config/spiral-review`), where `bootstrap` passes the reviewer model to `init`: an MVP item in its roadmap, not built.
     - spiral-review repo config: the instructions file is `REVIEW.md` (decided); whether to keep `.spiral-review.toml` is open there (R13). `scaffold` must get both from spiral-review, not write them itself.
-- [ ] **5. More skills:** only after a part of the [development process](documentation/development_process.md) has been repeated by hand, so the skill encodes real practice.
+- [x] **5. More skills:** only after a part of the [development process](documentation/development_process.md) has been repeated by hand, so the skill encodes real practice.
   - Evidence 2026-11-10 (this repo's PRs #1–#39, two other owned repos, owner prompts in session transcripts, BMAD-METHOD as reference): plan execution (this repo 13 chunks by 2 pasted prompts; ~75 chunks by 16 prompts elsewhere, orchestrator with one subagent per chunk, fresh-context reviewer, 3 parallel runs), plan writing (~35 plans), grills, ~40 "give me the prompt" hand-offs between sessions, handover stale 3 times.
   - Decided ([decision log](decisions.md)), one plan, chunks in order:
     1. Common documentation: Open questions empty before a plan merges; disjoint-files rule covers shared config, schema and setup; handover written as of after its PR merges; `questionable` marker on agent decision rows. This repo's fake-home Accept setup moves to `AGENTS.md`.
