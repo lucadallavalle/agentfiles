@@ -116,7 +116,7 @@ Gate: `pnpm check && pnpm compile`
 - [x] C02 — `review-chunk` loads model-invoked in all three harnesses and catches a seeded defect: on a local branch replaying #36 with one test assertion weakened and C08's box unchecked it flags both as fixes; on PR #36 against plan 002 C08 none of its fix findings is false
       Accept: gate; fake home: `codex debug prompt-input` lists `agentfiles:review-chunk`, OpenCode has no `autoinvoke: false` for it, `claude plugin details` lists it; both reports (fresh subagents following the branch's `SKILL.md`) in the PR, each fix finding on #36 checked against the code by the C02 session
       Depends: C01
-- [ ] C03 — `execute-plan` loads manual-only in all three harnesses, and the handover's Next action tells the owner to run `doctor --fix`, start a new session and run `/agentfiles:execute-plan docs/plans/003_skills.md merge`
+- [x] C03 — `execute-plan` loads manual-only in all three harnesses, and the handover's Next action tells the owner to run `doctor --fix`, start a new session and run `/agentfiles:execute-plan docs/plans/003_skills.md merge`
       Accept: gate; fake home: `codex debug prompt-input` omits `agentfiles:execute-plan`, OpenCode has `autoinvoke: false`, `claude plugin details` lists it; `review-chunk` from `main` (fresh subagent) commented on the PR
       Depends: C02
 - [ ] C04 — `write-plan` loads model-invoked in all three harnesses and writes a plan from the machine copy's template; run through `execute-plan`
