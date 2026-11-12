@@ -27,7 +27,7 @@ Chunks run serially, in plan order. Run two in parallel only when no `Depends:` 
 
 ## Per chunk
 
-1. **Branch:** `<type>/plan-NNN-cNN-<slug>` from fresh `origin/main` in a worktree of its own (`git worktree add -b <branch> <dir> origin/main`), `<type>` being the type of the PR title (`source_control.md`).
+1. **Branch:** `<type>/plan-NNN-cNN-<slug>` from fresh `origin/main` in a worktree of its own (`git worktree add --no-track -b <branch> <dir> origin/main`), `<type>` being the type of the PR title (`source_control.md`).
 2. **Implementer:** one subagent, working only in that worktree, given the brief below.
 3. **Review loop**, below, on the pushed branch, before any PR.
 4. **Verify:** run the gate and every `Accept:` clause yourself, in a checkout at the pushed head, and keep the output. The implementer's reported output is a claim. A failure is a fix finding: back to the implementer, then the reviewer again.
@@ -42,7 +42,7 @@ A chunk the plan marks as an owner check is never merged by you: open its PR, sa
 - The plan's path, the chunk's line with its `Accept:` and `Depends:`, the plan sections it touches by name, and the files to read as paths, not content: `AGENTS.md`, the common documentation above, the code it will change.
 - Its worktree and branch, and the files parallel chunks own, which it must not touch.
 - Which `Accept:` clauses are yours, not its: those that need the PR or a run only the orchestrator can make.
-- Its work: tests first where code exists; the gate and its `Accept:` clauses, passing; the chunk's box checked and nothing else in the plan changed (and the roadmap step's box when the chunk completes the step); one decision row per choice the plan and the docs don't cover, **Made By** `agent`, or `agent (questionable)` where it used judgement; commits per `source_control.md`; the branch pushed.
+- Its work: tests first where code exists; the gate and its `Accept:` clauses, passing; the chunk's box checked and nothing else in the plan changed (and the roadmap step's box when the chunk completes the step); one decision row per choice the plan and the docs don't cover, **Made By** `agent`, or `agent (questionable)` where it used judgement; commits per `source_control.md`; the branch pushed (`git push -u origin <branch>`).
 - It must not: open a PR, edit `docs/HANDOVER.md`, weaken, skip or delete a test, bypass commit signing or a hook, add a decision row that replaces an earlier one or carries the owner's name, or work around a stop condition (below). It stops and reports instead.
 - It returns: the branch and the pushed head commit, the real output of the gate and of `Accept:`, its decision rows, its deviations from the plan.
 
