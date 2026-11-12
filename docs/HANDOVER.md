@@ -1,23 +1,23 @@
 # Handover
 
-Updated: 2026-11-12, plan 003 C02
+Updated: 2026-11-12, plan 003 C03
 
 ## Where we are
 
-ROADMAP step 4 is done: [plan 002](plans/002_cli.md) C01–C08 are merged (#29–#36), and `agentfiles bootstrap` / `doctor --fix` set up a machine (plugins at the CLI's commit, user-level config, the documentation copy) and owned repos' copies. `attach`, `scaffold` and the spiral-review slot wait on spiral-review. The owner's machine is bootstrapped (Claude Code 2.1.319, Codex 0.167.0, OpenCode 2.2.6): `agentfiles doctor` reports 31 entries in sync. Claude Code `attribution` ships as `false` since #38. Step 5's skills, order and done criterion are decided (#40); [plan 003](plans/003_skills.md) is merged (#41). Its C01 is merged (#42): the common documentation has an Open questions section for plans, disjoint files that include shared config, schema and setup, a handover written as of after its PR merges and the `agent (questionable)` marker; `AGENTS.md` has the fake-home setup that loads a worktree's skills. The machine's and owned repos' copies report `outdated` until `doctor --fix`. C02 is merged (#43): `review-chunk`, model-invoked, reviews one chunk's PR or branch against its plan and its code; in its trial runs it flagged both defects seeded into a replay of #36 and found two real bugs in #36 (Open questions).
+ROADMAP step 4 is done: [plan 002](plans/002_cli.md) C01–C08 are merged (#29–#36), and `agentfiles bootstrap` / `doctor --fix` set up a machine (plugins at the CLI's commit, user-level config, the documentation copy) and owned repos' copies. `attach`, `scaffold` and the spiral-review slot wait on spiral-review. The owner's machine is bootstrapped (Claude Code 2.1.319, Codex 0.167.0, OpenCode 2.2.6): `agentfiles doctor` reports 31 entries in sync. Claude Code `attribution` ships as `false` since #38. Step 5's skills, order and done criterion are decided (#40); [plan 003](plans/003_skills.md) is merged (#41). Its C01 is merged (#42): the common documentation has an Open questions section for plans, disjoint files that include shared config, schema and setup, a handover written as of after its PR merges and the `agent (questionable)` marker; `AGENTS.md` has the fake-home setup that loads a worktree's skills. The machine's and owned repos' copies report `outdated` until `doctor --fix`. C02 is merged (#43): `review-chunk`, model-invoked, reviews one chunk's PR or branch against its plan and its code; in its trial runs it flagged both defects seeded into a replay of #36 and found two real bugs in #36 (Open questions). C03 is merged (#44): `execute-plan`, manual-only, orchestrates a merged plan's chunks (implementers, `review-chunk` loop, PRs, handover, merges with `merge`); it has not run yet, C04 and C05 are its first run.
 
 ## Prove it
 
 Run: `pnpm install && pnpm check && pnpm compile`
-Expect: `All matched files use Prettier code style!`, `Tests  208 passed (208)`, `✔ Validation passed`, `compile` without errors.
+Expect: `All matched files use Prettier code style!`, `Tests  209 passed (209)`, `✔ Validation passed`, `compile` without errors.
 
 ## Active chunk
 
-None.
+[Plan 003](plans/003_skills.md) C04 (`write-plan`), not started.
 
 ## Next action
 
-Execute [plan 003](plans/003_skills.md) C03 (`execute-plan`) by prompt, its review by a subagent following `skills/review-chunk/SKILL.md` from `main`; C04–C05 with `/agentfiles:execute-plan docs/plans/003_skills.md merge` after `doctor --fix` and a new session. The owner runs the Claude Code web check (Open questions).
+The owner runs `node bin/agentfiles.js doctor --fix`, starts a new session and runs `/agentfiles:execute-plan docs/plans/003_skills.md merge` (C04, then C05). The owner runs the Claude Code web check (Open questions).
 
 ## Decisions not to reopen
 
@@ -42,6 +42,9 @@ Execute [plan 003](plans/003_skills.md) C03 (`execute-plan`) by prompt, its revi
 
 ## Open questions
 
+- The owner reads `execute-plan`'s six `agent (questionable)` rows of 2026-11-12 (#44), first: it resumes from `origin` (boxes, branches, PRs) rather than from Active chunk alone, and a red gate on `main` is fixed through a `fix/` branch instead of stopping.
+- With `merge`, `execute-plan` merges a PR whose amendment doesn't change behaviour without the owner's review, as plan 003 decides; the development process asks for the owner's review of a PR with an amendment. Which holds?
+- `execute-plan`, deferred from #44's review: step 6's "nothing but the handover may have changed" against the parallel rule's merge of `origin/main`; without `merge`, open PRs of independent chunks carry handovers that go stale.
 - `bootstrap --owner ""` writes an empty owner that `config.json`'s reader rejects, so `doctor` and `bootstrap` exit 2 until the file is edited by hand; `--owner " me "` is appended again on every run. Found by `review-chunk` on #36, reproduced (#43); outside plan 003.
 - The owner confirms `review-chunk`'s four `agent (questionable)` rows of 2026-11-12, first the one where a later round reviews the whole diff: plan 003's "the diff since its last round in full" can also mean only the new commits.
 - `review-chunk`, deferred from #43's review: on a branch it diffs the local `HEAD`, so its caller must give it a checkout at the pushed head; it doesn't say what to do with `Accept:` clauses no diff can show; a later round without its earlier report asks the caller instead of reading its own PR comment.
