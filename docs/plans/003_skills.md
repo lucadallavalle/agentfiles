@@ -122,6 +122,6 @@ Gate: `pnpm check && pnpm compile`
 - [x] C04 — `write-plan` loads model-invoked in all three harnesses and writes a plan from the machine copy's template; run through `execute-plan`
       Accept: gate; fake home as C02; in a temporary git repo without `docs/documentation/` and without a remote, `write-plan` on a one-line request writes `docs/plans/001_<slug>.md` with Execution and Open questions, the file in the PR; the PR opened by `execute-plan` has `review-chunk`'s comment
       Depends: C03
-- [ ] C05 — `grill` pushes outcomes to the PR branch after the gate, edits an unmerged plan in place and names the next skill; run through `execute-plan`, whose final report is a comment on this PR, which checks step 5's box
+- [x] C05 — `grill` pushes outcomes to the PR branch after the gate, edits an unmerged plan in place and names the next skill; run through `execute-plan`, whose final report is a comment on this PR, which checks step 5's box
       Accept: gate; fake home: `grill` still manual-only (as C01); `execute-plan`'s final report commented on the PR after its merge
       Depends: C04

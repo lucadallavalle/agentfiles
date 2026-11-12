@@ -48,12 +48,18 @@ The **frontier** is every decision whose prerequisites are already settled: the 
 
 Record each settled decision at its level (see "Which level a decision belongs to" in `docs/documentation/README.md`):
 
-- **Design** (what the feature does): update the document under review, if it is not yet merged. A merged PRD or plan is immutable: add an amendment instead. A merged ADR is superseded by a new one, never edited.
+- **Design** (what the feature does): edit the document under review in place, if it is not yet merged: in a plan, change the sections the decision touches and take the question it settles out of Open questions (`None.` once empty), with no amendment. A merged PRD or plan is immutable: add an amendment instead. A merged ADR is superseded by a new one, never edited.
 - **Implementation** choice the docs don't cover: a row in `docs/decisions.md`, `Made By:` the owner's name, no ADR.
 - **Architecture**: only when all three hold: hard to reverse, surprising without context, a real trade-off between alternatives. Propose an ADR (`docs/adr/ADR-NNN_short-name.md`, next number, `docs/documentation/adr_template.md`) and add a decision log row linking to it. Otherwise it's a decision log row.
 
-Write as you go, not in a batch at the end. Be succinct. Create files only when you have something to write. If the repo has no `docs/documentation/` of its own, ask the owner where outcomes go before writing any file.
+Write as you go, not in a batch at the end; when the document under review has an open PR, on that PR's branch. Be succinct. Create files only when you have something to write. If the repo has no `docs/documentation/` of its own, ask the owner where outcomes go before writing any file.
 
 ## Done
 
-The session ends when the frontier is empty: every branch of the design tree visited. Summarize the settled decisions and where each was written, list anything still open, and wait for the owner to confirm shared understanding before the document merges. Do not plan or write code in this skill.
+The session ends when the frontier is empty: every branch of the design tree visited.
+
+When the document under review has an open PR, run the gate of `AGENTS.md`, when there is one, then commit the outcomes (`docs/documentation/source_control.md`) and push them to the PR's branch. If the gate fails on something you didn't write, don't push: say what failed. Without an open PR, commit nothing.
+
+Summarize the settled decisions and where each was written, list anything still open, and wait for the owner to confirm shared understanding before the document merges. Do not plan or write code in this skill.
+
+Next, once the owner has merged the document: `execute-plan <plan path>` for a plan; `write-plan` for a PRD or a roadmap step.
