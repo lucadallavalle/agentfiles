@@ -119,7 +119,7 @@ Gate: `pnpm check && pnpm compile`
 - [x] C03 — `execute-plan` loads manual-only in all three harnesses, and the handover's Next action tells the owner to run `doctor --fix`, start a new session and run `/agentfiles:execute-plan docs/plans/003_skills.md merge`
       Accept: gate; fake home: `codex debug prompt-input` omits `agentfiles:execute-plan`, OpenCode has `autoinvoke: false`, `claude plugin details` lists it; `review-chunk` from `main` (fresh subagent) commented on the PR
       Depends: C02
-- [ ] C04 — `write-plan` loads model-invoked in all three harnesses and writes a plan from the machine copy's template; run through `execute-plan`
+- [x] C04 — `write-plan` loads model-invoked in all three harnesses and writes a plan from the machine copy's template; run through `execute-plan`
       Accept: gate; fake home as C02; in a temporary git repo without `docs/documentation/` and without a remote, `write-plan` on a one-line request writes `docs/plans/001_<slug>.md` with Execution and Open questions, the file in the PR; the PR opened by `execute-plan` has `review-chunk`'s comment
       Depends: C03
 - [ ] C05 — `grill` pushes outcomes to the PR branch after the gate, edits an unmerged plan in place and names the next skill; run through `execute-plan`, whose final report is a comment on this PR, which checks step 5's box
