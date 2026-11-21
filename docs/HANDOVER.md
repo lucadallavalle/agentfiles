@@ -56,4 +56,3 @@ None.
 - Without `git` on `PATH`, plugin drift says "the CLI doesn't run from a git clone", which misnames the cause.
 - `pnpm install` skips `pnpm:devPreinstall` when nothing needs installing, so an existing checkout keeps its old `core.hooksPath` until a real install.
 - `write-plan` (#47): its trial didn't reproduce a recommended gate that names a file the plan creates, so that rule is untested.
-- vitest also runs the tests under `.claude/worktrees/`, so a leftover worktree there fails the gate and the commit hook of the checkout.
