@@ -1,6 +1,6 @@
 # Handover
 
-Updated: 2026-11-12, plan 003 C05
+Updated: 2026-11-21, ROADMAP step 6 added
 
 ## Where we are
 
@@ -17,7 +17,7 @@ None.
 
 ## Next action
 
-Ask the owner what comes next: the roadmap's planned steps are all done. The owner runs `node bin/agentfiles.js doctor --fix` to load `write-plan` and the new `grill`, and the Claude Code web check (Open questions).
+The owner settles [ROADMAP](ROADMAP.md) step 6's Needs, then `/agentfiles:write-plan` for step 6. The machine's skills are loaded (`doctor --fix` run); the Claude Code web check is still owed (Open questions).
 
 ## Decisions not to reopen
 
