@@ -51,6 +51,10 @@ In order; each step is one small PR. D-numbers refer to [ADR-001](adr/ADR-001_ge
   - Needs (when spiral-review's `pr` ships): how `review-chunk` hands code review to spiral-review: which command, whose findings and triage win (`dismiss` vs the 3-round cap), whether plan-conformance findings reach the digest, and whether `execute-plan` opens PRs through `ship`.
   - Depends: spiral-review `pr` / `pr --create` and `dismiss` (MVP in its roadmap, not built).
 
+- [ ] **6. Skills, second pass:** redo `grill`, `review-chunk`, `execute-plan` and `write-plan` after their first runs in plan 003.
+  - Evidence: the review findings deferred from #43–#46 and the trial notes, in [HANDOVER](HANDOVER.md)'s Open questions.
+  - Needs: the owner's reading of the 19 `agent (questionable)` rows of 2026-11-12 ([decision log](decisions.md)); whether `write-plan` writes a plan in a foreign repo; whether `execute-plan` with `merge` merges a PR with an amendment without the owner's review; what the pass covers beyond the deferred findings.
+
 ## Later
 
 - spiral-review consumes the common documentation from here (D7); its own copy is replaced then.
