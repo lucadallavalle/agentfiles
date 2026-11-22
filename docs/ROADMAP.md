@@ -57,6 +57,7 @@ In order; each step is one small PR. D-numbers refer to [ADR-001](adr/ADR-001_ge
     - `review-chunk`, `execute-plan`: the deferred findings and a restructure, old against new on trial cases, one PR per skill.
     - `execute-plan` with `merge` leaves a PR with an amendment to the owner and stops, until spiral-review's merge policy decides.
     - `grill` stays close to its upstream: only its deferred findings, and a commit without a push when the document has no open PR but a branch of its own; `write-plan`'s closing line for a repo without a remote follows.
+    - `execute-plan` and `review-chunk` read the `Owner check:` line and the `Accept:` rule the plan template has since #51: an `Accept:` fails before its chunk and passes after it; what only the owner can check is an `Owner check:` line.
     - The 19 `agent (questionable)` rows of 2026-11-12 are read.
 
 ## Later
