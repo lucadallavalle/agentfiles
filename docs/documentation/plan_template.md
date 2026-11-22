@@ -162,6 +162,7 @@ Gate: `[gate command from AGENTS.md]`
 
 - A chunk is one testable outcome, small enough for one agent session, written as a sentence that is true when it's done.
 - Each chunk has an `Accept:` command. A chunk is checked only when that command and the gate pass, with the real output in the commit or PR (see [Gate and Definition of Done](./README.md#gate-and-definition-of-done)).
+- An `Accept:` command fails before the chunk and passes after it, where the agent works: it is how the agent knows it is done, and a command that already passes proves nothing. When nothing there can prove the outcome, an earlier chunk builds the means (a test runner, a fixture, a fake). What only the owner can check goes in an `Owner check:` line saying what to look at; the agent doesn't merge that chunk.
 - A chunk is done in one PR. A chunk that needs others first has a `Depends:` line listing them; without it, it can start at once.
 - Chunks without a dependency path between them must touch disjoint files, shared config, schema and setup included; otherwise add a dependency.
 - Checking a box is progress tracking, not a change to the plan. Adding, removing or rewording a chunk after approval is an amendment.
