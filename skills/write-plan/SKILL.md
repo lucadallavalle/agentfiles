@@ -45,6 +45,7 @@ Each open question costs the owner a round of `grill`, so ask what they would wa
 Two sections are in every plan, a small one included, because the next skills work from them: `## Open questions` (`grill`; `None.` when nothing is open) and `## Execution` (`execute-plan`), which replaces the minimum plan's closing `Accept:` line.
 
 - **Chunks:** each one testable outcome, a sentence that is true when it's done, small enough for one agent session and one PR, with an `Accept:` a command can prove and a `Depends:` where it needs another. Chunks without a dependency path between them touch disjoint files, since they may run in parallel. In a plan with more than one chunk, the file tables have a Chunk column.
+- **Accept:** the implementer has only this and the gate to know the chunk is done, so run each command before you commit: it fails today, where the implementer will work, for the reason the chunk removes. One that passes already, or fails for want of a tool, proves nothing. When nothing in the repo can prove an outcome, an earlier chunk builds the means; what only the owner can check is an `Owner check:` line.
 - **Gate:** the gate of `AGENTS.md`. When the repo names none, recommend one from commands that pass in the repo today, and make it an open question. Every chunk runs the gate, the first one too, so a check that needs something the plan creates is that chunk's `Accept:`, not the gate.
 
 ## Commit and PR
