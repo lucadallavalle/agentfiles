@@ -51,9 +51,14 @@ In order; each step is one small PR. D-numbers refer to [ADR-001](adr/ADR-001_ge
   - Needs (when spiral-review's `pr` ships): how `review-chunk` hands code review to spiral-review: which command, whose findings and triage win (`dismiss` vs the 3-round cap), whether plan-conformance findings reach the digest, and whether `execute-plan` opens PRs through `ship`.
   - Depends: spiral-review `pr` / `pr --create` and `dismiss` (MVP in its roadmap, not built).
 
-- [ ] **6. Skills, second pass:** redo `grill`, `review-chunk`, `execute-plan` and `write-plan` after their first runs in plan 003.
+- [ ] **6. Skills, second pass:** redo `review-chunk` and `execute-plan` after their first runs in plan 003, as #47 redid `write-plan`; patch `grill`.
   - Evidence: the review findings deferred from #43–#46 and the trial notes, in [HANDOVER](HANDOVER.md)'s Open questions.
-  - Needs: the owner's reading of the 19 `agent (questionable)` rows of 2026-11-12 ([decision log](decisions.md)); whether `write-plan` writes a plan in a foreign repo; whether `execute-plan` with `merge` merges a PR with an amendment without the owner's review; what the pass covers beyond the deferred findings.
+  - Decided 2026-11-21 ([decision log](decisions.md)):
+    - `review-chunk`, `execute-plan`: the deferred findings and a restructure, old against new on trial cases, one PR per skill.
+    - `execute-plan` with `merge` leaves a PR with an amendment to the owner and stops, until spiral-review's merge policy decides.
+    - `grill` stays close to its upstream: only its deferred findings, and a commit without a push when the document has no open PR but a branch of its own; `write-plan`'s closing line for a repo without a remote follows.
+    - `execute-plan` and `review-chunk` read the `Owner check:` line and the `Accept:` rule the plan template has since #51: an `Accept:` fails before its chunk and passes after it; what only the owner can check is an `Owner check:` line.
+    - The 19 `agent (questionable)` rows of 2026-11-12 are read.
 
 ## Later
 
