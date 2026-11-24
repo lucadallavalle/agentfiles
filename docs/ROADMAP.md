@@ -51,7 +51,7 @@ In order; each step is one small PR. D-numbers refer to [ADR-001](adr/ADR-001_ge
   - Needs (when spiral-review's `pr` ships): how `review-chunk` hands code review to spiral-review: which command, whose findings and triage win (`dismiss` vs the 3-round cap), whether plan-conformance findings reach the digest, and whether `execute-plan` opens PRs through `ship`.
   - Depends: spiral-review `pr` / `pr --create` and `dismiss` (MVP in its roadmap, not built).
 
-- [ ] **6. Skills, second pass:** redo `review-chunk` and `execute-plan` after their first runs in plan 003, as #47 redid `write-plan`; patch `grill`.
+- [x] **6. Skills, second pass:** redo `review-chunk` and `execute-plan` after their first runs in plan 003, as #47 redid `write-plan`; patch `grill`.
   - Evidence: the review findings deferred from #43–#46 and the trial notes, in [HANDOVER](HANDOVER.md)'s Open questions.
   - Decided 2026-11-21 ([decision log](decisions.md)):
     - `review-chunk`, `execute-plan`: the deferred findings and a restructure, old against new on trial cases, one PR per skill.

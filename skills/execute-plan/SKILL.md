@@ -62,7 +62,7 @@ When the run ends or stops, remove the worktrees whose branch is pushed, and nam
 
 ### Review loop
 
-One reviewer per chunk: a fresh subagent told to follow the `review-chunk` skill, given the plan's path, the chunk, the branch and a checkout at the pushed head (the implementer's worktree after its push, clean, or a new one), since on a branch without a PR `review-chunk` diffs the checkout's `HEAD`. Never give it the implementer's summary or reply. Its report's head commit must equal the pushed head; if not, it reviewed something else: run it again.
+One reviewer per chunk: a fresh subagent told to follow the `review-chunk` skill, given the plan's path, the chunk, the branch and a checkout of the repo; `review-chunk` reviews `origin/<branch>`, wherever the checkout's `HEAD` is. Never give it the implementer's summary or reply. Its report's head commit must equal the pushed head; if not, it reviewed something else: run it again.
 
 - **Verdict `pass`:** go on to verify (4).
 - **Fix findings:** send them, as written, to the same implementer; when it has pushed, the same reviewer reviews the whole diff again at the new head. Where the harness can't continue a subagent, start a new one: an implementer with the brief, the branch and the findings; a reviewer with the branch and its previous reports.
