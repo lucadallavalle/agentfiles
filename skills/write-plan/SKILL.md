@@ -59,4 +59,4 @@ Two sections are in every plan, a small one included, because the next skills wo
 
 Report the plan's path, its branch and where that is checked out (the checkout, now off the branch it was on, or the worktree's path), the PR, or that there is none, and the open questions.
 
-Next: `grill` on the PR, which settles the open questions and empties the section; the owner approves the plan by merging the PR, then `execute-plan <plan path>`. Without a remote: `grill` on the branch, which leaves its edits uncommitted; the owner approves by committing them and merging the branch into the default branch.
+Next: `grill` on the PR, which settles the open questions and empties the section; the owner approves the plan by merging the PR, then `execute-plan <plan path>`. Without a remote: `grill` on the branch, which commits its edits there; the owner approves by merging the branch into the default branch.

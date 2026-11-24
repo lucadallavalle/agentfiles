@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 The owner's review of a strategy or feature document before it merges (development process: `docs/documentation/development_process.md`).
 
-The common documentation is the repo's `docs/documentation/`; when the repo has none, read the machine copy in `${XDG_CONFIG_HOME:-~/.config}/agentfiles/documentation/` instead. Every `docs/documentation/` path below means whichever of the two you read.
+The common documentation is the repo's `docs/documentation/`; when the repo has none, read the machine copy in `${XDG_CONFIG_HOME:-~/.config}/agentfiles/documentation/` instead. Every `docs/documentation/` path below means whichever of the two you read. When neither exists, say that `agentfiles doctor --fix` installs the machine copy and go on without it: the rules below still hold, and a template they name gives way to the repo's existing documents of that kind.
 
 Interview the owner relentlessly until you reach a shared understanding: nothing left silently assumed, so agents can later execute without reopening decisions.
 
@@ -52,13 +52,19 @@ Record each settled decision at its level (see "Which level a decision belongs t
 - **Implementation** choice the docs don't cover: a row in `docs/decisions.md`, `Made By:` the owner's name, no ADR.
 - **Architecture**: only when all three hold: hard to reverse, surprising without context, a real trade-off between alternatives. Propose an ADR (`docs/adr/ADR-NNN_short-name.md`, next number, `docs/documentation/adr_template.md`) and add a decision log row linking to it. Otherwise it's a decision log row.
 
-Write as you go, not in a batch at the end; when the document under review has an open PR, on that PR's branch. Be succinct. Create files only when you have something to write. If the repo has no `docs/documentation/` of its own, ask the owner where outcomes go before writing any file.
+Write as you go, not in a batch at the end. When the document under review has an open PR (`gh pr list --state open`, the one whose files include it), write on that PR's branch: switch to it in a clean checkout, else use a worktree of it. Be succinct. Create files only when you have something to write. If the repo has no `docs/documentation/` of its own, ask the owner where outcomes go before writing any file.
 
 ## Done
 
 The session ends when the frontier is empty: every branch of the design tree visited.
 
-When the document under review has an open PR, run the gate of `AGENTS.md`, when there is one, then commit the outcomes (`docs/documentation/source_control.md`) and push them to the PR's branch. If the gate fails on something you didn't write, don't push: say what failed. Without an open PR, commit nothing.
+Run the gate of `AGENTS.md`, when there is one, and fix what your edits broke. Then commit only the files you edited (`docs/documentation/source_control.md`):
+
+- **Open PR:** commit and push to the PR's branch.
+- **No open PR, the document on a branch of its own** (not the default branch, and the branch adds or changes the document): commit, don't push.
+- **Anywhere else:** commit nothing; the outcomes stay as uncommitted edits.
+
+If the gate fails on something you didn't write, commit but don't push, and say what failed. If a commit hook rejects the commit, leave the edits uncommitted and say why.
 
 Summarize the settled decisions and where each was written, list anything still open, and wait for the owner to confirm shared understanding before the document merges. Do not plan or write code in this skill.
 
