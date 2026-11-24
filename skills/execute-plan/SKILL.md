@@ -57,7 +57,7 @@ When the run ends or stops, remove the worktrees whose branch is pushed, and nam
 - Its worktree and branch, and the files parallel chunks own, which it must not touch.
 - Which `Accept:` clauses are yours, not its: those that need the PR or a run only the orchestrator can make.
 - Its work: first its `Accept:` on the untouched code, which should fail (one that passes already proves nothing: it reports that and you treat it as a wrong plan); tests first where code exists; the gate and its `Accept:` clauses, passing; the chunk's box checked and nothing else in the plan changed (and the roadmap step's box when the chunk completes the step); one decision row per choice the plan and the docs don't cover, **Made By** `agent`, or `agent (questionable)` where it used judgement; commits per `source_control.md`; the branch pushed (`git push -u origin <branch>`).
-- It must not: open a PR, edit `docs/HANDOVER.md`, weaken, skip or delete a test, bypass commit signing or a hook, add a decision row that replaces an earlier one or carries the owner's name, or work around a stop (below). It stops and reports instead.
+- It must not: open a PR, edit `docs/HANDOVER.md`, weaken, skip or delete a test, bypass commit signing or a hook, rewrite a pushed commit (amend, rebase, force-push: the reviews and your commits build on it), add a decision row that replaces an earlier one or carries the owner's name, or work around a stop (below). It stops and reports instead.
 - It returns: the branch and the pushed head commit, the real output of the gate and of `Accept:`, its decision rows, its deviations from the plan.
 
 ### Review loop
