@@ -8,10 +8,20 @@ import {
 const Installed = z.array(
   z.looseObject({ id: z.string(), scope: z.string(), version: z.string() }),
 );
-const Marketplaces = z.array(z.looseObject({ name: z.string() }));
+const Marketplaces = z.array(
+  z.looseObject({
+    name: z.string(),
+    source: z.string().optional(),
+    url: z.string().optional(),
+    repo: z.string().optional(),
+    path: z.string().optional(),
+  }),
+);
 
 const id = ({ plugin }: PluginContext) =>
   `${plugin.name}@${plugin.marketplace}`;
+
+const url = ({ plugin }: PluginContext) => `${plugin.repository}.git`;
 
 function json<T>(context: PluginContext, args: string[], schema: z.ZodType<T>) {
   try {
@@ -25,10 +35,28 @@ function json<T>(context: PluginContext, args: string[], schema: z.ZodType<T>) {
   }
 }
 
+/** The marketplace added under our name, and why its source is wrong. */
+function marketplace(context: PluginContext) {
+  const { marketplace: name } = context.plugin;
+  const m = json(
+    context,
+    ["plugin", "marketplace", "list", "--json"],
+    Marketplaces,
+  ).find((m) => m.name === name);
+  if (!m) return { added: false, wrong: `marketplace ${name} missing` };
+  if (m.source === "git" && m.url === url(context)) return { added: true };
+  const from = m.repo ?? m.url ?? m.path ?? m.source ?? "unknown source";
+  return {
+    added: true,
+    wrong: `marketplace ${name} from ${from}, not ${url(context)}`,
+  };
+}
+
 /**
  * The marketplace follows `main`, unpinned, added by its HTTPS URL (no SSH
- * key needed); one already added under the same name is kept. `plugin list
- * --json` shows the installed commit as `version`, its first 12 characters.
+ * key needed); one added under the same name from another source is removed,
+ * which uninstalls the plugin, and re-added. `plugin list --json` shows the
+ * installed commit as `version`, its first 12 characters.
  */
 export const claudeCodePlugin: PluginPart = {
   pinned: false,
@@ -36,19 +64,15 @@ export const claudeCodePlugin: PluginPart = {
     json(context, ["plugin", "list", "--json"], Installed).find(
       (p) => p.id === id(context) && p.scope === "user",
     )?.version,
+  wrongSource: (context) => marketplace(context).wrong,
   install: (context) => {
-    const { marketplace, repository } = context.plugin;
-    const added = json(
-      context,
-      ["plugin", "marketplace", "list", "--json"],
-      Marketplaces,
-    ).some((m) => m.name === marketplace);
-    harness(
-      context,
-      added
-        ? ["plugin", "marketplace", "update", marketplace]
-        : ["plugin", "marketplace", "add", `${repository}.git`],
-    );
+    const { added, wrong } = marketplace(context);
+    const name = context.plugin.marketplace;
+    if (!wrong) harness(context, ["plugin", "marketplace", "update", name]);
+    else {
+      if (added) harness(context, ["plugin", "marketplace", "remove", name]);
+      harness(context, ["plugin", "marketplace", "add", url(context)]);
+    }
     harness(context, ["plugin", "install", id(context), "-s", "user"]);
   },
   update: (context) => {

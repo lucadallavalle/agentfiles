@@ -17,6 +17,8 @@ export interface PluginPart {
   pinned: boolean;
   /** The installed commit, or a prefix of it; undefined when not installed. */
   installed(context: PluginContext): string | undefined;
+  /** Why an installed plugin's source is wrong; `install` must fix it. */
+  wrongSource?(context: PluginContext): string | undefined;
   install(context: PluginContext, commit: string): void;
   update(context: PluginContext, commit: string): void;
 }
@@ -60,9 +62,10 @@ function matches(installed: string, commit: string): boolean {
 
 /**
  * One entry per present harness with a plugin part: missing, or outdated
- * when installed at another commit than the CLI's own. `--fix` installs or
- * updates it and reads the installed commit again, never claiming a fix it
- * didn't make.
+ * when installed at another commit than the CLI's own or from a wrong
+ * source. `--fix` installs it (when missing or from a wrong source) or
+ * updates it, and reads the installed commit and source again, never
+ * claiming a fix it didn't make.
  */
 export function pluginDrift(
   harnesses: readonly PluginHarness[],
@@ -103,27 +106,34 @@ export function pluginDrift(
     const context = { env: options.env, dir: h.dir, binary: h.binary, plugin };
     try {
       const installed = h.part.installed(context);
+      const source = installed ? h.part.wrongSource?.(context) : undefined;
       const state = !installed
         ? "missing"
-        : matches(installed, commit)
+        : matches(installed, commit) && !source
           ? "in sync"
           : "outdated";
       if (state === "in sync" || !options.fix) {
         if (state === "missing") result.lines.push(`${h.name} plugin missing`);
         if (state === "outdated" && installed)
           result.lines.push(
-            `${h.name} plugin outdated: at ${short(installed)}, CLI at ${short(commit)}`,
+            `${h.name} plugin outdated: ${source ?? `at ${short(installed)}, CLI at ${short(commit)}`}`,
           );
         result.outcomes.push({ state, fixed: false });
         continue;
       }
-      if (state === "missing") h.part.install(context, commit);
+      if (state === "missing" || source) h.part.install(context, commit);
       else h.part.update(context, commit);
       const now = h.part.installed(context);
+      const still = now ? h.part.wrongSource?.(context) : undefined;
+      if (still) throw new Error(still);
       if (now && matches(now, commit)) {
-        result.lines.push(
-          `${h.name} plugin ${state}, ${state === "missing" ? "installed" : "updated"}`,
-        );
+        const done =
+          state === "missing"
+            ? "installed"
+            : source
+              ? "reinstalled"
+              : "updated";
+        result.lines.push(`${h.name} plugin ${state}, ${done}`);
         result.outcomes.push({ state, fixed: true });
       } else if (now && !h.part.pinned) {
         // `main` moved after the clone's fast-forward; the next --fix converges.

@@ -9421,7 +9421,7 @@ const ZodURL = /*@__PURE__*/ $constructor("ZodURL", (inst, def) => {
 	$ZodURL.init(inst, def);
 	ZodStringFormat.init(inst, def);
 });
-function url(params) {
+function url$1(params) {
 	return /* @__PURE__ */ _url(ZodURL, params);
 }
 const ZodEmoji = /*@__PURE__*/ $constructor("ZodEmoji", (inst, def) => {
@@ -10037,9 +10037,10 @@ function matches(installed, commit) {
 }
 /**
 * One entry per present harness with a plugin part: missing, or outdated
-* when installed at another commit than the CLI's own. `--fix` installs or
-* updates it and reads the installed commit again, never claiming a fix it
-* didn't make.
+* when installed at another commit than the CLI's own or from a wrong
+* source. `--fix` installs it (when missing or from a wrong source) or
+* updates it, and reads the installed commit and source again, never
+* claiming a fix it didn't make.
 */
 function pluginDrift(harnesses, options) {
 	const result = {
@@ -10080,21 +10081,25 @@ function pluginDrift(harnesses, options) {
 		};
 		try {
 			const installed = h.part.installed(context);
-			const state = !installed ? "missing" : matches(installed, commit) ? "in sync" : "outdated";
+			const source = installed ? h.part.wrongSource?.(context) : void 0;
+			const state = !installed ? "missing" : matches(installed, commit) && !source ? "in sync" : "outdated";
 			if (state === "in sync" || !options.fix) {
 				if (state === "missing") result.lines.push(`${h.name} plugin missing`);
-				if (state === "outdated" && installed) result.lines.push(`${h.name} plugin outdated: at ${short(installed)}, CLI at ${short(commit)}`);
+				if (state === "outdated" && installed) result.lines.push(`${h.name} plugin outdated: ${source ?? `at ${short(installed)}, CLI at ${short(commit)}`}`);
 				result.outcomes.push({
 					state,
 					fixed: false
 				});
 				continue;
 			}
-			if (state === "missing") h.part.install(context, commit);
+			if (state === "missing" || source) h.part.install(context, commit);
 			else h.part.update(context, commit);
 			const now = h.part.installed(context);
+			const still = now ? h.part.wrongSource?.(context) : void 0;
+			if (still) throw new Error(still);
 			if (now && matches(now, commit)) {
-				result.lines.push(`${h.name} plugin ${state}, ${state === "missing" ? "installed" : "updated"}`);
+				const done = state === "missing" ? "installed" : source ? "reinstalled" : "updated";
+				result.lines.push(`${h.name} plugin ${state}, ${done}`);
 				result.outcomes.push({
 					state,
 					fixed: true
@@ -10119,8 +10124,15 @@ const Installed = array(looseObject({
 	scope: string(),
 	version: string()
 }));
-const Marketplaces = array(looseObject({ name: string() }));
+const Marketplaces = array(looseObject({
+	name: string(),
+	source: string().optional(),
+	url: string().optional(),
+	repo: string().optional(),
+	path: string().optional()
+}));
 const id$1 = ({ plugin }) => `${plugin.name}@${plugin.marketplace}`;
+const url = ({ plugin }) => `${plugin.repository}.git`;
 function json(context, args, schema) {
 	try {
 		return schema.parse(JSON.parse(harness$3(context, args)));
@@ -10129,10 +10141,30 @@ function json(context, args, schema) {
 		throw error;
 	}
 }
+/** The marketplace added under our name, and why its source is wrong. */
+function marketplace(context) {
+	const { marketplace: name } = context.plugin;
+	const m = json(context, [
+		"plugin",
+		"marketplace",
+		"list",
+		"--json"
+	], Marketplaces).find((m) => m.name === name);
+	if (!m) return {
+		added: false,
+		wrong: `marketplace ${name} missing`
+	};
+	if (m.source === "git" && m.url === url(context)) return { added: true };
+	return {
+		added: true,
+		wrong: `marketplace ${name} from ${m.repo ?? m.url ?? m.path ?? m.source ?? "unknown source"}, not ${url(context)}`
+	};
+}
 /**
 * The marketplace follows `main`, unpinned, added by its HTTPS URL (no SSH
-* key needed); one already added under the same name is kept. `plugin list
-* --json` shows the installed commit as `version`, its first 12 characters.
+* key needed); one added under the same name from another source is removed,
+* which uninstalls the plugin, and re-added. `plugin list --json` shows the
+* installed commit as `version`, its first 12 characters.
 */
 const claudeCodePlugin = {
 	pinned: false,
@@ -10141,24 +10173,30 @@ const claudeCodePlugin = {
 		"list",
 		"--json"
 	], Installed).find((p) => p.id === id$1(context) && p.scope === "user")?.version,
+	wrongSource: (context) => marketplace(context).wrong,
 	install: (context) => {
-		const { marketplace, repository } = context.plugin;
-		harness$3(context, json(context, [
-			"plugin",
-			"marketplace",
-			"list",
-			"--json"
-		], Marketplaces).some((m) => m.name === marketplace) ? [
+		const { added, wrong } = marketplace(context);
+		const name = context.plugin.marketplace;
+		if (!wrong) harness$3(context, [
 			"plugin",
 			"marketplace",
 			"update",
-			marketplace
-		] : [
-			"plugin",
-			"marketplace",
-			"add",
-			`${repository}.git`
+			name
 		]);
+		else {
+			if (added) harness$3(context, [
+				"plugin",
+				"marketplace",
+				"remove",
+				name
+			]);
+			harness$3(context, [
+				"plugin",
+				"marketplace",
+				"add",
+				url(context)
+			]);
+		}
 		harness$3(context, [
 			"plugin",
 			"install",
@@ -11931,7 +11969,7 @@ const PackageJson = object({
 	license: string().min(1),
 	repository: object({
 		type: literal("git"),
-		url: url()
+		url: url$1()
 	})
 });
 /** Reads `<root>/package.json` and `<root>/skills/`; throws on a non-portable skill. */
