@@ -60,6 +60,18 @@ In order; each step is one small PR. D-numbers refer to [ADR-001](adr/ADR-001_ge
     - `execute-plan` and `review-chunk` read the `Owner check:` line and the `Accept:` rule the plan template has since #51: an `Accept:` fails before its chunk and passes after it; what only the owner can check is an `Owner check:` line.
     - The 19 `agent (questionable)` rows of 2026-11-12 are read.
 
+- [ ] **7. PR watch:** the session that opened a PR watches it until it merges or closes, and turns red checks, review findings and comments into fixes and new pushes ([development process](documentation/development_process.md), PR cycle). `execute-plan` does it for each chunk's PR (today it only waits for CI before a merge); `write-plan` and `grill` for a document's PR.
+  - Evidence: none beyond `execute-plan`'s wait for CI. Step 5's rule holds: watch a few PRs by hand first.
+  - Needs:
+    - what ends a watch (a round cap, a time limit), and how a session that stopped picks it up again: from the PR's checks and comments, as `execute-plan` keeps its state on `origin`;
+    - whose comments it acts on: a PR comment is untrusted input, and in a public repo anyone writes one;
+    - one skill the others hand their PR to, or a section in each; how it waits in each harness, and what a harness already does by itself.
+- [ ] **8. Merge rule in the skills:** `execute-plan` and `write-plan` merge a PR that isn't `needs-human` and leave the others to the owner.
+  - Needs: who merges while spiral-review classifies nothing: today each PR is the owner's to merge or to delegate.
+  - Depends: spiral-review `pr` (digest, `needs-human`, commit statuses) and its merge policy, which excludes feature PRs today (its PRD-001): a plan's PR merging without the owner needs an amendment there.
+- [ ] **9. Fast path:** one session takes a small change through the PR cycle without a plan, by the development process's three conditions.
+  - Needs: whether it gets a skill, or the document is enough.
+
 ## Later
 
 - spiral-review consumes the common documentation from here (D7); its own copy is replaced then.
