@@ -1,6 +1,6 @@
 # Handover
 
-Updated: 2026-11-24, `review-chunk`'s second pass
+Updated: 2026-11-27, the 2026-11-22 and 2026-11-24 rows read
 
 ## Where we are
 
@@ -17,7 +17,7 @@ None.
 
 ## Next action
 
-The owner reads the `agent (questionable)` rows of 2026-11-22 and 2026-11-24, then adds ROADMAP's next step; `node bin/agentfiles.js doctor --fix` and a new session load the merged skills. The Claude Code web check is still owed (Open questions).
+The owner adds ROADMAP's next step; `node bin/agentfiles.js doctor --fix` and a new session load the merged skills. The Claude Code web check is still owed (Open questions).
 
 ## Decisions not to reopen
 
@@ -31,7 +31,7 @@ The owner reads the `agent (questionable)` rows of 2026-11-22 and 2026-11-24, th
 - Plan 003: fake-home checks load the worktree's skills (`doctor --fix` can't); the review loop runs on the pushed branch before the PR, same reviewer each round; `review-chunk` has its own code pass only until spiral-review's `pr`: [plan 003](plans/003_skills.md), [decision log](decisions.md).
 - Harness checks run in a fake home under `/tmp`; a worktree's skills load from its root in a fake home `doctor` hasn't written, OpenCode through `opencode serve` without `--standalone` (it stops before plugins load): [AGENTS.md](../AGENTS.md), [decision log](decisions.md).
 - A `questionable` agent row has `agent (questionable)` in **Made By**: [decision log template](documentation/decision_log_template.md).
-- Step 6: `review-chunk` and `execute-plan` are redone as `write-plan` was (#47), `grill` is only patched and commits without a push on the document's own branch; with `merge`, a PR with an amendment waits for the owner; the `questionable` rows of 2026-11-12 are read: [ROADMAP](ROADMAP.md) step 6, [decision log](decisions.md).
+- Step 6: `review-chunk` and `execute-plan` are redone as `write-plan` was (#47), `grill` is only patched and commits without a push on the document's own branch; with `merge`, a PR with an amendment waits for the owner; the `questionable` rows of 2026-11-12 are read, and those of 2026-11-22 and 2026-11-24: the two on amendments by the owner (what the plan merely leaves out is a deviation, no stop), the other ten by the agent on the owner's instruction: [ROADMAP](ROADMAP.md) step 6, [decision log](decisions.md).
 - Core: a `Format` edits text to text; adapters return `Entry` lists and register in `src/adapters/index.ts`; a broken state file stops the whole run: [decision log](decisions.md).
 - Claude Code rules are `Bash(<prefix> *)`; `attribution` is `false`; `jsonc` removal keeps neighbouring comments; the bundler prefers `module` over `main`: [decision log](decisions.md).
 - Codex: `developer_instructions` spliced by recorded exact text, `prefix_rule` decisions `allow`/`prompt`/`forbidden`: [decision log](decisions.md).
@@ -43,11 +43,9 @@ The owner reads the `agent (questionable)` rows of 2026-11-22 and 2026-11-24, th
 
 ## Open questions
 
-- The owner reads `execute-plan`'s seven `agent (questionable)` rows of 2026-11-22, first: nothing starts without an `origin` that `gh` reaches; an amendment only when the chunk can't be done as the plan says.
 - `execute-plan`, untested paths: parallel chunks, a red gate on `main` after a merge, three review rounds without a `pass`, a harness without subagents. Its trial ran against a local stand-in for GitHub, not the real one.
 - `bootstrap --owner ""` writes an empty owner that `config.json`'s reader rejects, so `doctor` and `bootstrap` exit 2 until the file is edited by hand; `--owner " me "` is appended again on every run. Found by `review-chunk` on #36, reproduced (#43); outside plan 003.
-- The owner reads `review-chunk`'s five `agent (questionable)` rows of 2026-11-24. Its trial ran once per case against a local stand-in for GitHub; the old skill also reviewed the pushed head when its checkout was behind, so that fix rests on the rule, not on an observed failure.
-- The owner confirms the 2026-11-12 decision row on `opencode serve` without `--standalone`: the agent wrote it under the owner's name, from plan 003 and the owner's prompt for C01 (#42's review comment).
+- `review-chunk`'s trial ran once per case against a local stand-in for GitHub; the old skill also reviewed the pushed head when its checkout was behind, so that fix rests on the rule, not on an observed failure.
 - The fake-home block in `AGENTS.md` uses the fixed port 4797 and prints nothing when OpenCode's skills don't load within 30 s; fine while chunks run serially.
 - Claude Code web check not recorded: the README snippet as an environment's setup script should list `/agentfiles:grill` and `rules/agentfiles.md` in `/context`. If not, record the session's `whoami` and `$HOME` and add the gap to ADR-001's consequences.
 - Codex cloud is unverified until run.
