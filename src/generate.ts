@@ -76,7 +76,7 @@ export function documentationVersions(root: string): [string, string][] {
     }
   }
   for (const file of readDocumentation(root))
-    versions.push([file.name, sha256(file.text)]);
+    versions.push([file.name, sha256(file.bytes)]);
   return versions;
 }
 

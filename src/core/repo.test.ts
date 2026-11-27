@@ -28,12 +28,13 @@ function repo(...remotes: string[]) {
   return {
     dir,
     git,
-    write: (path: string, text: string) => {
+    write: (path: string, text: string | Uint8Array) => {
       mkdirSync(dirname(at(path)), { recursive: true });
       writeFileSync(at(path), text);
     },
     read: (path: string) =>
       existsSync(at(path)) ? readFileSync(at(path), "utf8") : undefined,
+    bytes: (path: string) => readFileSync(at(path)),
   };
 }
 
@@ -50,8 +51,8 @@ function drift(cwd: string, over: Partial<RepoOptions> = {}) {
     env,
     root,
     documentation: [
-      { name: "README.md", text: "v2\n", source: "/s/README.md" },
-      { name: "sub/a.md", text: "a\n", source: "/s/sub/a.md" },
+      { name: "README.md", bytes: Buffer.from("v2\n"), source: "/s/README.md" },
+      { name: "sub/a.md", bytes: Buffer.from("a\n"), source: "/s/sub/a.md" },
     ],
     hashes: {
       "README.md": [hash("file", "v1\n"), hash("file", "v2\n")],
@@ -92,6 +93,26 @@ describe("repo drift", () => {
       { path: "docs/documentation/README.md", state: "in sync", fixed: false },
       { path: "docs/documentation/sub/a.md", state: "in sync", fixed: false },
     ]);
+  });
+
+  it("copies a file that isn't text byte for byte", () => {
+    const v1 = Buffer.from([0x89, 0x50, 0xff, 0x00, 0x01]);
+    const v2 = Buffer.from([0x89, 0x50, 0xff, 0x00, 0x02]);
+    const over = {
+      documentation: [{ name: "a.png", bytes: v2, source: "/s/a.png" }],
+      hashes: { "a.png": [hash("file", v1), hash("file", v2)] },
+    };
+    const r = repo(ssh);
+    r.write("a.png", v1);
+    expect(drift(r.dir, { ...over, fix: true })).toEqual([
+      { path: "docs/documentation/a.png", state: "outdated", fixed: true },
+    ]);
+    expect(r.bytes("a.png")).toEqual(v2);
+    expect(drift(r.dir, over)).toEqual([
+      { path: "docs/documentation/a.png", state: "in sync", fixed: false },
+    ]);
+    r.write("a.png", Buffer.from([0x89, 0x50, 0xff, 0x00, 0x03]));
+    expect(drift(r.dir, over).map((o) => o.state)).toEqual(["edited"]);
   });
 
   it("reports edited copies and --fix leaves them alone", () => {

@@ -1,3 +1,4 @@
+import { isUtf8 } from "node:buffer";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { z } from "zod";
@@ -32,9 +33,15 @@ export const documentationHashesPath = "config/documentation-hashes.json";
 export interface ShippedFile {
   /** Relative to its directory, `/`-separated. */
   name: string;
-  text: string;
+  /** Byte for byte: an asset need not be text. */
+  bytes: Buffer;
   /** Absolute. */
   source: string;
+}
+
+/** The file's text, or undefined when it isn't UTF-8 text. */
+export function shippedText(file: ShippedFile): string | undefined {
+  return isUtf8(file.bytes) ? file.bytes.toString("utf8") : undefined;
 }
 
 export interface ShippedConfig {
@@ -58,7 +65,7 @@ export function readDocumentation(root: string): ShippedFile[] {
       const source = join(entry.parentPath, entry.name);
       return {
         name: relative(dir, source).split(sep).join("/"),
-        text: readFileSync(source, "utf8"),
+        bytes: readFileSync(source),
         source,
       };
     })

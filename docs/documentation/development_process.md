@@ -2,6 +2,10 @@
 
 Work runs in three loops, usually in sequence; a small change takes the [fast path](#fast-path). A loop is defined by its scope, not by the document type: an ADR can come out of any loop. Every PR of every loop runs the same [PR cycle](#pr-cycle); its merged output informs the next loop.
 
+![The loops, the PR cycle each PR runs and the fast path](./assets/development_process.png)
+
+Dashed boxes have a part that isn't built or decided. Source: [development_process.mmd](./assets/development_process.mmd).
+
 | Loop      | Scope                                        | Artifacts                                                                  | PR                                    | Personas                            |
 | --------- | -------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------- | ----------------------------------- |
 | Strategy  | product or epic                              | `STRATEGY.md`, `ROADMAP.md`, ADRs                                          | dedicated docs PR                     | strategist, architect               |

@@ -10,6 +10,12 @@
   "adr_template.md": [
     "4510d97c80eaf580249a01915ccf933deb517e7e05331fc0d58d14dafc0d0230"
   ],
+  "assets/development_process.mmd": [
+    "b228ae11d3f95513477c550b22de3faf322ba1a5d67ef8c6338c1b7c86f4a1b9"
+  ],
+  "assets/development_process.png": [
+    "eebb063a991d974dd95abeb5119f7453e13cb90791f737b9660d3b9f35e08d85"
+  ],
   "decision_log_template.md": [
     "aa16b389146c51765f708e28f65a1d916c35a0599c496b79f65e6eb8f9a54a1d",
     "6b4c35ddc482c9ad82cc345b6e7c0e87361273015da8c581081f1eaee40451ee",
@@ -20,7 +26,8 @@
     "f7da4767855a48cf0b0da0089e66f6bf393bc0be660f532c558c26a5c840b576",
     "bef4babd8600b9dd274c05e0b4114ebb5487656cb5843cab649e5e9df0d4b9f2",
     "2f9da127903fee0d469beb35d03196803f459e93fcc7236ff7dc0a53568dbbcb",
-    "edf237cacec2ebde7c0162733d21ea96eb71cce51d36bac252d25efb7f3e9210"
+    "edf237cacec2ebde7c0162733d21ea96eb71cce51d36bac252d25efb7f3e9210",
+    "f2e04f73e3f21033266e11ea73b6cf95f5a8701ee6b5fa04ece32a396fa9ee0f"
   ],
   "handover_template.md": [
     "acc7943d74313d380155100aaa5de5f8ce1da554593824bbd0e39b6d005bb748"

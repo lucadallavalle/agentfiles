@@ -74,8 +74,14 @@ export function readText(path: string): string | undefined {
   return readFileSync(path, "utf8");
 }
 
+/** The file's bytes, or undefined when it doesn't exist. */
+export function readBytes(path: string): Buffer | undefined {
+  if (!existsSync(path)) return undefined;
+  return readFileSync(path);
+}
+
 /** Writes through a temp file in the same directory and a rename, keeping the mode. */
-export function writeAtomic(path: string, text: string): void {
+export function writeAtomic(path: string, text: string | Uint8Array): void {
   const target = real(path);
   mkdirSync(dirname(target), { recursive: true });
   const mode = existsSync(target) ? statSync(target).mode & 0o7777 : 0o644;

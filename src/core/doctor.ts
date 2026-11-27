@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { readConfig, type ShippedConfig } from "./config.js";
+import { readConfig, shippedText, type ShippedConfig } from "./config.js";
 import {
   onPath,
   paths,
@@ -165,13 +165,20 @@ export function doctor(options: DoctorOptions): DoctorResult {
           value: config.instructions,
           source: config.instructionsSource,
         },
-        ...config.documentation.map((file): Entry => ({
-          kind: "file",
-          harness: self,
-          path: join(base.config, self, "documentation", file.name),
-          value: file.text,
-          source: file.source,
-        })),
+        // Skills read the machine copy, so it holds only the text files.
+        ...config.documentation.flatMap((file): Entry[] => {
+          const value = shippedText(file);
+          if (value === undefined) return [];
+          return [
+            {
+              kind: "file",
+              harness: self,
+              path: join(base.config, self, "documentation", file.name),
+              value,
+              source: file.source,
+            },
+          ];
+        }),
       ],
     },
   ];

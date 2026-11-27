@@ -334,6 +334,16 @@ describe("doctor", () => {
     expect(h.read(".config/agentfiles/documentation/README.md")).toBe("mine\n");
   });
 
+  it("keeps a file that isn't text out of the machine copy", () => {
+    const h = fakeHome();
+    const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0xff, 0x00]);
+    writeFileSync(join(h.root, "docs", "documentation", "a.png"), png);
+    expect(h.run(["doctor", "--fix"]).out).not.toContain("a.png");
+    expect(existsSync(h.at(".config/agentfiles/documentation/a.png"))).toBe(
+      false,
+    );
+  });
+
   it("names the instructions copy by absolute path outside HOME", () => {
     const h = fakeHome();
     const outside = mkdtempSync(join(tmpdir(), "agentfiles-xdg-"));
