@@ -149,7 +149,7 @@ Use Given/When/Then format consistently:
 
 ## Amendment Format
 
-PRDs are **immutable after approval** (see [Documentation Update Policies](./README.md#documentation-update-policies)). When requirements change, append an **Amendments** section — do not modify the original content.
+PRDs are **immutable after merge** (see [Documentation Update Policies](./README.md#documentation-update-policies)). When requirements change, append an **Amendments** section — do not modify the original content.
 
 ```markdown
 ---
