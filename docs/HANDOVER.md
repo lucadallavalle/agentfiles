@@ -17,7 +17,7 @@ None.
 
 ## Next action
 
-The owner adds ROADMAP's next step; `node bin/agentfiles.js doctor --fix` and a new session load the merged skills. The Claude Code web check is still owed (Open questions).
+ROADMAP step 7, PR cycle in the skills: watch a few PRs by hand, settle its Needs (e.g. in a `grill` session), then `write-plan`. `node bin/agentfiles.js doctor --fix` and a new session load the merged skills. The Claude Code web check is still owed (Open questions).
 
 ## Decisions not to reopen
 
