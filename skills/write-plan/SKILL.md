@@ -5,7 +5,7 @@ description: Write the implementation plan for a feature or roadmap step from th
 
 # Write plan
 
-The feature loop's plan (development process: `docs/documentation/development_process.md`): how one feature or roadmap step gets built, in chunks agents execute unattended. It has two readers: the owner, who reads it once and approves it, and the implementers, who each get one chunk and can't ask what you meant. You write the plan and open its PR; you don't write code, and you don't settle what only the owner can.
+The feature loop's plan (development process: `docs/documentation/development_process.md`): how one feature or roadmap step gets built, in chunks agents execute unattended. It has two readers: the owner, who reads it at most once (its PR needs the owner only when `needs-human`), and the implementers, who each get one chunk and can't ask what you meant. You write the plan and open its PR; you don't write code, and you don't settle what only the owner can.
 
 The common documentation is the repo's `docs/documentation/`; when the repo has none, read the machine copy in `${XDG_CONFIG_HOME:-~/.config}/agentfiles/documentation/` instead. Every `docs/documentation/` path below means whichever of the two you read. With neither, stop and say so: the plan has no format to follow.
 
@@ -33,7 +33,7 @@ A plan is a committed file, and a foreign repo gets none the owner didn't ask fo
 
 Follow the template: its sizing guide picks the sections, its Execution Chunks rules shape the chunks. Leave out the template's bracketed markers and the sections that don't apply. Title: `# NNN: <title>`. Say what and why, with enough how to show the intent: no code, no file contents. Use the domain words of `AGENTS.md`, and be succinct.
 
-Every statement in a plan is a fact, a decision already made, a choice of yours or a question. Keep them apart, because the owner approves the plan on what it says is settled:
+Every statement in a plan is a fact, a decision already made, a choice of yours or a question. Keep them apart, because the plan is approved on what it says is settled:
 
 - **Facts** you look up in the code, the docs and the tools: file paths, existing patterns, what a dependency does. Never guess one, never leave one as a question.
 - **Decisions already made** by the request, the roadmap, the PRD, the ADRs or the decision log are Key Decisions (in a small plan, lines of the approach), with where each was made as its rationale.
@@ -59,4 +59,4 @@ Two sections are in every plan, a small one included, because the next skills wo
 
 Report the plan's path, its branch and where that is checked out (the checkout, now off the branch it was on, or the worktree's path), the PR, or that there is none, and the open questions.
 
-Next: `grill` on the PR, which settles the open questions and empties the section; the owner approves the plan by merging the PR, then `execute-plan <plan path>`. Without a remote: `grill` on the branch, which commits its edits there; the owner approves by merging the branch into the default branch.
+Next: `grill` on the PR, which settles the open questions and empties the section; the PR merges, with the owner's approval when it is `needs-human` or spiral-review hasn't classified it, then `execute-plan <plan path>`. Without a remote: `grill` on the branch, which commits its edits there; the owner approves by merging the branch into the default branch.

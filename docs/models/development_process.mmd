@@ -1,0 +1,119 @@
+---
+config:
+  layout: dagre
+  theme: base
+  fontFamily: "Helvetica, Arial, sans-serif"
+  themeVariables:
+    fontFamily: "Helvetica, Arial, sans-serif"
+    fontSize: 15px
+    lineColor: "#64748b"
+    textColor: "#0f172a"
+    clusterBkg: "#f8fafc"
+    clusterBorder: "#cbd5e1"
+    edgeLabelBackground: "#ffffff"
+  flowchart:
+    curve: basis
+    nodeSpacing: 36
+    rankSpacing: 56
+    wrappingWidth: 420
+    padding: 14
+  themeCSS: ".cluster-label { font-weight: 600; } .cluster-label small { font-weight: 400; } .edgeLabel { font-size: 13px; color: #475569; }"
+---
+%% Proposed model of docs/documentation/development_process.md: every PR of every loop runs the same cycle.
+%% Render: pnpm dlx @mermaid-js/mermaid-cli@11 -i docs/models/development_process.mmd -o docs/models/development_process.png -b white -s 2
+flowchart TB
+    subgraph S["Strategy loop · product or epic<br/><small>personas: strategist, architect</small>"]
+        direction LR
+        SW("<b>Owner and session write</b><br/>STRATEGY.md, ROADMAP.md, ADRs<br/>grill")
+        SL("<b>Local review</b><br/>spiral-review, docs mode")
+        SC("<b>Docs PR in CI</b><br/>gate · spiral-review, more TBD")
+        SB("<b>The same session watches its PR</b><br/>fixes, pushes")
+        SM("<b>Owner reviews, merges</b><br/>every strategy PR")
+        SW --> SL
+        SL -- findings --> SW
+        SL -- opens PR --> SC
+        SC -- "red check, finding, comment" --> SB
+        SB -- push --> SC
+        SC -- "green, digest" --> SM
+    end
+
+    subgraph P["Feature loop · PRD, when product behaviour changes<br/><small>persona: product manager</small>"]
+        direction LR
+        PW("<b>Owner and session write</b><br/>the PRD<br/>grill")
+        PL("<b>Local review</b><br/>spiral-review, docs mode")
+        PC("<b>Docs PR in CI</b><br/>gate · spiral-review, more TBD")
+        PB("<b>The same session watches its PR</b><br/>fixes, pushes")
+        PM("<b>Owner approves by merging</b><br/>every PRD")
+        PW --> PL
+        PL -- findings --> PW
+        PL -- opens PR --> PC
+        PC -- "red check, finding, comment" --> PB
+        PB -- push --> PC
+        PC -- "green, digest" --> PM
+    end
+
+    subgraph L["Feature loop · plan with chunks<br/><small>persona: planner</small>"]
+        direction LR
+        LW("<b>Session writes the plan</b><br/>write-plan, then grill<br/>Open questions emptied")
+        LL("<b>Local review</b><br/>spiral-review, docs mode")
+        LC("<b>Docs PR in CI</b><br/>gate · spiral-review, more TBD")
+        LB("<b>The same session watches its PR</b><br/>fixes, pushes")
+        LM("<b>Owner approves by merging</b>")
+        LA("<b>Merged without the owner</b><br/>session,<br/>or spiral-review merge policy")
+        LW --> LL
+        LL -- findings --> LW
+        LL -- opens PR --> LC
+        LC -- "red check, finding, comment" --> LB
+        LB -- push --> LC
+        LC -- "green, needs-human" --> LM
+        LC -- "green, not needs-human" --> LA
+    end
+
+    subgraph E["Execution loop · one chunk, unattended (execute-plan)<br/><small>personas: orchestrator, implementer, reviewer</small>"]
+        direction LR
+        EW("<b>Orchestrator session</b><br/>its implementer does the chunk<br/>in its own worktree")
+        EL("<b>Local review, at most 3 rounds</b><br/>review-chunk: plan, Accept, gate<br/>code: spiral-review")
+        EC("<b>Code PR in CI</b><br/>gate · spiral-review, more TBD")
+        EB("<b>The same orchestrator watches its PR</b><br/>its implementer fixes, pushes")
+        EM("<b>Owner approves, merges</b>")
+        EA("<b>Merged without the owner</b><br/>orchestrator with merge,<br/>or spiral-review merge policy")
+        EW --> EL
+        EL -- findings --> EW
+        EL -- opens PR --> EC
+        EC -- "red check, finding, comment" --> EB
+        EB -- push --> EC
+        EC -- "green, needs-human" --> EM
+        EC -- "green, not needs-human" --> EA
+    end
+
+    S == "roadmap step" ==> P
+    P == "merged PRD" ==> L
+    L == "merged plan, one cycle per chunk" ==> E
+    FB(["<b>Feedback to an earlier loop</b><br/>a plan or PRD amendment, or a superseding ADR,<br/>in the chunk's PR, then needs-human"])
+    %% A note, not edges back to S and L: mermaid then lays the loops out of order.
+    E -. "what a chunk learns" .-> FB
+
+    subgraph K["Legend"]
+        direction LR
+        K1("one session writes, opens the PR and watches it")
+        K2("a part not built or not decided")
+        K3("<b>spiral-review decides the depth of every review</b><br/>loop of the PR, risk tier, lenses, round cap")
+        K5("<b>The owner approves every strategy PR and PRD,<br/>a plan or code PR only when needs-human</b><br/>spiral-review's risk classifier: high-risk,<br/>unresolved findings, or a change to an earlier loop")
+        K4("<b>A persona names who the session acts as</b><br/>skills and artifacts set its behaviour")
+        K1 ~~~ K2 ~~~ K3 ~~~ K5 ~~~ K4
+    end
+    FB ~~~ K
+
+    classDef write fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+    classDef review fill:#fef3c7,stroke:#d97706,color:#78350f
+    classDef ci fill:#ede9fe,stroke:#7c3aed,color:#4c1d95
+    classDef merge fill:#f1f5f9,stroke:#334155,color:#0f172a
+    classDef note fill:#ffffff,stroke:#94a3b8,color:#334155
+    classDef open stroke-dasharray: 6 4
+    class SW,PW,LW,EW,SB,PB,LB,EB,K1 write
+    class SL,PL,LL,EL review
+    class SC,PC,LC,EC ci
+    class SM,PM,LM,EM,LA,EA merge
+    class FB,K2,K3,K4,K5 note
+    class K2 open
+    class SL,PL,LL,EL,SC,PC,LC,EC,SB,PB,LB,EB,LA,EA open

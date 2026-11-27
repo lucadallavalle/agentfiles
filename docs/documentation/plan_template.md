@@ -165,13 +165,13 @@ Gate: `[gate command from AGENTS.md]`
 - An `Accept:` command fails before the chunk and passes after it, where the agent works: it is how the agent knows it is done, and a command that already passes proves nothing. When nothing there can prove the outcome, an earlier chunk builds the means (a test runner, a fixture, a fake). What only the owner can check goes in an `Owner check:` line saying what to look at; the agent doesn't merge that chunk.
 - A chunk is done in one PR. A chunk that needs others first has a `Depends:` line listing them; without it, it can start at once.
 - Chunks without a dependency path between them must touch disjoint files, shared config, schema and setup included; otherwise add a dependency.
-- Checking a box is progress tracking, not a change to the plan. Adding, removing or rewording a chunk after approval is an amendment.
+- Checking a box is progress tracking, not a change to the plan. Adding, removing or rewording a chunk after merge is an amendment.
 
 ---
 
 ## Amendment Format
 
-Implementation plans are **immutable after approval** (see [Documentation Update Policies](./README.md#documentation-update-policies)), except for checking off Execution chunks. When implementation deviates from the plan, append an **Amendments** section — do not modify the original content.
+Implementation plans are **immutable after merge** (see [Documentation Update Policies](./README.md#documentation-update-policies)), except for checking off Execution chunks. When implementation deviates from the plan, append an **Amendments** section — do not modify the original content.
 
 ```markdown
 ---

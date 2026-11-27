@@ -35,7 +35,7 @@ Different documentation types have different update strategies. The key principl
 | Product Strategy and Goals             | **Living**                                                                 | Define product strategy and goals               |
 | Product Roadmap                        | **Living**                                                                 | Define product tactical-level macro steps       |
 | Product Requirement Definitions (PRDs) | **Immutable** after merge amend separately if needed                       | Define product requirements and features        |
-| Implementation Plans                   | **Immutable** after approval; amend separately if needed                   | Preserves estimation basis and decision history |
+| Implementation Plans                   | **Immutable** after merge; amend separately if needed                      | Preserves estimation basis and decision history |
 | ADRs                                   | **Immutable**; supersede with new ADRs                                     | Creates auditable decision trail                |
 | README / Usage docs                    | **Living**; update with code                                               | Must reflect current behavior                   |
 | API docs                               | **Living**; ideally auto-generated                                         | Must match actual API surface                   |
@@ -52,7 +52,7 @@ Different documentation types have different update strategies. The key principl
 
 ### Handling Changes to Immutable Documents
 
-If requirements change after a plan is approved:
+If requirements change after a plan is merged:
 
 1. **Do not modify** the original document
 2. Add a **comment/amendment section** at the end noting the deviation
