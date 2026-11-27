@@ -69,14 +69,14 @@ flowchart TB
         LC -- "green, not needs-human" --> LA
     end
 
-    subgraph E["Execution loop · one chunk, unattended (execute-plan)<br/><small>personas: orchestrator, implementer, reviewer</small>"]
+    subgraph E["Execution loop · one chunk of a plan (execute-plan), or one fast-path change<br/><small>personas: orchestrator, implementer, reviewer</small>"]
         direction LR
-        EW("<b>Orchestrator session</b><br/>its implementer does the chunk<br/>in its own worktree")
+        EW("<b>One session</b><br/>orchestrator: its implementer does the chunk<br/>fast path: it makes the change itself")
         EL("<b>Local review, at most 3 rounds</b><br/>review-chunk: plan, Accept, gate<br/>code: spiral-review")
         EC("<b>Code PR in CI</b><br/>gate · spiral-review, more TBD")
-        EB("<b>The same orchestrator watches its PR</b><br/>its implementer fixes, pushes")
+        EB("<b>The same session watches its PR</b><br/>fixes, pushes<br/>orchestrator: through its implementer")
         EM("<b>Owner approves, merges</b>")
-        EA("<b>Merged without the owner</b><br/>orchestrator with merge,<br/>or spiral-review merge policy")
+        EA("<b>Merged without the owner</b><br/>session (orchestrator: with merge),<br/>or spiral-review merge policy")
         EW --> EL
         EL -- findings --> EW
         EL -- opens PR --> EC
@@ -89,6 +89,8 @@ flowchart TB
     S == "roadmap step" ==> P
     P == "merged PRD" ==> L
     L == "merged plan, one cycle per chunk" ==> E
+    FAST(["<b>Fast path</b><br/>a small change: execution paths only,<br/>no new behaviour or architecture decision,<br/>one PR and one session"])
+    FAST == "no PRD, no plan" ====> E
     FB(["<b>Feedback to an earlier loop</b><br/>a plan or PRD amendment, or a superseding ADR,<br/>in the chunk's PR, then needs-human"])
     %% A note, not edges back to S and L: mermaid then lays the loops out of order.
     E -. "what a chunk learns" .-> FB
@@ -114,6 +116,6 @@ flowchart TB
     class SL,PL,LL,EL review
     class SC,PC,LC,EC ci
     class SM,PM,LM,EM,LA,EA merge
-    class FB,K2,K3,K4,K5 note
+    class FB,FAST,K2,K3,K4,K5 note
     class K2 open
     class SL,PL,LL,EL,SC,PC,LC,EC,SB,PB,LB,EB,LA,EA open

@@ -1,12 +1,12 @@
 # Development Process
 
-Work runs in three loops, usually in sequence. A loop is defined by its scope, not by the document type: an ADR can come out of any loop. Every PR of every loop runs the same [PR cycle](#pr-cycle); its merged output informs the next loop.
+Work runs in three loops, usually in sequence; a small change takes the [fast path](#fast-path). A loop is defined by its scope, not by the document type: an ADR can come out of any loop. Every PR of every loop runs the same [PR cycle](#pr-cycle); its merged output informs the next loop.
 
-| Loop      | Scope               | Artifacts                                                                  | PR                                    | Personas                            |
-| --------- | ------------------- | -------------------------------------------------------------------------- | ------------------------------------- | ----------------------------------- |
-| Strategy  | product or epic     | `STRATEGY.md`, `ROADMAP.md`, ADRs                                          | dedicated docs PR                     | strategist, architect               |
-| Feature   | one feature         | PRD (when product behaviour changes), then implementation plan with chunks | a dedicated docs PR each              | product manager, planner            |
-| Execution | one chunk of a plan | code, tests, decision log rows (`Made By: agent`)                          | code PR against the gate and the plan | orchestrator, implementer, reviewer |
+| Loop      | Scope                                        | Artifacts                                                                  | PR                                    | Personas                            |
+| --------- | -------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------- | ----------------------------------- |
+| Strategy  | product or epic                              | `STRATEGY.md`, `ROADMAP.md`, ADRs                                          | dedicated docs PR                     | strategist, architect               |
+| Feature   | one feature                                  | PRD (when product behaviour changes), then implementation plan with chunks | a dedicated docs PR each              | product manager, planner            |
+| Execution | one chunk of a plan, or one fast-path change | code, tests, decision log rows (`Made By: agent`)                          | code PR against the gate and the plan | orchestrator, implementer, reviewer |
 
 A persona names who the session acts as; skills and artifacts set its behaviour.
 
@@ -15,8 +15,18 @@ Document formats and update policies: [README](./README.md). Where each decision
 ## Loops
 
 - **Strategy:** sets direction. Product documents (strategy, roadmap) and architecture (ADRs), written by the owner with the session, e.g. in a `grill` session. The owner reviews and merges every PR.
-- **Feature:** specifies one roadmap step. A PRD for what the feature does, then an implementation plan ([template](./plan_template.md)) for how. The owner approves a PRD by merging it. The plan breaks the work into execution chunks, one PR each, and states which depend on each other; the others can run in parallel. Execution starts only from a merged plan.
+- **Feature:** specifies one roadmap step. A PRD for what the feature does, then an implementation plan ([template](./plan_template.md)) for how. The owner approves a PRD by merging it. The plan breaks the work into execution chunks, one PR each, and states which depend on each other; the others can run in parallel. Execution starts only from a merged plan or on the fast path.
 - **Execution:** agents implement the plan's chunks unattended. Done means the gate passes with real output ([Gate and Definition of Done](./README.md#gate-and-definition-of-done)). An agent asks the owner only by the existing rules (e.g. a test or the gate looks wrong). The owner reads `Made By: agent` decision log rows after merge.
+
+## Fast path
+
+A change that needs no decision from an earlier loop skips the strategy and feature loops: one execution PR without a plan, through the same PR cycle and merge rule. All three must hold:
+
+- it touches only execution paths ([Loop of a path](#loop-of-a-path));
+- it changes no product behaviour except to fix a defect, and takes no architecture-level decision ([Which level a decision belongs to](./README.md#which-level-a-decision-belongs-to));
+- it fits one PR and one session.
+
+The PR says it took the fast path and states what changes and why, in place of a plan, so its review checks the three conditions; a fix comes with a test that fails without it. Work that turns out to break one of them stops and moves to the loop that decides it.
 
 ## PR cycle
 
