@@ -71,8 +71,13 @@ export function canonical(value: unknown): string {
 }
 
 export function hash(kind: Kind, value: unknown): string {
-  const text = kind === "file" ? String(value) : canonical(value);
-  return createHash("sha256").update(text).digest("hex");
+  const data =
+    kind !== "file"
+      ? canonical(value)
+      : value instanceof Uint8Array
+        ? value
+        : String(value);
+  return createHash("sha256").update(data).digest("hex");
 }
 
 interface Identity {

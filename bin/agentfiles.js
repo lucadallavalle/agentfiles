@@ -11,6 +11,7 @@ import childProcess, { spawnSync } from "node:child_process";
 import process$1 from "node:process";
 import { stripVTControlCharacters } from "node:util";
 import { createHash } from "node:crypto";
+import { isUtf8 } from "node:buffer";
 // node_modules/.pnpm/commander@15.0.0/node_modules/commander/lib/error.js
 /**
 * CommanderError class
@@ -3001,6 +3002,11 @@ function real(path) {
 function readText(path) {
 	if (!existsSync(path)) return void 0;
 	return readFileSync(path, "utf8");
+}
+/** The file's bytes, or undefined when it doesn't exist. */
+function readBytes(path) {
+	if (!existsSync(path)) return void 0;
+	return readFileSync(path);
 }
 /** Writes through a temp file in the same directory and a rename, keeping the mode. */
 function writeAtomic(path, text) {
@@ -11303,8 +11309,8 @@ function canonical(value) {
 	return JSON.stringify(value, (_, v) => v && typeof v === "object" && !Array.isArray(v) ? Object.fromEntries(Object.entries(v).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)) : v);
 }
 function hash(kind, value) {
-	const text = kind === "file" ? String(value) : canonical(value);
-	return createHash("sha256").update(text).digest("hex");
+	const data = kind !== "file" ? canonical(value) : value instanceof Uint8Array ? value : String(value);
+	return createHash("sha256").update(data).digest("hex");
 }
 /** Unique per entry, starting with its absolute path; also its label. */
 function entryId(entry) {
@@ -11734,6 +11740,10 @@ const Keys = record$1(string().min(1), json$1());
 const DocumentationHashes = record$1(string().min(1), array(string().regex(/^[0-9a-f]{64}$/)));
 /** Relative to the repo root; `pnpm generate` appends to it. */
 const documentationHashesPath = "config/documentation-hashes.json";
+/** The file's text, or undefined when it isn't UTF-8 text. */
+function shippedText(file) {
+	return isUtf8(file.bytes) ? file.bytes.toString("utf8") : void 0;
+}
 /** The common documentation: every file under `docs/documentation/`, sorted by name. */
 function readDocumentation(root) {
 	const dir = join(root, "docs", "documentation");
@@ -11744,7 +11754,7 @@ function readDocumentation(root) {
 		const source = join(entry.parentPath, entry.name);
 		return {
 			name: relative(dir, source).split(sep).join("/"),
-			text: readFileSync(source, "utf8"),
+			bytes: readFileSync(source),
 			source
 		};
 	}).sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
@@ -11849,7 +11859,7 @@ function ownName(root) {
 */
 function classify(shipped, known, current) {
 	if (current === void 0) return shipped === void 0 ? void 0 : "missing";
-	if (current === shipped) return "in sync";
+	if (shipped?.equals(current)) return "in sync";
 	const old = known.has(hash("file", current));
 	if (shipped === void 0) return old ? "unshipped" : "edited";
 	return old ? "outdated" : "edited";
@@ -11872,18 +11882,18 @@ function repoDrift(options) {
 	if (!isOwned(remotes, options.owners)) return [];
 	const own = ownName(options.root);
 	if (own && remotes.some((url) => repoName(url) === own)) return [];
-	const shipped = new Map(options.documentation.map((f) => [f.name, f.text]));
+	const shipped = new Map(options.documentation.map((f) => [f.name, f.bytes]));
 	const names = [.../* @__PURE__ */ new Set([...shipped.keys(), ...Object.keys(options.hashes)])].sort();
 	const outcomes = [];
 	for (const name of names) {
 		const path = `${documentationDir}/${name}`;
 		const file = join(top, ...path.split("/"));
-		const text = shipped.get(name);
-		const state = classify(text, new Set(options.hashes[name]), readText(file));
+		const bytes = shipped.get(name);
+		const state = classify(bytes, new Set(options.hashes[name]), readBytes(file));
 		if (!state) continue;
 		let fixed = false;
-		if (options.fix && text !== void 0 && (state === "missing" || state === "outdated")) {
-			writeAtomic(file, text);
+		if (options.fix && bytes !== void 0 && (state === "missing" || state === "outdated")) {
+			writeAtomic(file, bytes);
 			fixed = true;
 		} else if (options.fix && state === "unshipped") {
 			remove$1(file);
@@ -12212,13 +12222,17 @@ function doctor(options) {
 			path: instructionsPath,
 			value: config.instructions,
 			source: config.instructionsSource
-		}, ...config.documentation.map((file) => ({
-			kind: "file",
-			harness: self$1,
-			path: join(base.config, self$1, "documentation", file.name),
-			value: file.text,
-			source: file.source
-		}))]
+		}, ...config.documentation.flatMap((file) => {
+			const value = shippedText(file);
+			if (value === void 0) return [];
+			return [{
+				kind: "file",
+				harness: self$1,
+				path: join(base.config, self$1, "documentation", file.name),
+				value,
+				source: file.source
+			}];
+		})]
 	}];
 	const formats = /* @__PURE__ */ new Map();
 	const withPlugin = [];

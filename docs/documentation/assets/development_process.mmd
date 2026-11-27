@@ -19,8 +19,8 @@ config:
     padding: 14
   themeCSS: ".cluster-label { font-weight: 600; } .cluster-label small { font-weight: 400; } .edgeLabel { font-size: 13px; color: #475569; }"
 ---
-%% Proposed model of docs/documentation/development_process.md: every PR of every loop runs the same cycle.
-%% Render: pnpm dlx @mermaid-js/mermaid-cli@11 -i docs/models/development_process.mmd -o docs/models/development_process.png -b white -s 2
+%% The development process (../development_process.md): every PR of every loop runs the same cycle.
+%% Render: pnpm dlx @mermaid-js/mermaid-cli@11 -i docs/documentation/assets/development_process.mmd -o docs/documentation/assets/development_process.png -b white -s 2
 flowchart TB
     subgraph S["Strategy loop · product or epic<br/><small>personas: strategist, architect</small>"]
         direction LR

@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { ShippedFile } from "./config.js";
 import { git } from "./exec.js";
-import { readText, remove, writeAtomic, type Env } from "./files.js";
+import { readBytes, remove, writeAtomic, type Env } from "./files.js";
 import { isOwned, repoName } from "./owners.js";
 import { hash, type State } from "./tracked.js";
 
@@ -47,13 +47,13 @@ function ownName(root: string): string | undefined {
  * outdated (or unshipped when no longer shipped), any other edited.
  */
 function classify(
-  shipped: string | undefined,
+  shipped: Buffer | undefined,
   known: ReadonlySet<string>,
-  current: string | undefined,
+  current: Buffer | undefined,
 ): State | undefined {
   if (current === undefined)
     return shipped === undefined ? undefined : "missing";
-  if (current === shipped) return "in sync";
+  if (shipped?.equals(current)) return "in sync";
   const old = known.has(hash("file", current));
   if (shipped === undefined) return old ? "unshipped" : "edited";
   return old ? "outdated" : "edited";
@@ -79,7 +79,7 @@ export function repoDrift(options: RepoOptions): RepoOutcome[] {
   const own = ownName(options.root);
   if (own && remotes.some((url) => repoName(url) === own)) return [];
 
-  const shipped = new Map(options.documentation.map((f) => [f.name, f.text]));
+  const shipped = new Map(options.documentation.map((f) => [f.name, f.bytes]));
   const names = [
     ...new Set([...shipped.keys(), ...Object.keys(options.hashes)]),
   ].sort();
@@ -87,16 +87,20 @@ export function repoDrift(options: RepoOptions): RepoOutcome[] {
   for (const name of names) {
     const path = `${documentationDir}/${name}`;
     const file = join(top, ...path.split("/"));
-    const text = shipped.get(name);
-    const state = classify(text, new Set(options.hashes[name]), readText(file));
+    const bytes = shipped.get(name);
+    const state = classify(
+      bytes,
+      new Set(options.hashes[name]),
+      readBytes(file),
+    );
     if (!state) continue;
     let fixed = false;
     if (
       options.fix &&
-      text !== undefined &&
+      bytes !== undefined &&
       (state === "missing" || state === "outdated")
     ) {
-      writeAtomic(file, text);
+      writeAtomic(file, bytes);
       fixed = true;
     } else if (options.fix && state === "unshipped") {
       remove(file);

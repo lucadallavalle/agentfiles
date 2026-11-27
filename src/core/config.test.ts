@@ -37,15 +37,23 @@ describe("config/", () => {
     expect(readConfig(root, []).documentation).toEqual([
       {
         name: "b.md",
-        text: "b\n",
+        bytes: Buffer.from("b\n"),
         source: join(root, "docs", "documentation", "b.md"),
       },
       {
         name: "sub/a.md",
-        text: "a\n",
+        bytes: Buffer.from("a\n"),
         source: join(root, "docs", "documentation", "sub", "a.md"),
       },
     ]);
+  });
+
+  it("reads a file that isn't text byte for byte", () => {
+    const root = copy();
+    const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0xff, 0x00, 0xc3]);
+    writeFileSync(join(root, "docs", "documentation", "a.png"), png);
+    const [file] = readConfig(root, []).documentation;
+    expect([file?.name, file?.bytes]).toEqual(["a.png", png]);
   });
 
   it("requires the common documentation", () => {

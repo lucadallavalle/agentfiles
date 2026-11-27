@@ -1,7 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { mkdtempSync, readdirSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runInNewContext } from "node:vm";
 import { describe, expect, it } from "vitest";
@@ -50,7 +50,14 @@ describe(bundlePath, () => {
       });
     const skipped =
       "claude-code not installed, skipped\ncodex not installed, skipped\nopencode not installed, skipped\n";
-    const docs = readdirSync(join(root, "docs/documentation")).sort();
+    // The machine copy holds only the text files.
+    const dir = join(root, "docs/documentation");
+    const docs = readdirSync(dir, { recursive: true, withFileTypes: true })
+      .filter((entry) => entry.isFile() && !entry.name.endsWith(".png"))
+      .map((entry) =>
+        relative(dir, join(entry.parentPath, entry.name)).split(sep).join("/"),
+      )
+      .sort();
     const total = String(1 + docs.length);
     expect(doctor()).toMatchObject({
       status: 1,
