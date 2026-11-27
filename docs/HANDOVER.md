@@ -43,6 +43,8 @@ The owner adds ROADMAP's next step; `node bin/agentfiles.js doctor --fix` and a 
 
 ## Open questions
 
+- `execute-plan`: an `Accept:` that passes before the work is a wrong plan (2026-11-22 and 2026-11-24 rows), but the skill names an amendment only for a chunk that can't be done as the plan says; whether it gets one, and stops the run, is unsaid.
+- `execute-plan`: a run that starts again on a pushed branch without a PR has no earlier report, so its 3 review rounds count from one.
 - `execute-plan`, untested paths: parallel chunks, a red gate on `main` after a merge, three review rounds without a `pass`, a harness without subagents. Its trial ran against a local stand-in for GitHub, not the real one.
 - `bootstrap --owner ""` writes an empty owner that `config.json`'s reader rejects, so `doctor` and `bootstrap` exit 2 until the file is edited by hand; `--owner " me "` is appended again on every run. Found by `review-chunk` on #36, reproduced (#43); outside plan 003.
 - `review-chunk`'s trial ran once per case against a local stand-in for GitHub; the old skill also reviewed the pushed head when its checkout was behind, so that fix rests on the rule, not on an observed failure.
